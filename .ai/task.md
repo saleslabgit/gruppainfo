@@ -1,173 +1,304 @@
-# Task: TASK-2026-08-19-05
+# Task: TASK-2026-08-19-06
 
 Status: planned
-Created from: d57e0c57102e36dd6e694d5615336d5872b08861
+Created from: a5daaa772176f146d4157e6baa8f37afbccb222b
 
 ## Title
 
-Establish design system governance for all future UI work
+Implement the Stage 3 design-system foundation and baseline UI kit
 
 ## Goal
 
-Make the approved Gruppa Info design system and visual UI Kit mandatory sources for every future interface task, without starting Stage 3 implementation yet.
+Implement the reusable visual foundation that all subsequent Gruppa Info interfaces will use, while avoiding unnecessary up-front implementation of every component described in the full design specification.
 
-After this task, both ChatGPT planning/review and Codex implementation must have an explicit, durable repository rule that future UI must follow `DESIGN_SYSTEM.md` and the visual reference in `uikit/index.html`, must reuse the approved component system, and must not invent missing visual rules.
+Stage 3 must establish the real production-ready design tokens, local visual assets, shared Blade UI primitives, responsive application shell, and a browser-visible UI-kit page. Later stages may add specialized components only when they are first needed, but they must add them to the shared design system before using them on a product page.
+
+The implementation must match `DESIGN_SYSTEM.md` and the approved visual reference in `uikit/index.html`; Codex must not redesign, simplify, reinterpret, or "improve" the approved visual language.
 
 ## Facts
 
-- `main` at task creation is `d57e0c57102e36dd6e694d5615336d5872b08861`.
+- `main` at task creation is `a5daaa772176f146d4157e6baa8f37afbccb222b`.
 - Stage 1 and Stage 2 are completed and accepted.
-- Stage 3 UI Kit / Design System implementation has not started.
-- The repository now contains `DESIGN_SYSTEM.md` with implementation-ready design tokens, component rules, page composition rules, AI/developer rules, visual invariants, forbidden patterns, and unresolved design values.
-- `DESIGN_SYSTEM.md` explicitly states that it is the source of truth for numeric design values and design implementation rules.
-- The approved visual reference is stored in `uikit/index.html` with its supporting reference runtime in `uikit/support.js`.
-- `SPEC.md` already requires a reusable design system before mass page implementation and forbids page-specific duplicated styling.
-- `WORKFLOW.md` defines planning and acceptance behavior for ChatGPT.
-- `AGENTS.md` defines implementation behavior for Codex.
-- Project-wide technical constraints still apply to UI work, including Blade + Bootstrap + project CSS/Vanilla JS and the existing no-Node/no-Vite/no-runtime-CDN architecture. A design reference must not silently override unrelated technical, security, or delivery constraints.
+- `TASK-2026-08-19-05` established mandatory design-system governance in `WORKFLOW.md` and `AGENTS.md`.
+- `DESIGN_SYSTEM.md` is authoritative for explicit visual numeric values and design implementation rules.
+- `uikit/index.html` is the approved visual reference for intent not already resolved by `DESIGN_SYSTEM.md`.
+- `uikit/` is reference material only and must not become a Laravel runtime dependency.
+- The project uses Blade, local Bootstrap 5.3.8, project CSS, and Vanilla JS only where needed.
+- Node.js, npm, Vite, frontend build steps, runtime CDN dependencies, React, Vue, Inertia, Livewire, and Tailwind are prohibited.
+- Existing runtime assets are loaded directly from `public/`.
+- The application already has shared date/time and money formatters from Stage 1.
+- The current page is only a technical placeholder and is not an approved product interface.
+- The user has explicitly chosen an incremental design-system implementation strategy: implement the reusable foundation and components needed by the near-term stages now; add specialized components later when a real product screen first requires them.
 
 ## Assumptions
 
-- `DESIGN_SYSTEM.md` is authoritative for visual design, design tokens, component appearance/state rules, spacing, typography, responsive behavior, and page composition.
-- `uikit/index.html` is the approved visual reference and is used to resolve visual intent not already fixed by `DESIGN_SYSTEM.md`.
-- Where `DESIGN_SYSTEM.md` and `uikit/index.html` differ on numeric values or explicit implementation rules, `DESIGN_SYSTEM.md` wins, matching its own stated rule.
-- The `uikit/` files are reference artifacts only and must not become runtime dependencies of the Laravel application unless a future approved task explicitly changes that architecture.
-- Project-wide architecture, security, dependency, and asset-delivery constraints remain governed by `SPEC.md`, `WORKFLOW.md`, `AGENTS.md`, and current architecture documentation. If a design instruction conflicts with such a non-visual technical constraint, Codex must stop/report the conflict rather than silently choosing one.
+- Shared Blade UI components should live under a clear reusable namespace such as `resources/views/components/ui/`; use generic component names, never page-specific names such as `GroupCard` or `PaymentTable`.
+- The design-system stylesheet may reorganize the existing project CSS as needed, but runtime CSS remains directly served from `public/` with no compilation step.
+- Bootstrap may provide low-level layout/behavior where appropriate, but Bootstrap's default visual appearance is not the design system. Approved visual output must come from the project design tokens and component styles.
+- Montserrat and Lucide must be available locally at runtime. Vendoring pinned browser-ready assets with their licenses is preferred over introducing a package/build workflow.
+- The UI-kit route is a development/testing verification surface, not a production product page, and should not expose internal design documentation in production.
 
 ## Unknowns
 
-- `DESIGN_SYSTEM.md` currently mentions the source UI Kit by its former/generated name rather than the repository path `uikit/index.html`; references should be normalized so future agents cannot misunderstand the canonical file.
-- Some design values are intentionally listed as unresolved in `DESIGN_SYSTEM.md`; those gaps must remain unresolved until an explicit product/design decision is made.
+- The exact local Lucide distribution version and the exact local Montserrat font-file source/version are not currently fixed in the repository. Codex may select stable official distributable assets compatible with the no-build architecture, must pin/record what was selected, include the applicable license files, and must not use runtime CDN loading.
+- Some values/patterns are intentionally marked unresolved in `DESIGN_SYSTEM.md`. They remain unresolved and must not be invented in this task.
 
 ## Scope
 
-### 1. WORKFLOW.md — planning and acceptance rule
+### 1. Align the staged implementation plan
 
-Add a concise design-system governance section or equivalent rule that applies to every task affecting UI, visual presentation, layout, frontend components, or responsive behavior.
+Update the relevant Stage 3/design-system planning wording in `SPEC.md` and project documentation so it matches the user's approved incremental strategy without weakening the final design-system rules:
 
-It must establish that:
+- Stage 3 implements the foundation and baseline reusable components listed in this task;
+- specialized components from the broader design-system catalogue are implemented only when a subsequent product stage first needs them;
+- a product page may never introduce its own visual replacement for a missing shared component;
+- when a later screen needs a component not yet implemented, that component is first added to the shared UI system according to `DESIGN_SYSTEM.md`, then consumed by the screen;
+- unresolved design values still require an explicit user/design decision before implementation.
 
-- ChatGPT must inspect `DESIGN_SYSTEM.md` and the current `uikit/index.html` before planning a UI task;
-- UI task acceptance must verify conformance to both sources, not only functional behavior;
-- for visual/design questions, `DESIGN_SYSTEM.md` is authoritative for explicit numeric values and implementation rules;
-- `uikit/index.html` is the approved visual reference for visual intent not already resolved by `DESIGN_SYSTEM.md`;
-- if a required UI pattern/value is absent or explicitly unresolved, do not invent it; surface the gap for a user decision;
-- project-wide architecture/security/runtime constraints remain in force and cannot be silently overridden by a design reference.
+Keep the full component catalogue in `DESIGN_SYSTEM.md` as the target design language. Do not remove or redesign components merely because their implementation is deferred.
 
-Keep `WORKFLOW.md` a process document. Do not duplicate token tables or component specifications there.
+### 2. Design tokens and global foundations
 
-### 2. AGENTS.md — mandatory implementation behavior
+Implement the shared CSS foundation from `DESIGN_SYSTEM.md`, including the approved values needed by the baseline system:
 
-Add a dedicated UI / Design System section or equivalent mandatory rules for Codex.
+- color tokens;
+- typography tokens and responsive heading rules;
+- spacing scale;
+- control sizes;
+- radii;
+- borders and focus system;
+- shadows/elevation;
+- base page/surface/text styles;
+- responsive breakpoints and container/application-shell behavior required by the implemented components.
 
-For any interface/frontend task, Codex must:
+Use named CSS custom properties/tokens consistently. Do not scatter duplicated raw values across component styles when an approved token applies.
 
-- read `DESIGN_SYSTEM.md` before implementation;
-- inspect the relevant visual reference in `uikit/index.html`;
-- implement using shared reusable components/tokens instead of page-specific visual copies;
-- use only approved design tokens, component variants, spacing, typography, colors, radii, states, and page patterns;
-- not restyle or "improve" approved components based on personal preference;
-- not introduce a new visual variant or one-off design primitive without an explicit approved design-system change;
-- stop/report when the design system has no answer or contains an unresolved value needed by the task;
-- treat `uikit/` as reference material, not production runtime code/dependency;
-- continue to obey project-level stack, security, and asset-delivery constraints.
+The custom design-system styles must load after Bootstrap so they control the final appearance.
 
-Keep the detailed values in `DESIGN_SYSTEM.md`; `AGENTS.md` should enforce behavior, not duplicate the design specification.
+### 3. Local typography and icons
 
-### 3. DESIGN_SYSTEM.md — canonical repository references and boundary clarity
+Make the approved visual assets production-compatible with the project's no-CDN architecture:
 
-Make only minimal documentation corrections needed to make the governance unambiguous:
+- Montserrat is the only UI font; provide local runtime files for weights 400, 500, 600, and 700 and wire them through `@font-face` or the simplest equivalent direct-CSS mechanism;
+- Lucide is the only icon library; provide a pinned browser-ready local distribution suitable for direct loading without Node/npm/build tooling;
+- include the relevant font/icon license files in the vendored asset directories;
+- record the selected versions/source facts in development/architecture documentation;
+- do not load Google Fonts, unpkg, jsDelivr, or any other runtime CDN.
 
-- replace/clarify references to the source UI Kit so the canonical repository reference is `uikit/index.html`;
-- preserve the existing rule that `DESIGN_SYSTEM.md` wins over the visual reference for numeric values and explicit design implementation rules;
-- clarify, if necessary, that design-system authority is scoped to visual/design rules and does not silently override project-wide technical/security/runtime constraints;
-- do not redesign, retokenize, or change approved visual values in this task.
+Do not copy `uikit/support.js` into the application and do not make `uikit/index.html` a runtime dependency.
 
-If the existing Lucide "via CDN" wording conflicts with the project's no-runtime-CDN architecture, resolve the documentation conflict without changing the approved design intent: Lucide remains the only icon library, but the production asset-delivery mechanism must conform to project architecture. Do not add a new frontend dependency or implement asset delivery in this task.
+### 4. Baseline reusable Blade components
 
-### 4. Architecture/status documentation
+Implement a coherent baseline set of generic shared Blade components sufficient for Stages 4-7 and common application states. Follow the exact states, variants, dimensions, typography, spacing, focus behavior, responsive rules, and visual intent defined in `DESIGN_SYSTEM.md` and `uikit/index.html`.
 
-Update the smallest relevant documentation so future project orientation makes the rule visible:
+At minimum implement shared primitives for:
 
-- `docs/architecture.md`: document the frontend design-system boundary and canonical sources (`DESIGN_SYSTEM.md` + `uikit/index.html`), and state that future pages compose the shared Blade design-system components rather than local page-specific styling;
-- `docs/project-status.md`: record that the approved design specification/reference are present and govern the upcoming Stage 3, while Stage 3 implementation itself is still not started/completed.
+#### Actions
 
-Do not claim that Stage 3 components or product UI already exist.
+- Button with the approved baseline variants needed by the system (including primary, secondary, danger, and any other variants already defined by `DESIGN_SYSTEM.md` that naturally belong to the same button primitive);
+- Icon Button where required by baseline navigation/table/modal interactions.
 
-### 5. Report
+#### Forms
 
-Replace `.ai/report.md` with a factual report for this governance task.
+- Label / required indicator;
+- Text Input;
+- Textarea;
+- Select;
+- Checkbox;
+- Radio;
+- helper text / validation error presentation;
+- reusable form field composition/rhythm.
+
+Do not invent Small/Large form-control variants: the design specification explicitly leaves them unresolved.
+
+#### Feedback and data display
+
+- Alert;
+- Badge / semantic status badge primitive;
+- Card;
+- Empty State;
+- Loading presentation sufficient for normal page/component loading;
+- Error State sufficient for inline and failed-block/page states.
+
+#### Data/list administration foundation
+
+- Table styling/component structure;
+- Table toolbar primitives needed for search/filter/result-count/action composition;
+- Pagination;
+- Dropdown Menu.
+
+These must be generic building blocks, not psychologist/group/payment-specific implementations.
+
+#### Navigation and page structure
+
+- responsive application shell;
+- desktop sidebar/navigation;
+- mobile navigation replacement required by the approved responsive shell (implement the generic Drawer primitive if that is the design-system pattern needed to do this correctly);
+- page header;
+- basic header/topbar behavior only where required by the approved shell.
+
+#### Overlays / confirmation
+
+- Modal;
+- Confirmation pattern/dialog using the approved neutral/destructive action ordering and variants.
+
+#### Existing domain presentation helpers
+
+- reusable Blade presentation for date/time using the existing centralized formatter;
+- reusable Blade presentation for money using the existing centralized formatter;
+- do not duplicate timezone or money-formatting logic in Blade components.
+
+### 5. Explicitly deferred components
+
+Do **not** implement components only for catalogue completeness when they are not required by the baseline above.
+
+Unless they are genuinely required internally to satisfy the responsive shell or another baseline component, defer specialized components such as:
+
+- Stepper;
+- Choice Card;
+- Timeline;
+- Metric;
+- Progress;
+- specialized document/file item;
+- specialized upload/dropzone interaction;
+- Tabs/Breadcrumbs/Popover/Tooltip/Toast/Chips/Switch and other catalogue items that are not needed by the baseline acceptance surface.
+
+When a later stage first needs one of these, it must be implemented as a shared design-system component before product-page use.
+
+Do not use this deferred list as permission to invent a page-specific substitute.
+
+### 6. UI-kit verification page
+
+Create a Laravel/Blade UI-kit page that renders the implemented system from the actual production CSS/JS and Blade components, not copied markup/styles from `uikit/index.html`.
+
+The page must allow visual verification of the implemented baseline, including as applicable:
+
+- typography and core colors;
+- buttons and icon buttons;
+- form controls and labels;
+- normal, disabled, validation/error, and success/semantic states;
+- alerts and badges;
+- cards;
+- table + toolbar + pagination;
+- dropdown;
+- modal and confirmation behavior;
+- navigation/application shell;
+- empty/loading/error states;
+- date/time and money presentation;
+- keyboard focus behavior;
+- desktop and mobile responsive behavior.
+
+The UI-kit route must be available for local development/testing and must not become a normal public production route.
+
+Keep this page a verification surface. Do not rebuild the huge source reference document one-to-one and do not copy `uikit/index.html` into a Blade template.
+
+### 7. JavaScript behavior
+
+Use the minimum JavaScript required for the implemented interactive components.
+
+- Prefer existing local Bootstrap behavior where it satisfies interaction needs without changing the approved visual design.
+- Keep project-specific JS in the existing direct-runtime approach (`public/`, no build step).
+- Ensure keyboard interaction and focus behavior work for interactive baseline components.
+- Do not add a frontend framework or package manager.
+
+### 8. Documentation and report
+
+Update documentation to describe the actual implemented state:
+
+- `docs/architecture.md` — design-system implementation structure, component location, token/runtime-asset boundaries;
+- `docs/development.md` — UI-kit route, local font/icon assets, and how to verify the design system;
+- `docs/project-status.md` — Stage 3 baseline implementation status and the rule that specialized components remain incremental;
+- `README.md` only if a small orientation link/change is genuinely useful;
+- `.ai/report.md` — factual implementation report and actual checks.
+
+Do not claim deferred components are implemented.
 
 ## Out Of Scope
 
-- Implementing Stage 3 CSS tokens, Blade components, or the Laravel UI Kit page.
-- Changing application UI, routes, controllers, views, `public/app.css`, or `public/app.js` for Stage 3.
-- Importing/copying the reference UI Kit implementation into the Laravel runtime.
-- Adding npm, Node.js, Vite, React, Vue, Livewire, Inertia, Tailwind, or new frontend packages.
-- Adding runtime CDN dependencies.
-- Redesigning the approved UI Kit.
-- Changing approved colors, spacing, typography, radii, shadows, component sizes, responsive rules, or page patterns.
-- Filling unresolved design values without a user decision.
-- Changing product/business behavior or Stage 2 domain logic.
-- Broad documentation cleanup unrelated to design-system governance.
+- Stage 4 authentication/integration functionality.
+- Admin psychologist management flows.
+- Psychologist cabinet product pages.
+- Group creation/moderation flows.
+- Payment, scheduler, application, or external-integration behavior.
+- Implementing every component in `DESIGN_SYSTEM.md` merely for completeness.
+- Filling any unresolved design-system value.
+- Redesigning approved tokens/components.
+- Importing `uikit/index.html` or `uikit/support.js` into Laravel runtime.
+- Page-specific CSS/component forks.
+- Node.js, npm, Vite, frontend compilation, runtime CDN assets, or new frontend frameworks.
+- Backend/domain refactoring unrelated to rendering the baseline UI system.
 
 ## Constraints
 
-- Follow `WORKFLOW.md` and `AGENTS.md` as they exist at task start.
-- Keep changes concise and avoid duplicating the full design specification across documents.
-- Preserve `DESIGN_SYSTEM.md` as the detailed design source of truth.
-- Preserve `uikit/index.html` and `uikit/support.js` as reference artifacts; do not modify them unless a path/reference defect makes a tiny correction strictly necessary, and do not convert them into production assets.
-- Do not change `SPEC.md` unless a direct contradiction cannot be resolved by the scoped governance wording; prefer leaving SPEC unchanged because §24/§25 already establish the design-system requirement.
-- Do not implement Stage 3 in this task.
-- Do not commit secrets, local data, logs, caches, or unrelated artifacts.
+- Follow `WORKFLOW.md`, `AGENTS.md`, `DESIGN_SYSTEM.md`, and the current `SPEC.md` source-of-truth hierarchy.
+- Before UI work, inspect `uikit/index.html` as required by governance.
+- Explicit numeric design values and implementation rules in `DESIGN_SYSTEM.md` win over visual approximation.
+- When `DESIGN_SYSTEM.md` is silent, use `uikit/index.html` for approved visual intent; if neither source resolves a required decision, stop/report instead of inventing.
+- Keep `uikit/` reference-only.
+- Use generic reusable component names and APIs.
+- No one-off or page-specific copies of shared UI primitives.
+- Preserve the current Laravel/Blade/Bootstrap/no-build architecture.
+- Do not alter Stage 2 business/domain behavior.
+- Do not commit secrets, local data, caches, logs, temporary screenshots, or unrelated artifacts.
 
 ## Acceptance Criteria
 
-1. `WORKFLOW.md` explicitly requires `DESIGN_SYSTEM.md` + `uikit/index.html` to be consulted when planning and accepting UI work.
-2. `AGENTS.md` explicitly requires Codex to follow `DESIGN_SYSTEM.md` + `uikit/index.html` for UI implementation and forbids visual invention outside the approved system.
-3. The precedence is unambiguous: explicit design values/rules in `DESIGN_SYSTEM.md` override the visual reference; the visual reference guides unresolved visual intent; missing/unresolved patterns require a user decision rather than invention.
-4. Project-wide technical/security/runtime constraints remain explicitly in force and are not silently overridden by design reference implementation details.
-5. Repository references in `DESIGN_SYSTEM.md` point unambiguously to `uikit/index.html` as the canonical visual reference.
-6. The documentation makes clear that `uikit/` is reference material, not a Laravel runtime dependency.
-7. `docs/architecture.md` records the design-system boundary for future frontend work.
-8. `docs/project-status.md` records that the approved design sources are present but Stage 3 implementation is still pending.
-9. No Stage 3 UI code or product functionality is implemented.
-10. No approved visual token/value is changed.
-11. `.ai/report.md` accurately describes the documentation/governance changes and checks.
-12. Final diff contains only files necessary to establish design-system governance.
+1. The Laravel application has a real shared design-token layer matching the explicit applicable values in `DESIGN_SYSTEM.md`.
+2. Montserrat 400/500/600/700 loads locally with no runtime font CDN request.
+3. Lucide loads locally with a pinned/recorded distribution and no runtime icon CDN request.
+4. The implemented baseline Blade components are generic, reusable, and centralized; no page-specific visual duplicates are introduced.
+5. Buttons, forms, feedback states, badges, cards, tables, toolbar/pagination, dropdown, modal/confirmation, navigation/shell, empty/loading/error states, and date/money presentation can be inspected on the UI-kit page.
+6. Implemented controls/components match the required visual states, dimensions, spacing, typography, colors, radii, and focus behavior from `DESIGN_SYSTEM.md`.
+7. The application shell and UI-kit verification surface work at desktop and mobile widths according to the approved responsive rules.
+8. Keyboard focus is visible and conforms to the approved focus system for implemented focusable controls.
+9. Date/time rendering continues to use the existing centralized `Europe/Minsk` presentation path; money rendering continues to use the existing integer-minor-unit formatter.
+10. The UI-kit page is development/testing-only and is not exposed as a normal production route.
+11. `uikit/index.html` and `uikit/support.js` remain reference-only and unchanged unless a truly necessary reference-path correction is identified; they are not loaded by Laravel runtime.
+12. No Node/npm/Vite/frontend build step or runtime CDN dependency is introduced.
+13. Specialized deferred components are not implemented merely for completeness and product-specific pages are not started.
+14. `SPEC.md`/documentation accurately record the incremental design-system strategy so later tasks cannot misread the deferred components as permission for page-specific styling.
+15. Automated project checks remain green and targeted rendering/route tests cover the new UI-kit foundation where practical.
+16. `.ai/report.md` accurately lists implemented vs deferred components, local assets, checks, visual/runtime verification, and any remaining gaps.
+17. Final diff contains only changes necessary for the Stage 3 baseline design-system implementation.
 
 ## Checks
 
 Run and report at minimum:
 
-- inspect all changed Markdown files for contradictory precedence/source-of-truth wording;
-- search changed governance documents for the canonical references `DESIGN_SYSTEM.md` and `uikit/index.html`;
-- verify no application/runtime/frontend implementation files changed;
+- targeted tests for the UI-kit route/component rendering and any new environment guard;
+- full `php artisan test` on the isolated MySQL test database;
+- `composer check` (or its current equivalent aggregate checks), including Pint and Larastan/PHPStan;
+- `composer check-platform-reqs` if not already included in the aggregate command;
+- verify the UI-kit page responds successfully in development/testing;
+- inspect rendered HTML/runtime asset references and verify there are no Google Fonts, unpkg, jsDelivr, or other runtime CDN dependencies;
+- verify local Montserrat and Lucide runtime assets exist and are actually referenced by the application;
+- verify the UI-kit page in a real browser at desktop and mobile viewport sizes if browser tooling is available without adding project dependencies; if unavailable, report the limitation clearly for user manual acceptance rather than claiming visual verification;
+- exercise keyboard focus and interactive baseline controls where browser tooling is available;
 - `git diff --check`;
-- final `git status`, diff, and staged-file inspection.
+- final `git status --short`, full diff, and staged-file inspection.
 
-Full Laravel tests, Pint, Larastan, and browser acceptance are not required if the task changes Markdown/governance documentation only. If any runtime/code file changes unexpectedly become necessary, run the relevant project checks and explain why.
+The user remains the product tester for final visual acceptance. Automated tests cannot substitute for checking visual conformance to `DESIGN_SYSTEM.md` and `uikit/index.html`.
 
 ## Hard Workflow Gate
 
 Before implementation:
 
-- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, `DESIGN_SYSTEM.md`, `SPEC.md` §24/§25/§31-32 as relevant, `docs/architecture.md`, and `docs/project-status.md`;
-- inspect `uikit/index.html` sufficiently to confirm it is the current approved visual reference;
+- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, `DESIGN_SYSTEM.md`, relevant `SPEC.md` sections, `docs/architecture.md`, `docs/development.md`, and `docs/project-status.md`;
+- inspect `uikit/index.html` sufficiently to understand the implemented baseline components and responsive shell;
 - run `git log --oneline -5` and `git status --short`;
-- confirm `TASK-2026-08-19-05` is the latest relevant planner task and has not already been completed;
+- confirm `TASK-2026-08-19-06` is the current planned task and has not already been completed;
 - do not touch unknown local changes.
 
 Before commit:
 
-- complete the required checks;
-- update `.ai/report.md` with actual results;
+- complete the applicable automated/runtime checks;
+- update `.ai/report.md` with actual results and an explicit implemented/deferred component list;
 - inspect `git status --short`, full diff, and staged files;
-- stage only files related to this task;
-- ensure no secrets or unrelated artifacts are included.
+- stage only task-related files;
+- ensure no secrets, unrelated artifacts, caches, generated screenshots, or local data are included.
 
 If the gate passes, commit with:
 
-`codex: TASK-2026-08-19-05 establish design system governance`
+`codex: TASK-2026-08-19-06 implement design system foundation`
 
-If safe completion is impossible or a material source-of-truth conflict cannot be resolved within the boundaries above, report `partial`, `blocked`, or `failed` instead of guessing.
+If a required visual decision is unresolved or safe completion is impossible, report `partial`, `blocked`, or `failed` instead of inventing a design rule.
