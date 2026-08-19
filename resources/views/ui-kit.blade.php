@@ -39,6 +39,14 @@
         <div class="ui-demo ui-confirmation-grid"><x-ui.confirmation title="Опубликовать изменения?" message="Новые данные сразу увидят пользователи после следующего обновления страницы." /><x-ui.confirmation title="Удалить запись?" message="Это действие нельзя отменить." danger /></div>
     </section>
 
+    <section class="ui-kit-section" id="stage-five-components">
+        <h2>Компоненты управления психологами</h2><p class="ui-section-description">Фильтры, chips, описание и приватные документы.</p>
+        <div class="ui-demo ui-demo--row"><x-ui.chip>Обычный</x-ui.chip><x-ui.chip selected removable>Статус: принят</x-ui.chip><x-ui.chip disabled>Недоступен</x-ui.chip></div>
+        <div class="ui-demo"><x-ui.filters id="sample-filters" action="/ui-kit" :active-count="1"><x-slot:fields><x-ui.form-field label="Статус" name="sample-status"><x-ui.select name="status" id="sample-status" value="approved" :options="['' => 'Все', 'approved' => 'Принят']" /></x-ui.form-field></x-slot:fields><x-slot:mobileFields><x-ui.form-field label="Статус" name="sample-status-mobile"><x-ui.select name="status" id="sample-status-mobile" value="approved" :options="['' => 'Все', 'approved' => 'Принят']" /></x-ui.form-field></x-slot:mobileFields></x-ui.filters></div>
+        <div class="ui-demo"><x-ui.description-list :columns="2"><x-ui.description-item label="Имя">Анна Орлова</x-ui.description-item><x-ui.description-item label="Статус"><x-ui.badge variant="success">Принят</x-ui.badge></x-ui.description-item></x-ui.description-list></div>
+        <div class="ui-demo ui-form-stack"><x-ui.file-upload name="sample-document" label="Выберите или перетащите файл" /><div class="ui-document-list"><x-ui.document-item name="Диплом.pdf" meta="Диплом · 1,2 МБ" view-href="#" download-href="#" /></div></div>
+    </section>
+
     <x-ui.modal id="sample-modal" title="Информационное окно"><p>Modal использует общий production-компонент и локальный Bootstrap bundle.</p><x-slot:footer><x-ui.button data-bs-dismiss="modal">Понятно</x-ui.button></x-slot:footer></x-ui.modal>
     <x-ui.modal id="confirm-modal" title="Удалить запись?" size="small"><p>Это действие нельзя отменить.</p><x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><x-ui.button variant="danger">Удалить</x-ui.button></x-slot:footer></x-ui.modal>
 </x-ui.app-shell>

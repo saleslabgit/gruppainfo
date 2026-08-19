@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Domain\User\UserStatus;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +17,7 @@ use Illuminate\Notifications\Notifiable;
  * @property bool $disabled
  * @property bool $free
  * @property bool $admin
+ * @property CarbonImmutable|null $personal_data_consent_at
  */
 final class User extends Authenticatable
 {
@@ -52,6 +54,18 @@ final class User extends Authenticatable
     public function documents(): HasMany
     {
         return $this->hasMany(UserDocument::class);
+    }
+
+    public function actionHistory(): HasMany
+    {
+        return $this->hasMany(UserActionHistory::class, 'target_user_id');
+    }
+
+    public function fullName(): string
+    {
+        $parts = array_filter([$this->last_name, $this->first_name, $this->middle_name]);
+
+        return $parts === [] ? 'Не указано' : implode(' ', $parts);
     }
 
     public function groups(): HasMany

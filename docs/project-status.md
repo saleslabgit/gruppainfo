@@ -1,6 +1,6 @@
 # Статус проекта
 
-Текущий реализованный этап: **Stage 4 — авторизация и контроль доступа**. Финальная продуктовая/визуальная приёмка остаётся за пользователем.
+Текущий реализованный этап: **Stage 5 — административный CRUD психологов**. Финальная продуктовая/визуальная приёмка остаётся за пользователем.
 
 ## Работает сейчас
 
@@ -36,13 +36,20 @@
 - повторная проверка `approved`/`disabled`/soft-delete на каждом защищённом запросе и немедленный отзыв доступа;
 - переиспользуемая инвалидация всех database sessions одного пользователя;
 - idempotent development/testing seed психолога вместе с существующим development-администратором;
-- минимальные responsive acceptance surfaces Stage 4 на общих UI-компонентах.
+- сохранённая Stage 4 auth/session boundary и административная landing page;
+- responsive список психологов с поиском, комбинируемыми фильтрами, pagination и truthful empty states;
+- ручное создание, detail и редактирование всех анкетных полей без password/email-onboarding;
+- явные approve/reject, tariff и disable/enable действия через доменные границы;
+- actor-aware `gp_user_action_history` для значимых административных действий;
+- немедленная инвалидация database sessions при reject, disable и soft delete;
+- policy-защищённые private document upload/view/download/delete с MIME-проверкой по содержимому;
+- общие Chip, Filters/Drawer, Description List, File Upload и Document Item компоненты на `/ui-kit`.
 
 ## Намеренно не реализовано
 
-Последующая продуктовая функциональность ещё не реализована. Пока нет административного CRUD, продуктового наполнения кабинета психолога, CRUD групп, обработки заявок, scheduler-задач, публичного HTTP API, email-onboarding, SMTP-интеграции, платёжного адаптера, банковского webhook-контроллера и внешних интеграций. Страницы `/admin` и `/cabinet` пока служат только для проверки auth/access foundation.
+Последующая продуктовая функциональность ещё не реализована. Пока нет продуктового наполнения кабинета психолога, CRUD групп, обработки заявок, scheduler-задач, публичного HTTP API, email-onboarding, SMTP-интеграции, платёжного адаптера, банковского webhook-контроллера и внешних интеграций. `/cabinet` пока служит только для проверки auth/access foundation.
 
-Специализированные компоненты полного каталога (`Stepper`, `Choice Card`, `Timeline`, `Metric`, `Progress`, document/upload patterns, tabs/breadcrumbs/popover/tooltip/toast/chips/switch и другие не требуемые baseline элементы) намеренно отложены. При первой продуктовой необходимости компонент сначала добавляется в общий UI namespace по `DESIGN_SYSTEM.md`, затем используется экраном; page-specific замены запрещены.
+Специализированные компоненты полного каталога (`Stepper`, `Choice Card`, `Timeline`, `Metric`, `Progress`, tabs/breadcrumbs/popover/tooltip/toast/switch и другие пока не требуемые элементы) намеренно отложены. При первой продуктовой необходимости компонент сначала добавляется в общий UI namespace по `DESIGN_SYSTEM.md`, затем используется экраном; page-specific замены запрещены.
 
 ## Актуальный порядок работ
 
@@ -66,9 +73,10 @@
 - Legacy-поле `accept` ещё не сопоставляется со статусами; оно не используется и не записывается доменной логикой.
 - Платёжный провайдер и его протокол остаются неизвестными; провайдер-специфичная реализация блокируется до Stage 13 и получения официальных данных.
 - Внешний integration secret и SMTP не нужны для ближайших внутренних CRUD-этапов.
+- Числовой продуктовый лимит размера документа не утверждён; доступен необязательный `DOCUMENT_MAX_UPLOAD_KB`, а при пустом значении действует PHP/framework upload ceiling.
 
 ## Следующий этап
 
-Следующий этап по актуальному `SPEC.md` — **Stage 5: административный CRUD психологов**.
+Следующий этап по актуальному `SPEC.md` — **Stage 6: кабинет психолога**.
 
-Stage 5 использует готовые admin/access boundaries и `UserSessionInvalidator` для отзыва сессий при disable/reject/delete. Внешняя анкета, `/api/v1`, password setup email и SMTP остаются последующими этапами.
+Stage 6 использует готовые auth/access boundaries и не должен добавлять публичную анкету, `/api/v1`, password setup email, SMTP или платежи раньше утверждённых этапов.

@@ -118,4 +118,26 @@ document.addEventListener("DOMContentLoaded", () => {
             window.lucide?.createIcons();
         });
     });
+
+    document.querySelectorAll("[data-ui-file-upload]").forEach((upload) => {
+        const input = upload.querySelector("[data-ui-file-input]");
+        const label = upload.querySelector("[data-ui-file-label]");
+
+        input.addEventListener("change", () => {
+            label.textContent = input.files[0]?.name ?? "Выберите файл";
+        });
+
+        ["dragenter", "dragover"].forEach((eventName) => {
+            upload.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                upload.classList.add("is-dragging");
+            });
+        });
+
+        ["dragleave", "drop"].forEach((eventName) => {
+            upload.addEventListener(eventName, () => {
+                upload.classList.remove("is-dragging");
+            });
+        });
+    });
 });
