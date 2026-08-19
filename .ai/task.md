@@ -1,319 +1,511 @@
-# Task: TASK-2026-08-19-12
+# Task: TASK-2026-08-19-13
 
 Status: planned
-Created from: 10c8d94825859f2d6612888ab50f08e69ecf73d3
+Created from: ea2999606c79b861ed6f52b9de99dc6563328613
 
 ## Title
 
-Implement Stage 6 psychologist cabinet
+Implement Stage 7 group CRUD and moderation
 
 ## Goal
 
-Implement the revised `SPEC.md` Stage 6 as the first real psychologist-facing product surface, using only the already accepted internal authentication, profile data, private-document access, and Stage 3/5 design-system primitives.
+Implement the revised `SPEC.md` Stage 7 as the complete internal group-management and moderation workflow, without bank/payment integration and without starting later lifecycle, applications, external API, or email stages.
 
-After this task an approved, enabled psychologist can enter a real responsive cabinet, navigate between **Мои группы** and **Мои данные**, see a truthful pre-Stage-7 empty groups state, and read their own questionnaire/profile data and private documents. The cabinet must be strictly self-scoped: it must not accept another psychologist ID as a way to select profile data, must not leak another user's fields or documents, and must preserve all Stage 4/5 access boundaries.
+After this task a psychologist can create a draft group, fill and save its data, submit it for moderation, see moderation feedback/history, revise and resubmit when requested, view every own group, and delete only permitted groups. An administrator can list/search/filter/sort/paginate groups, create/view/edit groups, moderate them through the existing domain state machine, inspect full history, manually delete abandoned draft records, and activate an approved group after manual publication with correct placement dates and optional external catalog ID.
 
-This task must not start Stage 7 group CRUD/moderation. In particular, it must not add group creation/edit/delete, group status actions, group detail, application counters, moderation history, payments, or fake controls for functionality that does not exist yet.
+The workflow must remain state-machine driven:
+
+`draft -> moderation -> revision/rejected/approved -> active`
+
+`awaiting_payment` must not be reachable from any Stage 7 UI/action. No Stage 7 action creates `gp_payments`, redirects to a bank, or depends on a payment provider.
 
 ## Facts
 
-- Current `main` at task creation is `10c8d94825859f2d6612888ab50f08e69ecf73d3` (`codex: TASK-2026-08-19-11 fix Stage 5 UI design-system gaps`).
-- Stage 1–4 are accepted. The user requested moving to the next stage after technical acceptance of the Stage 5 correction, so Stage 5 is the implemented baseline for this task.
-- Current `SPEC.md` Stage 6 requires a shared psychologist cabinet layout, pages **Мои группы** and **Мои данные**, display of the current psychologist's data/documents, empty states, mobile support, self-only access, and no admin access.
-- `SPEC.md §23` states that **Мои данные** shows the psychologist questionnaire data and that self-editing is not required in MVP.
-- Stage 7, not Stage 6, owns the real group list content, group create/edit/delete, moderation workflow, group status/history presentation, ownership policies for group CRUD, and group actions.
-- The accepted Stage 4 route boundary already provides `stale-session -> auth -> eligible -> role:psychologist` for `/cabinet`.
-- The current `/cabinet` is only a Stage 4 acceptance view and has no product content yet.
-- `App\Models\User` already exposes `educationType`, `documents`, `groups`, `fullName()`, typed questionnaire booleans, and `personal_data_consent_at`.
-- Stage 5 already implemented private documents on `storage/app/private`, centralized `UserDocumentType` labels, `x-ui.document-item`, and owner/admin document authorization. An authenticated psychologist can view/download only their own document through the existing protected `documents.view` / `documents.download` routes; another psychologist receives authorization denial.
-- Stage 5 already implemented the corrected shared `Description List`, `Document Item`, `Empty State`, AppShell/Drawer, PageHeader, Card, Date and other primitives needed by this stage. No new visual component is expected to be necessary.
-- `DESIGN_SYSTEM.md §4.29` defines the Empty State, §4.37 the File/Document Item, §4.38 the Key-Value/Description List, and §6 the approved page composition patterns.
-- The relevant `uikit/index.html` reference contains the approved Empty State, List Item/File Item, Key-Value, Sidebar/Drawer and responsive visual intent. It remains reference-only.
-- The development/testing psychologist from Stage 4 already provides known local credentials for manual cabinet verification. Stage 5 can be used to populate that development psychologist's profile and documents if richer manual fixtures are desired; Stage 6 does not need a new password mechanism or extra product seed identity.
+- Current `main` at task creation is `ea2999606c79b861ed6f52b9de99dc6563328613` (`codex: TASK-2026-08-19-12 implement Stage 6 psychologist cabinet`).
+- Stage 1–5 are accepted technically; Stage 6 is implemented and technically accepted, and the user explicitly requested the next stage.
+- Current `SPEC.md` Stage 7 requires psychologist group creation/form/view/edit/delete/list, admin CRUD/list, moderation, comments/rejection reason, status history, manual activation, `external_catalog_id`, manual abandoned-draft deletion, policies and IDOR protection.
+- Stage 7 acceptance explicitly requires the payment flow to remain absent even for a psychologist whose `gp_users.free=false`.
+- `gp_groups` and `gp_group_status_history` already exist from Stage 2 with the required columns, indexes, soft delete, relations, `public_uuid`, moderation fields, publication fields and placement fields. Do not add a replacement group schema.
+- `GroupStatus` already contains `awaiting_payment`, `draft`, `moderation`, `revision`, `rejected`, `approved`, `active`, `expired` and the approved transition matrix.
+- `GroupStatusTransitionService` already uses `lockForUpdate`, rejects invalid/stale transitions, changes status and writes `gp_group_status_history` atomically. It is the mandatory status-transition boundary and must be reused rather than bypassed.
+- `SettingService` and `SettingKey::PlacementDurationDays` already exist. `SettingSeeder` provides `placement_duration_days=30` by default.
+- `Group` already generates `public_uuid` on creation and casts status, monetary minor units and publication timestamps.
+- Existing dictionaries include definitions for `group_format` and `gender`, but product dictionary item values are intentionally not seeded because they are not approved yet.
+- Existing cabinet `/cabinet/groups` is the truthful Stage 6 empty surface that Stage 7 must now replace with the real own-group list.
+- Stage 5 provides the real admin shell, Table/Toolbar/Search/Filters/Pagination, Modal, Form controls, Description List and corrected List/Form/Detail compositions.
+- `DESIGN_SYSTEM.md` already defines the shared Timeline component (§4.35) and Money Input visual (§4.10), but Timeline is not implemented in the shared Blade namespace and the existing `x-ui.money` is display-only.
+- `uikit/index.html` contains approved Timeline, Money, Table/List, form, Modal/Confirmation and responsive reference examples. It remains reference-only.
+- `SPEC.md §12` defines the Russian group status labels; raw status codes must not be duplicated through views.
+- `SPEC.md §14` allows psychologist editing only in `draft` and `revision`, viewing of every own group, and psychologist deletion only in `draft` and `rejected` when there is no successful non-refunded payment.
+- Stage 8 owns automatic expiry and free extension. Stage 10 owns participant applications/counters. Stage 13 owns bank/payment integration.
 
 ## Assumptions
 
-- Use a reusable psychologist cabinet layout, analogous in responsibility to the accepted admin layout, composed from `x-ui.app-shell`. It should expose only real Stage 6 navigation: **Мои группы**, **Мои данные**, and POST logout.
-- `/cabinet` should resolve to the primary **Мои группы** section, preferably by redirecting to a named `/cabinet/groups` route rather than keeping a third fake overview page.
-- Use `/cabinet/groups` for **Мои группы** and `/cabinet/profile` for **Мои данные** unless an existing repository convention discovered during implementation provides an equally clear stable route. Do not expose a user ID parameter for the own-profile route.
-- Because Stage 7 owns the actual group list/CRUD, Stage 6 **Мои группы** is intentionally an empty-content state. The shared Empty State replaces the future list data region; do not fabricate a toolbar, table, pagination, group card schema, or add-group CTA merely to make the page look fuller. This is the pre-Stage-7 empty state of the future list surface, not a new product page pattern.
-- The psychologist's **Мои данные** page is read-only. It shows questionnaire/profile information useful to the psychologist and their private documents, but does not expose administrator-only controls or system/security fields such as tariff management, disabled toggle, status transitions, `admin`, password, `accept`, session state, audit records, or internal storage paths.
-- The questionnaire fields visible to the psychologist are the same personal/questionnaire facts already stored for that user: identity/contact, education/training/license, group-leading experience, confirmations, webinar readiness, personal-data consent metadata, and their document list. Nullable values use the existing neutral `Не указано` representation.
-- Existing owner document routes are the correct delivery boundary. Stage 6 should link to them rather than add duplicate cabinet-specific file-serving routes.
-- `SPEC.md §28` requires explicit authorization. For the own-profile cabinet controller, add or reuse a clearly named policy/gate ability for self-view access rather than relying only on Blade assumptions. Do not broaden the existing admin-oriented `UserPolicy::view` semantics in a way that weakens Stage 5 authorization.
-- No new design-system component should be added unless implementation proves an actually required shared primitive is missing. If a required visual pattern is absent or unresolved, report the gap instead of inventing it.
+- Stage 7's temporary “free path for everyone” means **bypassing the payment gate**, not falsifying the historical tariff snapshot. On group creation copy the current psychologist `free` flag into `gp_groups.free` per `SPEC.md §4.4`, but regardless of whether that value is `true` or `false`, create the group directly in `draft` and create no payment. A `free=false` psychologist must therefore still reach the same Stage 7 CRUD/moderation flow.
+- Psychologist **Добавить группу** should follow the existing free-group scenario: create a minimal empty `draft` first, then redirect to its edit form. This intentionally makes abandoned drafts possible and matches the nullable Stage 2 schema.
+- Draft/revision save may persist incomplete data, but every supplied value must still pass type/range/dictionary validation. Transition to `moderation` is the completeness gate and must validate the full business form before calling the status service.
+- The moderation completeness gate should require the group content fields named by `SPEC.md §11`: name, description, schedule, format, meeting duration, participant count, gender and meeting price. System/admin fields (`status`, `disabled`, `accept`, `free`, `public_uuid`, moderation comments, external ID, publication/expiry fields) are never trusted from psychologist form input.
+- Meeting duration and participant count must be positive integers. Meeting price is entered for humans in BYN but stored exactly as integer minor units; do not use `float`/binary floating point for parsing.
+- Admin creation may select an active non-admin psychologist as owner. Once a group exists, generic edit forms do not silently reassign ownership unless an existing repository rule explicitly requires it.
+- Admin may edit group content regardless of group status, as allowed by `SPEC.md §14`; status itself remains changeable only through explicit domain actions.
+- Admin soft-delete in this stage is intended for manual cleanup of draft/`awaiting_payment` records, especially abandoned drafts. Do not add a generic destructive action for active/approved/moderation groups merely because “CRUD” appears in the stage description.
+- The existing successful-payment deletion guard is a safety invariant, but Stage 7 must not add payment creation/history UI. If a pre-existing/test `succeeded` payment is linked to a group, psychologist deletion must remain denied; no new bank behavior is introduced.
+- Revision and rejection comments are persisted both in the existing current-field representation (`moderator_comment` / `rejection_reason`) where applicable and in immutable status history. History is the durable record and previous comments must never be overwritten there.
+- Activation is an explicit admin action from `approved` only. It may accept optional `external_catalog_id`; publication timestamps are generated by the application, never user-entered.
+- Group status presentation should be centralized on the enum (or one equivalent shared mapper) using the exact Russian labels from `SPEC.md §12` and existing Badge semantic variants only.
+- Timeline must be implemented generically in `resources/views/components/ui/` before first product use and demonstrated on `/ui-kit`.
+- The first editable meeting-price field requires a generic shared Money Input conforming to `DESIGN_SYSTEM.md §4.10`; do not create a group-specific money control.
 
 ## Unknowns
 
-None that block this stage.
+Two numeric product values are not defined anywhere in the current repository/specification and must **not** be invented:
+
+1. `SPEC.md` says rejection reason has a minimum length, but does not define the number. Stage 7 must enforce a required, trimmed, non-empty reason now, but must not invent `min:N`. Record the missing numeric threshold in the report/status documentation.
+2. `SPEC.md §22` defines an “abandoned drafts older than N days” quick filter, but no `N` or setting key exists. Implement the fully defined quick filters (`approved` awaiting publication and `expired` requiring removal), normal `draft` status filtering, and manual draft deletion; do not implement a fake abandoned-age threshold. Record this unresolved value for a later product/settings decision.
+
+Dictionary item values for group format/gender are also intentionally unapproved. Do not seed invented product values. Automated/browser verification may create clearly temporary test fixtures and must remove development fixtures afterwards.
+
+These unknown numeric values do not block the core Stage 7 CRUD/moderation acceptance flow.
 
 ## Scope
 
-### 1. Real psychologist cabinet routes and controller boundary
+### 1. Group domain/application workflow boundary
 
-Replace the Stage 4 acceptance-only `/cabinet` surface with real Stage 6 routes/controllers while preserving the existing protected middleware pipeline.
-
-At minimum:
-
-- `/cabinet` resolves to the main **Мои группы** section;
-- `GET /cabinet/groups` renders **Мои группы**;
-- `GET /cabinet/profile` renders **Мои данные**;
-- all three remain inside `stale-session -> auth -> eligible -> role:psychologist`;
-- an administrator cannot use these routes as a parallel product interface;
-- a guest is redirected by normal auth behavior;
-- a psychologist made ineligible remains revoked by the accepted Stage 4 middleware behavior.
-
-Use a thin controller for product reads rather than growing route closures. Keep data selection out of Blade.
-
-For the own-profile action:
-
-- derive the psychologist from the authenticated request/session only;
-- do not accept `user_id`, `psychologist_id`, route model binding, query parameter, hidden input, or other client-controlled identity selector for **Мои данные**;
-- explicitly authorize the self-view operation through a policy/gate ability appropriate to the existing architecture;
-- eager-load only the relationships needed for the page, at minimum `educationType` and `documents`.
-
-Do not add any mutation endpoint to the cabinet in this stage.
-
-### 2. Reusable psychologist cabinet layout/navigation
-
-Add a reusable cabinet layout based on the shared application shell.
-
-Navigation must contain only real current product sections:
-
-- **Мои группы**;
-- **Мои данные**;
-- POST logout using the existing route/CSRF behavior.
+Build the smallest group application/domain coordination needed around the existing `GroupStatusTransitionService`.
 
 Requirements:
 
-- active navigation state follows the current section;
-- desktop uses the existing persistent Sidebar;
-- tablet/mobile use the existing AppShell Drawer/Topbar behavior;
-- do not add disabled/fake links for Stage 7+ features;
-- do not duplicate the complete shell markup per page;
-- no page-specific colors, spacing, icons or navigation variant outside the existing design system.
+- never assign `group.status` directly from controllers, requests, Blade or generic mass-assignment endpoints;
+- every status transition goes through `GroupStatusTransitionService`;
+- multi-step actions that combine transition + side fields must be atomic in one outer transaction;
+- use row locking/current DB state for mutation authorization/invariants where stale route-bound models could otherwise allow an invalid operation;
+- keep controllers thin;
+- do not create a second transition matrix or duplicate history-writing logic.
 
-If a small generic navigation helper/partial is needed to avoid unsafe raw HTML duplication, keep it generic and within the existing UI/layout architecture. Do not refactor the accepted admin layout unless the smallest safe reuse genuinely requires it.
+Explicit Stage 7 actions:
 
-### 3. **Мои группы** pre-Stage-7 empty state
+- psychologist submit: `draft -> moderation`;
+- psychologist resubmit after corrections: `revision -> moderation`;
+- admin request revision: `moderation -> revision`, required comment;
+- admin reject: `moderation -> rejected`, required non-empty reason;
+- admin approve: `moderation -> approved`;
+- admin activate: `approved -> active`.
 
-Implement the real cabinet landing section with a truthful empty state only.
+A forged POST/PATCH attempting any other transition must fail safely and leave status/history/side fields consistent.
+
+### 2. Group creation and free-path override for Stage 7
+
+Psychologist creation:
+
+- expose a real **Добавить группу** action from **Мои группы**;
+- create a non-admin-owned `gp_groups` row for the authenticated psychologist only;
+- `status=draft`;
+- `disabled=false`;
+- copy `owner.free` to `group.free`;
+- let the model generate `public_uuid`;
+- do not write `accept`;
+- do not create `gp_payments`;
+- do not use `awaiting_payment` even when `owner.free=false`;
+- redirect immediately to the draft edit form.
+
+Admin creation:
+
+- provide a protected admin group-create flow using an existing active non-admin psychologist as owner;
+- same initial Stage 7 state rules: `draft`, no payment, snapshot owner tariff, generated UUID;
+- do not create new psychologist records from the group form.
+
+Test explicitly that a `free=false` psychologist creates a `free=false` **draft** with zero payment rows.
+
+### 3. Shared group form and validation
+
+Implement one reusable group form composition used by psychologist/admin pages where appropriate.
+
+Editable business fields from existing `gp_groups`:
+
+- `name`;
+- `description`;
+- `schedule`;
+- `format_id` from active `group_format` dictionary items;
+- `meeting_duration_minutes`;
+- `participant_count`;
+- `gender_id` from active `gender` dictionary items;
+- `price_per_meeting` entered as a human BYN amount and stored as integer minor units.
+
+Validation rules:
+
+- draft/revision save accepts incomplete fields but validates any supplied values;
+- moderation submission requires the full business form;
+- dictionary IDs must belong to the correct active dictionary, not merely exist globally;
+- string DB limits must be respected where the schema defines them;
+- positive integer rules for duration/count;
+- price conversion must be exact and reject malformed/over-precision input without floats;
+- validation errors use shared field-level error presentation and preserve entered values.
+
+Never accept generic form writes to:
+
+- owner ID from psychologist requests;
+- `status`;
+- `disabled`;
+- `accept`;
+- `free`;
+- `public_uuid`;
+- `moderator_comment` / `rejection_reason`;
+- `external_catalog_id` from psychologist forms;
+- `published_at`, `expires_at`, `expiry_warning_sent_at`, `placement_days`;
+- timestamps/deleted state.
+
+Implement the shared Money Input first if needed. Follow `DESIGN_SYSTEM.md §4.10` exactly and update `/ui-kit`; do not modify `DESIGN_SYSTEM.md` to justify implementation choices.
+
+### 4. Psychologist **Мои группы** real list
+
+Replace the Stage 6 empty-only page with the real ownership-scoped group list.
 
 Requirements:
 
-- PageHeader title: **Мои группы** with concise truthful supporting text;
-- use the shared `x-ui.empty-state` with an approved empty-data icon/state;
-- communicate that groups will appear in this section once they are added in the product flow;
-- no **Добавить группу** button or any other CTA pointing to an unimplemented route;
-- no fake group rows/cards, fake counts, fake statuses, fake moderation notices, toolbar, filters, pagination, applications, payments, or dates;
-- do not implement Group queries/serialization merely to pre-build Stage 7;
-- do not add Group policies/controllers/actions as part of this task.
+- query only current authenticated psychologist's non-deleted groups;
+- never accept an owner/user filter from the client;
+- use a bounded/paginated list suitable for growth;
+- use the approved List composition and shared Table/Toolbar/Pagination primitives;
+- Toolbar may contain the truthful result count and real **Добавить группу** action; do not invent search/filter controls not required for this user list;
+- show at minimum group name, centralized status, format, creation date and available view action;
+- show publication/expiry values only when present and truthfully as `Не указано`/equivalent when absent;
+- do **not** show application counters yet; Stage 10 owns internal application work;
+- no payment-history surface;
+- empty state now includes the real add-group action;
+- list query must not produce N+1 queries.
 
-The page must remain visually valid on desktop and mobile using only existing shared components/tokens.
+Available actions must be status-driven and truthful. Do not render an edit/delete/submit control when policy/domain rules do not permit that action.
 
-### 4. **Мои данные** read-only profile page
+### 5. Psychologist group detail/edit/delete/submit
 
-Implement the current psychologist's questionnaire/profile as the approved Detail-page composition using shared Card + Description List primitives.
+Group detail:
 
-Display, where present:
+- owner can view every own non-deleted group regardless of status;
+- another psychologist cannot view it by changing the group ID;
+- show full group data, status, dates, optional external catalog ID if present, and current relevant moderation feedback;
+- show full immutable status/comment history;
+- use the shared Timeline component for history;
+- history actor/date/comment must be readable; system actor is represented truthfully when actor is null/system;
+- status history relation must not create N+1 actor lookups.
 
-- surname, first name, middle name;
-- email and phone;
-- education type;
-- other education;
-- modality/program;
-- training center;
-- graduation year;
-- training hours;
-- license number;
-- license expiry date;
-- group-leading experience;
-- groups-held count;
-- documents-truth confirmation;
-- education-compliance confirmation;
-- webinar/live readiness;
-- personal-data-consent date/time;
-- personal-data-consent version.
+Editing:
 
-Presentation requirements:
+- psychologist can edit only `draft` and `revision`;
+- `moderation`, `approved`, `active`, `expired` and `rejected` cannot be edited by psychologist;
+- owner check and status rule must both be enforced server-side/policy/domain, not only by hidden buttons;
+- revision detail makes the latest correction comment prominent using existing Alert/Card patterns, with full history below.
 
-- nullable/empty values render truthfully as `Не указано`;
-- questionnaire booleans render the same centralized yes/no/not-specified wording used by the accepted Stage 5 presentation, without raw `0/1`;
-- dates/date-times use existing date/time presentation conventions; display timestamps in configured `Europe/Minsk` presentation timezone;
-- do not show raw enum/database codes where a human-readable label already exists;
-- do not show tariff (`free`), admin flag, disabled flag, password/remember token, legacy `accept`, generated `active_email`, internal audit metadata, storage paths, or session information as profile data;
-- do not render Edit, Save, Upload, Delete, status-action, tariff-action, access-action, or password controls;
-- do not add a profile update endpoint.
+Submitting:
 
-Reuse the corrected shared Description List. Do not create a cabinet-only Key-Value variant or page-specific CSS fork.
+- `draft -> moderation` and `revision -> moderation` only after complete Form Request validation;
+- transition writes actor/history through the existing transition service;
+- repeated/forged submit from another status is rejected and does not create duplicate/invalid history.
 
-### 5. Own private documents in **Мои данные**
+Deletion:
 
-Render only the current psychologist's documents below the profile information.
+- psychologist may soft-delete only own `draft` or `rejected` groups;
+- deny delete when a linked payment is currently `succeeded` (read-only safety check; do not build payment UI);
+- use existing destructive Modal/Confirmation pattern;
+- deleting a group never force-deletes history/payments/applications;
+- another psychologist cannot delete via IDOR.
+
+### 6. Admin group list
+
+Add **Группы** as a real admin navigation section and implement the admin List page.
+
+List requirements:
+
+- all non-deleted groups;
+- eager-load only what the rows need, at minimum owner and relevant dictionaries;
+- pagination;
+- search by internal group ID, group name and psychologist identity (name/email where useful);
+- combinable GET filters for status and free/paid snapshot;
+- sorting whitelist: creation date, publication date, expiry date; explicit asc/desc; safe default to newest created;
+- quick filter for `approved` groups awaiting publication;
+- quick filter for `expired` groups requiring manual removal;
+- normal `draft` filter remains available;
+- do not invent the unresolved “older than N days” abandoned quick-filter threshold;
+- no bank/payment-success filter in this internal no-bank stage;
+- query parameters survive pagination;
+- truthful empty/no-results states;
+- no N+1 regression.
+
+Show at minimum the §22 group facts that are available now: ID, name, psychologist, status, free/paid snapshot, creation/publication/expiry dates and view action.
+
+### 7. Admin group create/view/edit
+
+Create:
+
+- admin can create a Stage 7 draft for an existing active psychologist;
+- owner selection is validated against active non-admin users;
+- no payment is created regardless of selected owner's tariff.
+
+View/detail:
+
+- show psychologist identity, all group fields, status, free/paid snapshot, publication dates, UUID/external ID as appropriate, and full status history;
+- do not expose fake bank details when no payment exists;
+- use centralized status labels/Badge and shared Timeline;
+- show only state-valid moderation/activation/delete actions.
+
+Edit:
+
+- admin may edit group content regardless of status;
+- generic edit cannot directly assign status/system fields;
+- changing content must not silently create history entries or transition status;
+- do not silently change the stored `free` snapshot when psychologist tariff later changes.
+
+### 8. Admin moderation actions
+
+Implement explicit protected actions, each with policy authorization, Form Request validation where input exists, and approved Modal form composition.
+
+**Request revision** (`moderation -> revision`):
+
+- comment required, trimmed, non-empty;
+- set/update `moderator_comment` as the current/latest moderator comment;
+- write the same comment into immutable status history through the transition;
+- never erase previous history comments.
+
+**Reject** (`moderation -> rejected`):
+
+- reason required, trimmed, non-empty;
+- do not invent the unspecified numeric `min:N`;
+- set `rejection_reason`;
+- persist reason in transition history;
+- psychologist detail visibly shows the reason.
+
+**Approve** (`moderation -> approved`):
+
+- no arbitrary status select;
+- transition/history through the existing service.
+
+All invalid transitions, including forged actions against stale/current incompatible states, must be rejected by the domain transition service and leave data consistent.
+
+### 9. Manual activation after external publication
+
+Implement the admin **Отметить активной** action for `approved` groups only.
+
+In one transaction:
+
+1. obtain current `placement_duration_days` through `SettingService` / `SettingKey::PlacementDurationDays`;
+2. require a valid positive configured integer; do not silently hardcode a fallback if configuration is corrupt/missing;
+3. transition `approved -> active` through `GroupStatusTransitionService` with the admin actor;
+4. set `published_at` to current UTC time;
+5. set `placement_days` to the configured value at activation time;
+6. set `expires_at = published_at + placement_days`;
+7. reset `expiry_warning_sent_at=null`;
+8. persist optional trimmed `external_catalog_id` if supplied.
+
+Do not allow browser input to choose publication/expiry timestamps or placement days.
+
+Use time-frozen automated tests to prove exact values and that changing the setting after activation does not rewrite the already stored `placement_days`/dates.
+
+Stage 8, not this task, will automatically transition `active -> expired` and implement free extension.
+
+### 10. Manual admin draft cleanup
+
+Implement a destructive, policy-protected soft-delete action for admin cleanup of `draft` and existing `awaiting_payment` records.
 
 Requirements:
 
-- use the existing `x-ui.document-item` and centralized `UserDocumentType` label;
-- show original filename and safe metadata such as document category and size;
-- provide **Открыть** / **Скачать** through the existing authorized `documents.view` / `documents.download` routes;
-- do not expose `path`, filesystem disk name, private storage directory, or a `/storage/...` URL;
-- no upload control in the psychologist cabinet;
-- no delete control in the psychologist cabinet;
-- if there are no documents, render a truthful shared empty state rather than a broken/blank area;
-- no document mutation behavior is introduced.
+- confirmation required;
+- no age threshold is invented;
+- do not label every draft as objectively “abandoned” in UI; present manual cleanup truthfully;
+- do not expose generic delete of moderation/approved/active/expired groups in this task;
+- soft delete only; preserve related history/data;
+- test admin can delete a draft and cannot use the cleanup action for an active/moderating group.
 
-Preserve the existing document policy: owner can receive their bytes, another psychologist cannot. Do not weaken admin document access.
+### 11. Group policies and IDOR
 
-### 6. Self-scope and IDOR protection
+Add explicit `GroupPolicy` (or equivalent existing Laravel policy pattern) and register it.
 
-Stage 6 must make cross-user access structurally difficult and test it explicitly.
+At minimum cover:
 
-At minimum:
+- psychologist list/create scoped to self;
+- view own group only;
+- edit/update own only in `draft`/`revision`;
+- submit own only in `draft`/`revision`;
+- psychologist delete own only in `draft`/`rejected` plus payment safety invariant;
+- admin list/create/view/edit;
+- admin moderation only on non-deleted psychologist groups and only through valid state actions;
+- admin manual cleanup only for permitted draft states.
 
-- **Мои данные** has no route parameter selecting a user;
-- when two psychologists exist, the first psychologist's profile page renders the first user's fields/documents and does not render a unique marker belonging only to the second user;
-- a psychologist can open/download their own document;
-- the same psychologist receives 403/not-found equivalent for another psychologist's document and never receives the bytes;
-- an administrator cannot access psychologist-only cabinet routes;
-- a psychologist still receives denial for Stage 5 admin routes;
-- changing query parameters must not select another psychologist's profile because profile identity comes only from the authenticated user.
+Route middleware remains defense-in-depth; controller actions must explicitly authorize resources/actions.
 
-Keep existing Stage 4 stale-session/access revocation and Stage 5 document-policy tests green.
+Add IDOR tests for view, edit, update, submit and delete with two psychologists.
 
-### 7. UI/design-system and responsive verification
+### 12. Shared Timeline and group status presentation
 
-Use `DESIGN_SYSTEM.md` and `uikit/index.html` exactly as governance requires.
+Implement the already-designed Timeline generically before using it in group detail pages.
 
-Expected existing shared components are sufficient:
+Timeline must follow `DESIGN_SYSTEM.md §4.35` exactly:
 
-- AppShell / Drawer navigation;
-- PageHeader;
-- Card;
-- Description List / Description Item;
-- Document Item;
-- Empty State;
-- Date;
-- normal text/link primitives.
+- 12px marker + 1px connector;
+- 16px marker/content gap;
+- 24px entry spacing except last;
+- approved semantic variants only;
+- title, datetime/actor line and optional comment block;
+- no group-specific visual primitive.
 
-Do not add a new visual variant simply for the cabinet.
+Add a `/ui-kit` demonstration using the real shared component.
 
-Verify at least normal desktop and mobile (~390px):
+Centralize group status labels using the exact `SPEC.md §12` user-facing wording:
 
-- navigation active states;
-- mobile Drawer access to both sections and logout;
-- **Мои группы** empty state fits without overflow;
-- **Мои данные** Description Lists collapse/read correctly;
-- document items/actions remain usable on mobile;
-- no horizontal page overflow;
-- no runtime CDN/build regression;
-- keyboard focus remains the accepted shared behavior.
+- `awaiting_payment` — `Ожидает оплаты` (not reachable from Stage 7 UI);
+- `draft` — `Черновик`;
+- `moderation` — `На модерации`;
+- `revision` — `На доработке`;
+- `rejected` — `Отклонена`;
+- `approved` — `Одобрена, ожидает публикации`;
+- `active` — `Активная`;
+- `expired` — `Закончена`.
 
-No UI-kit change is required unless a generic shared component actually changes. If no shared component changes, keep `/ui-kit` untouched and just preserve its tests.
+Use existing Badge semantic variants; do not add colors.
 
-### 8. Tests
+### 13. Responsive/UI behavior
 
-Add focused feature/integration coverage, preferably in a dedicated Stage 6 cabinet test file.
+All new pages must compose approved generic components and the List/Form/Detail page patterns from `DESIGN_SYSTEM.md`.
 
-Cover at minimum:
+Verify desktop and mobile (~390px):
 
-1. guest `/cabinet`, `/cabinet/groups`, and `/cabinet/profile` requests follow normal login redirect behavior;
-2. administrator receives the existing explicit role denial on psychologist cabinet product routes;
-3. approved enabled psychologist reaches `/cabinet`, is directed to **Мои группы**, and sees the Stage 6 empty state;
-4. **Мои группы** contains no fake Stage 7 create/edit/group action route or button;
-5. psychologist opens **Мои данные** and sees their own questionnaire values including representative nullable, boolean and date/time fields;
-6. profile page does not show another psychologist's unique data marker;
-7. profile page does not expose admin/security fields or mutation controls;
-8. own documents are listed with view/download links and no raw private path;
-9. profile with zero documents renders the approved empty document state;
-10. own document view/download remains authorized and another psychologist's document remains denied;
-11. existing `/admin` denial for psychologists remains green;
-12. existing disabled/rejected/soft-delete/stale-session behavior remains green;
-13. Stage 5 admin CRUD/document/audit behavior remains green;
-14. `/ui-kit` remains local/testing-only and unchanged unless a justified shared component modification occurs.
+- psychologist group list, real add action and empty state;
+- create/edit form fields, custom selects and Money Input;
+- detail actions remain reachable without hover;
+- revision/rejection feedback is obvious;
+- Timeline is readable;
+- admin list filters/sorting/pagination;
+- moderation and activation modals fit viewport and use the accepted body/footer action pattern;
+- tables use approved responsive horizontal scrolling;
+- no horizontal page overflow outside table scroll containers;
+- mobile Drawer navigation includes real **Группы** section where appropriate;
+- no runtime CDN/build-tool regression.
 
-Where useful, assert query behavior remains bounded and no per-document relationship N+1 is introduced by the profile page.
+If a required visual pattern is not covered by `DESIGN_SYSTEM.md`/uikit, stop and report the gap rather than inventing a fourth page pattern or new component variant.
 
-### 9. Documentation and report
+### 14. Tests
 
-Update only documentation made factual by the implementation:
+Add focused Stage 7 feature/domain tests. At minimum prove:
 
-- `docs/architecture.md` — psychologist cabinet self-scope/read boundary and reuse of the existing private-document policy/controller;
-- `docs/development.md` — local Stage 6 URLs and concise manual verification using the development psychologist;
-- `docs/project-status.md` — Stage 6 implemented and Stage 7 next;
-- `.ai/report.md` — exact implementation, changed files, tests, browser checks and remaining gaps.
+1. psychologist `free=true` and `free=false` both create direct `draft` groups; stored `group.free` snapshots their respective tariff and no payment row is created;
+2. draft save persists allowed fields and rejects protected-field injection;
+3. moderation submission requires complete valid group data and creates `draft -> moderation` history with actor;
+4. admin revision requires a non-empty comment, transitions through the domain service, updates current comment and preserves history;
+5. psychologist sees revision comment/history, edits, and resubmits `revision -> moderation`;
+6. rejection requires a non-empty reason, writes history and psychologist sees it;
+7. approval is `moderation -> approved` through the domain service;
+8. activation computes UTC `published_at`, frozen `placement_days`, `expires_at`, clears warning timestamp and stores optional external catalog ID atomically;
+9. forged invalid transition is rejected and does not corrupt history/fields;
+10. psychologist edit authorization is limited to `draft`/`revision`;
+11. psychologist delete is limited to own `draft`/`rejected`, is soft delete, and succeeds/denies according to the existing succeeded-payment safety invariant;
+12. second psychologist receives denial on view/edit/update/submit/delete of another owner's group;
+13. admin can create/view/edit groups and manually soft-delete a draft, but cleanup action does not delete moderation/active records;
+14. admin search/status/free filters, defined quick filters, sorting and pagination work and preserve query params;
+15. psychologist/admin group lists have bounded query counts/no N+1;
+16. status history shows all transitions/actors/comments in order;
+17. `awaiting_payment` and payment creation are unreachable from Stage 7 web UI;
+18. existing Stage 4–6 auth/session/admin-psychologist/document tests remain green;
+19. `/ui-kit` remains production-guarded and demonstrates any newly implemented shared Timeline/Money Input components.
 
-Do not change `SPEC.md`; Stage 6 and the roadmap are already approved.
+Use temporary dictionary items/factories in automated tests. Do not add invented dictionary values to production seed data.
+
+### 15. Documentation and report
+
+Update only facts made true by Stage 7:
+
+- `docs/architecture.md` — group ownership/policies, domain workflow coordination, activation boundary and no-bank Stage 7 rule;
+- `docs/development.md` — Stage 7 URLs and concise manual verification for psychologist/admin, including temporary dictionary fixture guidance if needed;
+- `docs/project-status.md` — Stage 7 implemented, Stage 8 next, plus the two unresolved numeric thresholds;
+- `.ai/report.md` — exact implementation, changed files, checks/browser flows, facts/unknowns/remaining risks.
+
+Do not change `SPEC.md`; the roadmap/stage is already approved.
 
 ## Out Of Scope
 
-- Stage 7 group CRUD, group forms, group detail, group moderation, group policies, group status actions, or group history UI.
-- **Добавить группу** or any fake/stub Stage 7 action.
-- Group application counters or application lists.
-- Group expiry/lifecycle/extension behavior.
-- Admin group management.
-- Editing psychologist profile data from the psychologist cabinet.
-- Uploading or deleting psychologist documents from the psychologist cabinet.
-- Password setup/reset/change UI.
-- Registration or public questionnaire intake.
-- Email/SMTP/queued notifications.
-- `/api/v1` external integrations.
-- Payments/bank integration.
-- New roles/permissions framework.
-- Schema migrations or domain-model changes unless an unexpected concrete blocker proves one strictly necessary and is reported instead of guessed.
-- New frontend dependencies, Node/npm/Vite, runtime CDN, Vue/React/Livewire/Inertia.
-- Redesign of accepted Stage 3/5 shared components.
+- Bank/acquirer adapter, redirect, return or webhook.
+- Creating `gp_payments` from any Stage 7 UI/action.
+- Making `awaiting_payment` reachable through Stage 7 product flows.
+- Payment history UI or bank/payment-success filters.
+- Automatic `active -> expired` scheduler behavior.
+- Expiry warning email/job/queue behavior.
+- Free or paid extension.
+- Participant application list/counters/status handling.
+- Public application intake or psychologist questionnaire intake API.
+- `/api/v1`, HMAC, idempotency or external-site integration.
+- Email/password onboarding or SMTP.
+- Dictionary/settings CRUD.
+- Inventing group-format/gender product dictionary values.
+- Inventing the rejection-reason minimum length.
+- Inventing the abandoned-draft age threshold.
+- New schema for groups/history unless a concrete incompatibility with the already-approved Stage 2 schema is proven and reported first.
+- Vue/React/Livewire/Inertia/Tailwind/Vite/npm/Node or runtime CDN dependencies.
+- Unrelated redesign/refactoring of accepted Stage 3–6 UI.
 
 ## Constraints
 
 - Follow `WORKFLOW.md`, `AGENTS.md`, current `SPEC.md`, `DESIGN_SYSTEM.md`, and `uikit/index.html`.
-- Work only from current `main` and the current task; do not change `.ai/task.md` during implementation.
-- Preserve the accepted Stage 4 auth/access pipeline and Stage 5 CRUD/document-security behavior.
-- Current-user identity for **Мои данные** comes only from the authenticated request; never trust client-provided user IDs for self-profile selection.
-- Keep controllers thin and use explicit policy/gate authorization for self-profile access.
-- Do not duplicate private document delivery; reuse the existing authorized controller/routes.
-- Use only shared design-system components/tokens; no cabinet-specific visual primitive or arbitrary CSS value.
-- Do not invent future group UX while Stage 7 remains separate.
-- No new dependencies unless an actual blocker is proven and reported first.
-- No `uikit/` runtime dependency or modification.
-- No secrets, real personal data, uploaded local fixtures, screenshots, browser artifacts, logs or caches in the commit.
+- Work only from current `main` and this task; do not modify `.ai/task.md` during execution.
+- Preserve Stage 4 auth/session/stale-session security and Stage 5/6 access/document behavior.
+- Reuse the existing `GroupStatus`, `GroupStatusTransitionService`, `SettingService`, models, schema and Laravel policy architecture.
+- No controller/form may directly write group status.
+- `accept` remains legacy/non-authoritative and must not become a workflow source of truth.
+- Money remains integer minor units; no floats.
+- Store timestamps in UTC and render through existing Europe/Minsk conventions.
+- Use Form Requests for all mutations/input validation.
+- Use explicit authorization in controller actions in addition to route role middleware.
+- Use only shared design-system components/tokens and approved page compositions.
+- Add shared Timeline/Money Input before product use; do not create page-specific copies.
+- Do not invent missing numeric/product/design values.
+- Do not seed unapproved dictionary items.
+- No new dependency unless a concrete blocker is proven and reported.
 
 ## Acceptance Criteria
 
-1. `/cabinet` is a real Stage 6 psychologist product entry and resolves to **Мои группы** rather than the old auth acceptance page.
-2. The cabinet has a reusable responsive layout with real **Мои группы**, **Мои данные**, and POST logout navigation only.
-3. **Мои группы** shows a truthful shared empty state and contains no fake Stage 7 group CRUD/action UI.
-4. **Мои данные** displays only the authenticated psychologist's questionnaire/profile data in a read-only Detail composition.
-5. Nullable, boolean and date/time profile values are rendered human-readably through existing presentation conventions.
-6. The psychologist cabinet exposes no profile-edit, tariff, disable/status, password, audit, upload, or document-delete controls.
-7. The current psychologist's private documents are listed through shared Document Item and existing authorized view/download routes; private paths are not exposed.
-8. A psychologist cannot obtain another psychologist's profile data by URL/query manipulation and cannot obtain another psychologist's document bytes.
-9. Guest/admin/psychologist route boundaries remain correct; ineligible/stale users continue to lose access according to Stage 4.
-10. Stage 5 admin CRUD, status/audit/session revocation and private-document security remain green.
-11. Desktop and mobile cabinet navigation, empty state, profile data and document list conform to the accepted design system with no horizontal overflow.
-12. No Stage 7 group CRUD/moderation, public API, email/onboarding or payment behavior is introduced.
-13. Focused Stage 6 tests and the full isolated-MySQL suite pass.
-14. Pint, Larastan/PHPStan, platform requirements, applicable JS syntax check if JS changes, and `git diff --check` pass.
-15. `docs/project-status.md` records Stage 6 as implemented only after implementation and verification are actually complete, with Stage 7 as next.
-16. `.ai/report.md` accurately records actual verification and final diff contains only Stage 6-related files.
+1. Psychologist can create a draft, save group data, submit to moderation, view all own groups and view group detail.
+2. A `free=false` psychologist follows the same Stage 7 direct-draft path, while the group's `free` snapshot remains `false`; no payment is created and `awaiting_payment` is not used.
+3. Psychologist can edit only own `draft`/`revision` groups and delete only own permitted `draft`/`rejected` groups.
+4. Another psychologist cannot view/edit/update/submit/delete a group by changing IDs.
+5. Admin has real group list/create/view/edit surfaces with search, status/free filters, defined quick filters, sorting and pagination without N+1.
+6. `draft -> moderation`, `revision -> moderation`, `moderation -> revision/rejected/approved`, and `approved -> active` happen only through `GroupStatusTransitionService`.
+7. Revision comment is required, preserved in history and visibly shown to psychologist.
+8. Rejection reason is required/non-empty, preserved in history and visibly shown to psychologist; no arbitrary numeric minimum is invented.
+9. History contains every Stage 7 transition with actor/date/comment and is visible to psychologist/admin through the shared Timeline.
+10. Admin activation uses configured placement duration and atomically sets `published_at`, `placement_days`, `expires_at`, clears warning timestamp and optionally stores `external_catalog_id`.
+11. Admin can manually soft-delete draft cleanup records but cannot use that action as a generic active/moderation delete.
+12. Existing group `public_uuid`, tariff snapshot, history and related rows remain preserved according to soft-delete/domain rules.
+13. Group forms use server-side validation and exact minor-unit money conversion; protected/system fields cannot be mass-assigned from requests.
+14. No Stage 7 web action creates a payment, redirects to a bank or exposes `awaiting_payment` as a selectable/reachable state.
+15. New UI uses approved List/Form/Detail patterns and shared components; Timeline and Money Input are generic and represented on `/ui-kit` before product use.
+16. Desktop/mobile flows are usable, moderation feedback is obvious, modals are compliant and tables do not cause page-level overflow.
+17. Existing Stage 4–6 security/product regressions remain green.
+18. Full MySQL test suite, Pint, Larastan/PHPStan, platform requirements, applicable JS syntax check and `git diff --check` pass.
+19. Final diff contains only Stage 7 group workflow/UI/tests/docs and justified shared UI additions.
+20. The two undefined numeric thresholds remain explicitly documented as unresolved rather than guessed.
 
 ## Checks
 
 Run and report at minimum:
 
-- focused Stage 6 cabinet feature tests;
-- existing `AuthenticationAccessTest` and `StaleAuthenticatedSessionTest`;
-- existing Stage 5 admin CRUD and psychologist document tests;
-- existing `UiKitPageTest`;
-- full `php artisan test` on the isolated MySQL test database;
-- `composer check` including Pint and Larastan/PHPStan;
+- focused group status/domain workflow tests, including stale/invalid transition cases;
+- focused psychologist group CRUD/policy/IDOR tests;
+- focused admin group CRUD/list/filter/sort/moderation/activation tests;
+- query-count/N+1 tests for psychologist and admin group lists;
+- payment-absence regression for both free and paid-tariff psychologists;
+- existing `AuthenticationAccessTest`, `StaleAuthenticatedSessionTest`, `UserSessionInvalidatorTest`, Stage 5 admin/document tests and Stage 6 cabinet tests;
+- existing and expanded `UiKitPageTest` for Timeline/Money Input if added;
+- full isolated-MySQL `php artisan test` / project `composer check` gate;
+- Pint and Larastan/PHPStan through the existing project command;
 - `composer check-platform-reqs`;
-- `node --check public/app.js` only if JS changes;
-- local route inspection for `/cabinet`, `/cabinet/groups`, `/cabinet/profile` and existing document routes;
-- local HTTP/browser login as development psychologist;
-- desktop browser verification of **Мои группы** and **Мои данные**;
-- mobile browser verification around 390px, including Drawer navigation and document actions;
-- browser self-scope check with two psychologists/unique markers if safely possible;
-- browser console/network inspection: no errors/warnings caused by the task and no runtime CDN/build-tool requests;
+- `node --check public/app.js` only if JS changes and Node is available externally without adding it as a dependency;
+- route inspection for group routes and absence of `/api/v1`/payment routes added by this task;
+- real browser flow at desktop and ~390px using temporary test dictionary fixtures if needed:
+  - psychologist create -> edit/save -> submit;
+  - admin request revision -> psychologist sees feedback -> edit/resubmit;
+  - separate reject fixture with visible reason;
+  - separate approve -> manual activation fixture with dates/external ID;
+  - ownership/available-action checks;
+  - admin search/filter/sort/pagination;
+  - mobile navigation/forms/modals/timeline;
+- browser console/network inspection with no runtime CDN/external requests;
+- cleanup of every temporary browser fixture/artifact;
 - `git diff --check`;
 - final `git status --short`, full diff and staged-file inspection.
 
@@ -323,23 +515,24 @@ Final manual visual/product acceptance remains with the product owner.
 
 Before implementation:
 
-- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, current `SPEC.md` Stage 6 and relevant §23/§28/§29 rules, `DESIGN_SYSTEM.md`, `docs/architecture.md`, `docs/development.md`, and `docs/project-status.md`;
-- inspect `routes/web.php`, current Stage 4 `/cabinet` view, `User`, `UserDocument`, `UserDocumentPolicy`, existing document controller/routes, Stage 5 admin profile/detail presentation, the existing UI components named in this task, and relevant auth/document tests;
-- inspect the approved `uikit/index.html` sections for navigation, Empty State, List/File Item, Key-Value/Description List and responsive behavior;
+- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, current Stage 7 sections of `SPEC.md`, `DESIGN_SYSTEM.md`, current project-status/architecture/development docs;
+- inspect `Group`, `GroupStatus`, `GroupStatusTransitionService`, `GroupStatusHistory`, payment status relation used only for deletion safety, settings service/key/seeder, dictionary definitions, current admin/cabinet layouts/routes and relevant shared UI components;
+- inspect the matching `uikit/index.html` Timeline, Money, Table/List, form and Modal examples;
 - run `git log --oneline -5` and `git status --short`;
-- confirm `TASK-2026-08-19-12` is the current planned task created from `10c8d94825859f2d6612888ab50f08e69ecf73d3` and Stage 7 has not already started;
+- confirm `TASK-2026-08-19-13` is the current planned task created from `ea2999606c79b861ed6f52b9de99dc6563328613`;
 - do not touch unknown local changes.
 
 Before commit:
 
 - complete all applicable focused/full/browser checks;
-- update `.ai/report.md` with actual results only;
+- update `.ai/report.md` with actual results only, including the unresolved numeric thresholds;
+- update only factual Stage 7 documentation;
 - inspect final Git status, full diff and staged files;
-- stage only Stage 6-related files;
-- ensure no secrets, real personal data, test uploads, screenshots, browser artifacts, logs, caches or unrelated files are committed.
+- stage only task-related files;
+- ensure no screenshots, Playwright artifacts, temporary dictionary/group/payment fixtures, uploaded files, logs, caches, secrets or sensitive data are committed.
 
 If the gate passes, commit with:
 
-`codex: TASK-2026-08-19-12 implement Stage 6 psychologist cabinet`
+`codex: TASK-2026-08-19-13 implement Stage 7 group CRUD and moderation`
 
-If a required product/design/security behavior cannot be safely implemented within this scope, report `partial`, `blocked`, or `failed` instead of starting Stage 7 or weakening existing boundaries.
+If safe completion is impossible because of a real unresolved product/design/security requirement, report `partial`, `blocked`, or `failed` instead of inventing the missing value or weakening existing boundaries.
