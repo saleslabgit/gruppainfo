@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const close = () => {
             panel.hidden = true;
+            select.classList.remove("is-open");
             trigger.setAttribute("aria-expanded", "false");
             trigger
                 .querySelector("svg")
@@ -31,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         trigger.addEventListener("click", () => {
             const opening = panel.hidden;
             panel.hidden = !opening;
+            select.classList.toggle("is-open", opening);
             trigger.setAttribute("aria-expanded", String(opening));
             trigger
                 .querySelector("svg")
@@ -53,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (["ArrowDown", "Enter", " "].includes(event.key)) {
                 event.preventDefault();
                 panel.hidden = false;
+                select.classList.add("is-open");
                 trigger.setAttribute("aria-expanded", "true");
                 trigger
                     .querySelector("svg")
@@ -94,6 +97,25 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!select.contains(event.target)) {
                 close();
             }
+        });
+    });
+
+    document.querySelectorAll("[data-ui-password]").forEach((password) => {
+        const input = password.querySelector("[data-ui-password-input]");
+        const toggle = password.querySelector("[data-ui-password-toggle]");
+
+        toggle.addEventListener("click", () => {
+            const revealed = input.type === "password";
+            input.type = revealed ? "text" : "password";
+            toggle.setAttribute("aria-pressed", String(revealed));
+            toggle.setAttribute(
+                "aria-label",
+                revealed ? "Скрыть пароль" : "Показать пароль",
+            );
+            toggle
+                .querySelector("svg")
+                ?.setAttribute("data-lucide", revealed ? "eye-off" : "eye");
+            window.lucide?.createIcons();
         });
     });
 });

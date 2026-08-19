@@ -30,7 +30,7 @@ Font: **Montserrat** (400, 500, 600, 700) — the only font in the system. Icon 
 | `color-background-disabled` | `#E4E1D8` | Disabled control background |
 | `color-border-default` | `#EBE9E2` | Default 1px borders |
 | `color-border-strong` | `#D6D2C8` | Hover borders |
-| `color-border-focus` | `#FF714A` | 2px focus border |
+| `color-border-focus` | `#FF714A` | Effective 2px focus edge |
 | `color-success` | `#2E9960` | Success icon/text/badge text, success progress fill |
 | `color-success-subtle` | `#E2F2E8` | Success badge/alert background |
 | `color-warning` | `#C97A17` | Warning icon/text/badge text |
@@ -60,7 +60,7 @@ Font: **Montserrat** (400, 500, 600, 700) — the only font in the system. Icon 
 | `color-highlight-card-title` | `#D14B29` | Highlighted Card title text |
 | `color-highlight-card-body` | `#8A4A32` | Highlighted Card body text |
 
-Every focusable element uses `color-border-focus` (2px border) **and** a `0 0 0 3px color-primary-subtle` box-shadow together. Focus is never color-only.
+Every focusable element uses one clean `color-border-focus` edge with an effective visual thickness of `2px` **and** a `3px color-primary-subtle` halo. The implementation must preserve the resting border geometry: keep the control's `1px` border, change it to `color-border-focus`, then add a `1px` outer primary ring and the halo. Focus is never color-only and never changes layout or creates an inner/nested ring.
 
 ### 1.2 Typography
 
@@ -141,9 +141,9 @@ One fixed radius value per component — no shared ambiguous "md/lg" range:
 
 ### 1.6 Borders
 
-- Width: `1px` for all default/hover/error/disabled borders. `2px` only for the focus ring border.
-- Colors: default `#EBE9E2`; hover `#D6D2C8`; focus `#FF714A` (2px, always paired with the halo below); error `#D14545` (1px, no halo); disabled `#EBE9E2`.
-- Focus halo (paired with every 2px focus border): `box-shadow: 0 0 0 3px #FFE1D3`.
+- Width: `1px` for all resting control borders. Focus keeps that geometry and creates an effective `2px` primary edge with one additional outer pixel; no state changes the control's box dimensions.
+- Colors: default `#EBE9E2`; hover `#D6D2C8`; focus `#FF714A` (effective 2px visual edge, always paired with the halo below); error `#D14545` (1px, no halo); disabled `#EBE9E2`.
+- Focus halo: after the effective 2px primary edge, render `3px #FFE1D3`; in CSS this is `box-shadow: 0 0 0 1px #FF714A, 0 0 0 4px #FFE1D3` on a control that retains its 1px border.
 
 ### 1.7 Shadows / elevation
 
@@ -155,7 +155,14 @@ One fixed radius value per component — no shared ambiguous "md/lg" range:
 | `shadow-modal` | `0 20px 48px rgba(60,56,52,0.22)` | Modal, Drawer |
 | `shadow-toast` | `0 12px 28px rgba(60,56,52,0.2)` | Toast |
 
-### 1.8 Icons
+### 1.8 Motion
+
+- Tokens: `motion-duration-fast:160ms`; `motion-ease-standard:ease-out`.
+- Apply them consistently to visual micro-interaction properties on interactive components: `color`, `background-color`, `border-color`, `box-shadow`, and `opacity` where applicable.
+- Never animate width, height, padding, margin, position, or other layout geometry.
+- Under `prefers-reduced-motion:reduce`, effectively disable nonessential project-defined transitions and animations. Do not replace Bootstrap's Modal/Offcanvas transition mechanism.
+
+### 1.9 Icons
 
 - Library: Lucide only. In production it must be delivered locally in accordance with the project architecture; the delivery mechanism is not defined by this design specification. No other icon library is permitted.
 - Stroke-width: `1.75` for all standalone and inline icons. `2` for spinner icons (`loader-2`). `2.5` for the checkmark glyph inside 20×20px Checkbox and inside the 13px table-row checkbox.
@@ -163,14 +170,14 @@ One fixed radius value per component — no shared ambiguous "md/lg" range:
 - Icon + text gap: `8px` inside buttons; `6px` inside all other inline contexts (chips, tabs badges, list metadata, breadcrumbs, dropdown items, filters, toolbar).
 - Icon color: `color-text-primary` by default; semantic color (`color-success`/`color-warning`/`color-danger`/`color-info`) when representing a status.
 
-### 1.9 Focus system
+### 1.10 Focus system
 
-Every focusable element (button, input, select, checkbox, radio, switch, link, tab, menu item) receives, on keyboard focus, exactly:
+Every focusable element (button, input, select, checkbox, radio, switch, link, tab, menu item) receives one visually identical, layout-stable treatment on keyboard focus:
 ```
-border: 2px solid #FF714A;
-box-shadow: 0 0 0 3px #FFE1D3;
+border-color: #FF714A; /* retain the resting 1px border width */
+box-shadow: 0 0 0 1px #FF714A, 0 0 0 4px #FFE1D3;
 ```
-No other focus treatment exists in this system.
+Composite controls apply this treatment only to their outer visual shell via `:focus-within`; their nested native input must not render a second focus ring. No other focus treatment exists in this system.
 
 ---
 
@@ -185,7 +192,7 @@ display: flex; min-height: 100vh; background: #F5F4F0;
 
 **Main content**: `margin-left: 264px; flex: 1; padding: 56px 64px 140px; max-width: 1180px`.
 
-**Sidebar nav group**: `margin-top: 8px` between groups. Group label: `padding: 14px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9C948A`. Nav item: `padding: 6px 10px; border-radius: 8px; font-size: 14px`.
+**Sidebar nav group**: `margin-top: 8px` between groups. Group label: `padding: 14px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9C948A`. Nav item: `padding: 6px 10px; border-radius: 8px; font-size: 14px`; adjacent nav items have a `4px` vertical gap in both the desktop Sidebar and mobile Drawer so active and hovered rounded surfaces never merge.
 
 ### Page header
 - Bottom margin before first section: `56px`.
@@ -256,7 +263,7 @@ Control height (Input/Button) never changes across breakpoints — always the va
 **Dimensions**: see §1.4 for height/padding/icon-size per size tier. Icon-to-label gap: `8px`. Border-radius: Small = `radius-sm` (8px); Default/Large = `radius-control` (10px).
 **Typography**: `text-button-sm` / `text-button-md` / `text-button-lg` matching the size tier, weight 600.
 
-**Primary**: default `background:#FF714A` `color:#FFFFFF` → hover `background:#E85F3A` → active `background:#D14B29` → focus `background:#FF714A` + `border:2px solid #D14B29` + halo → disabled `background:#E4E1D8` `color:#C4BEB3` → loading: background unchanged, `opacity:0.85`, an 16px `loader-2` spinner is prepended at `gap:8px`, button width and height do not change.
+**Primary**: default `background:#FF714A` `color:#FFFFFF` → hover `background:#E85F3A` → active `background:#D14B29` → focus `background:#FF714A` + the layout-stable focus treatment from §1.10 → disabled `background:#E4E1D8` `color:#C4BEB3` → loading: background unchanged, `opacity:0.85`, an 16px `loader-2` spinner is prepended at `gap:8px`, button width and height do not change.
 **Secondary**: default `border:1px solid #EBE9E2` `background:#FFFFFF` `color:#3C3834` → hover `border:#D6D2C8` `background:#F5F4F0` → active `background:#EBE9E2` → disabled `border:#EBE9E2` `color:#C4BEB3`.
 **Ghost**: default `background:transparent` `color:#3C3834` → hover `background:#EBE9E2` → disabled `color:#C4BEB3`.
 **Danger**: default `background:#D14545` `color:#FFFFFF` → hover `background:#B93A3A` → disabled `background:#FAE2E2` `color:#E9A6A6`.
@@ -269,17 +276,17 @@ Control height (Input/Button) never changes across breakpoints — always the va
 ### 4.2 Icon Button
 
 **Dimensions**: box size and icon size per §1.4 (Small 32×32/16px icon, Default 40×40/18px icon, Large 48×48/20px icon).
-**Colors**: default `border:1px solid #EBE9E2` `background:#FFFFFF` `color:#3C3834`; filled variant `background:#F5F4F0`; circular variant `border-radius:999px` `background:#FF714A` `color:#FFFFFF` (used only for a single primary floating add action); disabled `opacity:0.5` `color:#9C948A`; focus adds `border:2px solid #FF714A` + halo.
+**Colors**: default `border:1px solid #EBE9E2` `background:#FFFFFF` `color:#3C3834`; filled variant `background:#F5F4F0`; circular variant `border-radius:999px` `background:#FF714A` `color:#FFFFFF` (used only for a single primary floating add action); disabled `opacity:0.5` `color:#9C948A`; focus uses §1.10 without changing dimensions.
 
 ### 4.3 Links
 
-Default `color:#FF714A` underlined → hover `color:#D14B29` underlined → focus adds `outline:2px solid #FF714A`, `box-shadow:0 0 0 3px #FFE1D3`, `border-radius:4px`, `padding:2px 4px` → disabled `color:#9C948A` `opacity:0.8` no underline → destructive link `color:#D14545` underlined. Icon+text link: icon `14px`, `gap:6px`.
+Default `color:#FF714A` underlined → hover `color:#D14B29` underlined → focus uses the layout-stable treatment from §1.10 with `border-radius:4px` → disabled `color:#9C948A` `opacity:0.8` no underline → destructive link `color:#D14545` underlined. Icon+text link: icon `14px`, `gap:6px`.
 
 ### 4.4 Input
 
 **Anatomy**: Label → (required marker) → Control (prefix → value → suffix) → Helper or Error (never both at once).
-**Dimensions**: `height:40px`; `padding:0 14px`; `border-radius:10px`; label `margin-bottom:6px`; helper/error `margin-top:6px`; `width:100%` of its container.
-**States**: default/empty `border:1px solid #EBE9E2` `background:#FFFFFF`; hover `border:#D6D2C8`; focus `border:2px solid #FF714A` + halo; filled `border:#EBE9E2` `color:#3C3834`; error `border:1px solid #D14545`, error text below with a 13px `alert-circle` icon at `gap:5px`; disabled `background:#F5F4F0` `border:#EBE9E2` `color:#C4BEB3`; readonly `background:#F5F4F0` `border:#EBE9E2` `color:#71695F`.
+**Dimensions**: `height:40px`; `padding:0 14px`; `border-radius:10px`; label `margin-bottom:8px`; helper/error `margin-top:12px`; `width:100%` of its container.
+**States**: default/empty `border:1px solid #EBE9E2` `background:#FFFFFF`; hover `border:#D6D2C8`; focus uses the layout-stable primary edge + halo from §1.10; filled `border:#EBE9E2` `color:#3C3834`; error `border:1px solid #D14545`, error text below with a 13px `alert-circle` icon at `gap:5px`; disabled `background:#F5F4F0` `border:#EBE9E2` `color:#C4BEB3`; readonly `background:#F5F4F0` `border:#EBE9E2` `color:#71695F`.
 **Prefix**: attached block, `height:40px`, `padding:0 12px`, `background:#F5F4F0`, `border-radius:10px 0 0 10px`, joined to the control which becomes `border-radius:0 10px 10px 0`.
 **Suffix icon**: `18px`, positioned `right:12px`.
 **Types**: text, email, phone, number, password render identically; password adds a trailing `eye` icon at `right:12px`, size `18px`. No other type-specific visual variant exists.
@@ -293,24 +300,24 @@ Same border/color/state rules as Input. `height:96px` fixed (not `min-height`); 
 
 **Anatomy**: Label → trigger (value or placeholder + icon) → option panel.
 **Trigger**: `height:40px`, `padding:0 14px`, `border-radius:10px`, trailing icon `chevron-down` (closed) or `chevron-up` (open), `16px`.
-**Panel**: `padding:6px`, `border-radius:12px`, `box-shadow:shadow-md`, positioned directly below the trigger with `4px` vertical gap. Option: `padding:9px 10px`, `border-radius:8px`, `font-size:14px`.
-**States**: placeholder `color:#9C948A`; selected value `color:#3C3834`; open trigger gets the 2px focus border + halo; hover option `background:#F5F4F0`; selected option `background:#FF714A` `color:#FFFFFF` with a trailing `14px` check icon; disabled option `color:#C4BEB3`; error trigger `border:1px solid #D14545`.
+**Panel**: `padding:6px`, `border-radius:12px`, `box-shadow:shadow-md`, positioned directly below the trigger with `4px` vertical gap. Options form a vertical stack with `4px` between adjacent items. Option: `padding:9px 10px`, `border-radius:8px`, `font-size:14px`.
+**States**: placeholder `color:#9C948A`; selected value `color:#3C3834`; while open, the trigger retains the layout-stable focus treatment from §1.10 even when keyboard focus moves into an option; hover/focused unselected option `background:#F5F4F0`; selected option remains `background:#FF714A` `color:#FFFFFF` with a trailing `14px` check icon and is not replaced by hover styling; disabled option `color:#C4BEB3`; error trigger `border:1px solid #D14545`.
 **Forbidden**: no native `<select>` rendering — always this custom trigger+panel.
 
 ### 4.7 Checkbox
 
 `20×20px` box, `border-radius:5px`, label `gap:10px` (the `<label>` wraps both, making the label part of the clickable area).
-Unchecked `border:1px solid #D6D2C8` `background:#FFFFFF`; checked `background:#FF714A` with a `13px` white check icon (`stroke-width:2.5`); indeterminate `background:#FF714A` with a `10×2px` white bar; hover `border:#D6D2C8` `background:#F5F4F0`; focus `border:2px solid #FF714A` + halo; disabled unchecked `border:#EBE9E2` `background:#F5F4F0`; disabled checked `background:#E4E1D8` with white check icon.
+Unchecked `border:1px solid #D6D2C8` `background:#FFFFFF`; checked `background:#FF714A` with a `13px` white check icon (`stroke-width:2.5`); indeterminate `background:#FF714A` with a `10×2px` white bar; hover `border:#D6D2C8` `background:#F5F4F0`; focus uses §1.10 without changing dimensions; disabled unchecked `border:#EBE9E2` `background:#F5F4F0`; disabled checked `background:#E4E1D8` with white check icon.
 
 ### 4.8 Radio
 
 `20×20px` circle (`border-radius:999px`), label `gap:10px`.
-Unchecked `border:1px solid #D6D2C8`; selected `border:6px solid #FF714A` `background:#FFFFFF`; hover `border:#D6D2C8` `background:#F5F4F0`; focus `border:2px solid #FF714A` + halo; disabled `border:1px solid #EBE9E2` `background:#F5F4F0`.
+Unchecked `border:1px solid #D6D2C8`; selected `border:6px solid #FF714A` `background:#FFFFFF`; hover `border:#D6D2C8` `background:#F5F4F0`; focus uses §1.10 without changing dimensions; disabled `border:1px solid #EBE9E2` `background:#F5F4F0`.
 
 ### 4.9 Switch
 
 Track `44×26px`, `border-radius:999px`. Thumb `20×20px`, inset `3px` from the track edge (canonical size; see Unresolved for the source's one 18px outlier in the Focus demo, resolved here to 20px for consistency with every other Switch instance).
-Off `background:#EBE9E2`, thumb at `left:3px`; on `background:#FF714A`, thumb at `right:3px`; focus adds `border:2px solid #FF714A` + halo; disabled `background:#E4E1D8`, thumb `opacity:0.7`.
+Off `background:#EBE9E2`, thumb at `left:3px`; on `background:#FF714A`, thumb at `right:3px`; focus uses §1.10 without changing dimensions; disabled `background:#E4E1D8`, thumb `opacity:0.7`.
 Optional label `15px/500` at `gap:10px` from the track; optional description line below the label, `13px` `color:#9C948A`, `margin-top:2px`.
 
 ### 4.10 Date / Time / Money
@@ -333,7 +340,7 @@ Label→control: `8px`. Control→helper/error: `12px`. Between fields in the sa
 
 ### 4.13 Labels, Helper, Error
 
-Label: `14px/500`, `margin-bottom:6px`, `color:#3C3834` (`#C4BEB3` when disabled). Required marker: `*` in `color:#D14545`, immediately after the label text with no added spacing. Helper: `12px`, `color:#9C948A`. Error: `12px/500`, `color:#D14545`, optional `13px` `alert-circle` icon at `gap:5px`. Helper and Error never render at the same time.
+Label: `14px/500`, `margin-bottom:8px`, `color:#3C3834` (`#C4BEB3` when disabled). Required marker: `*` in `color:#D14545`, immediately after the label text with no added spacing. Helper: `12px`, `margin-top:12px`, `color:#9C948A`. Error: `12px/500`, `margin-top:12px`, `color:#D14545`, optional `13px` `alert-circle` icon at `gap:5px`. Helper and Error never render at the same time.
 
 ### 4.14 Badge / Status
 
@@ -351,7 +358,7 @@ Neutral `background:#EBE9E2` `color:#71695F`; Info `background:#E4EDF5` `color:#
 **Basic**: `background:#F5F4F0`, no border, `padding:20px`, `border-radius:14px`, `shadow-none`.
 **Interactive**: `background:#FFFFFF`, `border:1px solid #EBE9E2`, `padding:20px`, `border-radius:14px`, `cursor:pointer`; hover applies `shadow-sm`.
 **Highlighted**: `background:#FFE1D3`, `border:1px solid #FFD3BC`, `padding:20px`, `border-radius:14px`, title `color:#D14B29`, body `color:#8A4A32`.
-**With Header/Footer**: `border:1px solid #EBE9E2`, `border-radius:14px`, `overflow:hidden`. Header `padding:16px 20px` + `border-bottom:1px solid #EBE9E2`, title `15px/600`. Body `padding:20px`, `14px` `color:#71695F`. Footer `padding:14px 20px` + `border-top:1px solid #EBE9E2`, actions right-aligned.
+**With Header/Footer**: `border:1px solid #EBE9E2`, `border-radius:14px`, `overflow:hidden`. Header `padding:16px 20px` + `border-bottom:1px solid #EBE9E2`, title `15px/600`. Body `padding:20px`, `14px` `color:#71695F`. Footer `padding:14px 20px` + `border-top:1px solid #EBE9E2`, actions right-aligned. The final child in Header, Body, and Footer has no trailing bottom margin; component padding alone defines the final inset.
 **Forbidden**: no page-specific card name — every card is one of these 4 patterns. No shadow above `shadow-sm` on any Card.
 
 ### 4.17 Divider
@@ -609,10 +616,10 @@ Progress: value(0-100), variant(default|success)
 - Every Page Header uses the same vertical rhythm (title→description 12px, description→content 24px).
 - Every Table uses the same row rhythm (14px vertical / 20px horizontal padding) and the same header background (`#F5F4F0`).
 - Every Badge of the same semantic meaning uses the same bg/text pair regardless of the entity it describes.
-- Every focus ring in the system is visually identical: 2px `#FF714A` border + 3px `#FFE1D3` halo.
+- Every focus ring in the system is visually identical and layout-stable: an effective 2px `#FF714A` edge + 3px `#FFE1D3` halo, with composite controls focusing only their outer shell.
 - Every disabled element uses `#C4BEB3` text and `#F5F4F0`/`#E4E1D8` surface — never opacity alone.
 - Only Modal, Drawer, Dropdown Menu, Select panel, Popover, and Toast use an elevation shadow; no other component uses any shadow above `shadow-sm`.
-- Every icon is Lucide, `stroke-width:1.75` except the two documented exceptions in §1.8.
+- Every icon is Lucide, `stroke-width:1.75` except the two documented exceptions in §1.9.
 
 ---
 
