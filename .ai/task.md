@@ -1,228 +1,321 @@
-# Task: TASK-2026-08-19-11
+# Task: TASK-2026-08-19-12
 
 Status: planned
-Created from: e06dd53b99938ee8280495747ef297f6947248c7
+Created from: 10c8d94825859f2d6612888ab50f08e69ecf73d3
 
 ## Title
 
-Fix Stage 5 UI and design-system conformance gaps
+Implement Stage 6 psychologist cabinet
 
 ## Goal
 
-Close the four UI/design-system blockers found during acceptance of `TASK-2026-08-19-10` without changing the accepted Stage 5 CRUD, authorization, audit, document-security, session-revocation, or domain behavior.
+Implement the revised `SPEC.md` Stage 6 as the first real psychologist-facing product surface, using only the already accepted internal authentication, profile data, private-document access, and Stage 3/5 design-system primitives.
 
-The correction must make the shared File Upload interaction truthful and functional, align the shared two-column Description List with the exact canonical design values, compose confirmation modals through the approved Modal body/footer pattern, and restore the psychologist List page to the approved `PageHeader -> TableToolbar -> 16px gap -> Table -> Pagination` composition.
+After this task an approved, enabled psychologist can enter a real responsive cabinet, navigate between **Мои группы** and **Мои данные**, see a truthful pre-Stage-7 empty groups state, and read their own questionnaire/profile data and private documents. The cabinet must be strictly self-scoped: it must not accept another psychologist ID as a way to select profile data, must not leak another user's fields or documents, and must preserve all Stage 4/5 access boundaries.
 
-Stage 5 remains unaccepted until these corrections are complete.
+This task must not start Stage 7 group CRUD/moderation. In particular, it must not add group creation/edit/delete, group status actions, group detail, application counters, moderation history, payments, or fake controls for functionality that does not exist yet.
 
 ## Facts
 
-- Current `main` at task creation is `e06dd53b99938ee8280495747ef297f6947248c7` (`codex: TASK-2026-08-19-10 implement administrative psychologist CRUD`).
-- Stage 1–4 are accepted.
-- Stage 5 backend/security implementation passed review; the remaining blockers are UI/design-system conformance only.
-- The current Stage 5 implementation already has working psychologist CRUD, policies, status transitions, audit, private document storage/delivery, MIME validation, IDOR protection, session invalidation, search/filters/pagination, and automated tests.
-- `DESIGN_SYSTEM.md` already contains the canonical rules needed for all four corrections. It is not missing a design decision and must not be changed merely to justify the current implementation.
-- `uikit/index.html` remains the approved visual reference where `DESIGN_SYSTEM.md` does not already resolve intent.
-- The current File Upload component says the user may choose or drag a file, and renders a drag-over state, but its JS does not actually transfer dropped files into the native file input.
-- The current two-column Description List uses `1fr 1fr` and `12px 32px`, while `DESIGN_SYSTEM.md §4.38` requires `grid-template-columns:max-content max-content`, `justify-content:start`, and `gap:8px 16px`.
-- The current psychologist detail page nests standalone `x-ui.confirmation` inside `x-ui.modal`. The Modal design specification defines confirmation/destructive confirmation as a Modal usage pattern whose short message lives in the body and whose actions live in the Modal footer.
-- The current psychologist list wraps Toolbar, Table, and Pagination in one bordered `.ui-table-wrap`, with the Table starting immediately under the toolbar. `DESIGN_SYSTEM.md §6` requires the List page sequence `PageHeader -> TableToolbar -> 16px gap -> Table -> Pagination`, with Pagination as the Table footer and no gap between Table and Pagination.
-- `DESIGN_SYSTEM.md` and `uikit/` are reference/governance sources only and remain outside runtime.
+- Current `main` at task creation is `10c8d94825859f2d6612888ab50f08e69ecf73d3` (`codex: TASK-2026-08-19-11 fix Stage 5 UI design-system gaps`).
+- Stage 1–4 are accepted. The user requested moving to the next stage after technical acceptance of the Stage 5 correction, so Stage 5 is the implemented baseline for this task.
+- Current `SPEC.md` Stage 6 requires a shared psychologist cabinet layout, pages **Мои группы** and **Мои данные**, display of the current psychologist's data/documents, empty states, mobile support, self-only access, and no admin access.
+- `SPEC.md §23` states that **Мои данные** shows the psychologist questionnaire data and that self-editing is not required in MVP.
+- Stage 7, not Stage 6, owns the real group list content, group create/edit/delete, moderation workflow, group status/history presentation, ownership policies for group CRUD, and group actions.
+- The accepted Stage 4 route boundary already provides `stale-session -> auth -> eligible -> role:psychologist` for `/cabinet`.
+- The current `/cabinet` is only a Stage 4 acceptance view and has no product content yet.
+- `App\Models\User` already exposes `educationType`, `documents`, `groups`, `fullName()`, typed questionnaire booleans, and `personal_data_consent_at`.
+- Stage 5 already implemented private documents on `storage/app/private`, centralized `UserDocumentType` labels, `x-ui.document-item`, and owner/admin document authorization. An authenticated psychologist can view/download only their own document through the existing protected `documents.view` / `documents.download` routes; another psychologist receives authorization denial.
+- Stage 5 already implemented the corrected shared `Description List`, `Document Item`, `Empty State`, AppShell/Drawer, PageHeader, Card, Date and other primitives needed by this stage. No new visual component is expected to be necessary.
+- `DESIGN_SYSTEM.md §4.29` defines the Empty State, §4.37 the File/Document Item, §4.38 the Key-Value/Description List, and §6 the approved page composition patterns.
+- The relevant `uikit/index.html` reference contains the approved Empty State, List Item/File Item, Key-Value, Sidebar/Drawer and responsive visual intent. It remains reference-only.
+- The development/testing psychologist from Stage 4 already provides known local credentials for manual cabinet verification. Stage 5 can be used to populate that development psychologist's profile and documents if richer manual fixtures are desired; Stage 6 does not need a new password mechanism or extra product seed identity.
 
 ## Assumptions
 
-- Fix the shared components and shared layout primitives where the defect is generic; do not patch only one psychologist page if the same shared component would remain wrong elsewhere.
-- File Upload remains a normal multipart form control. This task does not introduce AJAX upload or fake progress behavior. Drag-and-drop only needs to select the dropped file(s) into the existing native input so the existing form submit flow works.
-- The current File Upload is single-file. A dropped selection should obey the native single-file semantics rather than silently adding multi-file behavior.
-- The existing `x-ui.modal` footer slot is the correct primitive for confirmation actions. Do not create a new confirmation-modal component unless the existing shared Modal API proves insufficient.
-- Standalone `x-ui.confirmation` remains valid for standalone confirmation surfaces defined by `DESIGN_SYSTEM.md §4.32`; this task only removes its misuse inside Modal confirmation flows.
-- The psychologist list may use a small generic shared list/table composition wrapper if useful, but it must not introduce psychologist-specific layout CSS.
+- Use a reusable psychologist cabinet layout, analogous in responsibility to the accepted admin layout, composed from `x-ui.app-shell`. It should expose only real Stage 6 navigation: **Мои группы**, **Мои данные**, and POST logout.
+- `/cabinet` should resolve to the primary **Мои группы** section, preferably by redirecting to a named `/cabinet/groups` route rather than keeping a third fake overview page.
+- Use `/cabinet/groups` for **Мои группы** and `/cabinet/profile` for **Мои данные** unless an existing repository convention discovered during implementation provides an equally clear stable route. Do not expose a user ID parameter for the own-profile route.
+- Because Stage 7 owns the actual group list/CRUD, Stage 6 **Мои группы** is intentionally an empty-content state. The shared Empty State replaces the future list data region; do not fabricate a toolbar, table, pagination, group card schema, or add-group CTA merely to make the page look fuller. This is the pre-Stage-7 empty state of the future list surface, not a new product page pattern.
+- The psychologist's **Мои данные** page is read-only. It shows questionnaire/profile information useful to the psychologist and their private documents, but does not expose administrator-only controls or system/security fields such as tariff management, disabled toggle, status transitions, `admin`, password, `accept`, session state, audit records, or internal storage paths.
+- The questionnaire fields visible to the psychologist are the same personal/questionnaire facts already stored for that user: identity/contact, education/training/license, group-leading experience, confirmations, webinar readiness, personal-data consent metadata, and their document list. Nullable values use the existing neutral `Не указано` representation.
+- Existing owner document routes are the correct delivery boundary. Stage 6 should link to them rather than add duplicate cabinet-specific file-serving routes.
+- `SPEC.md §28` requires explicit authorization. For the own-profile cabinet controller, add or reuse a clearly named policy/gate ability for self-view access rather than relying only on Blade assumptions. Do not broaden the existing admin-oriented `UserPolicy::view` semantics in a way that weakens Stage 5 authorization.
+- No new design-system component should be added unless implementation proves an actually required shared primitive is missing. If a required visual pattern is absent or unresolved, report the gap instead of inventing it.
 
 ## Unknowns
 
-None that block this correction.
+None that block this stage.
 
 ## Scope
 
-### 1. Make File Upload drag-and-drop actually work
+### 1. Real psychologist cabinet routes and controller boundary
 
-Correct the shared File Upload behavior in `resources/views/components/ui/file-upload.blade.php`, `public/app.js`, and shared CSS only as needed.
+Replace the Stage 4 acceptance-only `/cabinet` surface with real Stage 6 routes/controllers while preserving the existing protected middleware pipeline.
 
-Required behavior:
+At minimum:
 
-- clicking the dropzone continues to open the native file picker;
-- `dragenter` / `dragover` prevent the browser's default file-open/navigation behavior and activate the approved drag-over state;
-- `dragleave` removes the drag-over state when appropriate;
-- `drop` prevents default browser behavior, removes the drag-over state, and transfers the dropped file into the component's native `<input type="file">` using browser-supported file APIs;
-- after a successful drop, the same visible filename label used by picker selection updates to the dropped filename;
-- the existing form submit sends the dropped file through the same multipart field as picker selection;
-- do not bypass the existing server-side MIME/type/size validation;
-- do not implement client-side security validation as a replacement for server validation;
-- do not implement AJAX upload, upload progress, multiple files, or a new upload workflow;
-- if a drag payload contains no file, leave the current file selection unchanged and do not navigate/open it in the browser.
+- `/cabinet` resolves to the main **Мои группы** section;
+- `GET /cabinet/groups` renders **Мои группы**;
+- `GET /cabinet/profile` renders **Мои данные**;
+- all three remain inside `stale-session -> auth -> eligible -> role:psychologist`;
+- an administrator cannot use these routes as a parallel product interface;
+- a guest is redirected by normal auth behavior;
+- a psychologist made ineligible remains revoked by the accepted Stage 4 middleware behavior.
 
-Keep the approved File Upload dimensions, colors, border, drag-over styling, error styling, and visual language unchanged unless a concrete existing implementation value differs from `DESIGN_SYSTEM.md`.
+Use a thin controller for product reads rather than growing route closures. Keep data selection out of Blade.
 
-Add the smallest useful regression coverage. Because project Node/browser dependencies are prohibited, do not add a JS test framework. If existing browser tooling is available externally, verify a real drag-and-drop interaction there and record the result. Static PHP/UI tests may verify required hooks/markup but must not falsely claim they prove browser drop behavior.
+For the own-profile action:
 
-### 2. Correct the shared two-column Description List
+- derive the psychologist from the authenticated request/session only;
+- do not accept `user_id`, `psychologist_id`, route model binding, query parameter, hidden input, or other client-controlled identity selector for **Мои данные**;
+- explicitly authorize the self-view operation through a policy/gate ability appropriate to the existing architecture;
+- eager-load only the relationships needed for the page, at minimum `educationType` and `documents`.
 
-Align the shared `Description List / Key-Value` two-column variant exactly with `DESIGN_SYSTEM.md §4.38`.
+Do not add any mutation endpoint to the cabinet in this stage.
 
-For the two-column variant use:
+### 2. Reusable psychologist cabinet layout/navigation
 
-- `display:grid`;
-- `grid-template-columns:max-content max-content`;
-- `justify-content:start`;
-- `gap:8px 16px`;
-- existing approved label/value typography.
+Add a reusable cabinet layout based on the shared application shell.
 
-Do not keep the current invented `1fr 1fr` / `12px 32px` desktop rule.
+Navigation must contain only real current product sections:
 
-Preserve the approved responsive behavior for narrow screens without inventing a new component variant. If the existing mobile collapse is necessary for readability, ensure it composes from the same shared component and does not change the canonical desktop/tablet values.
-
-Verify the psychologist detail page and `/ui-kit` use the corrected shared component with no page-specific override.
-
-### 3. Recompose confirmation modals through the Modal footer
-
-Fix all Stage 5 confirmation/destructive-confirmation flows on the psychologist detail page so they use the approved Modal usage pattern.
-
-For Modal-based confirmations:
-
-- Modal Header contains the modal title and close action;
-- Modal Body contains the short explanatory/confirmation message;
-- Modal Footer contains the actions;
-- desktop/tablet action order remains Secondary/Cancel left and Primary/Danger right;
-- mobile action behavior continues to follow the existing approved full-width stacked ordering;
-- destructive actions use the Danger button variant;
-- do not nest the standalone bordered/padded Confirmation component inside Modal body;
-- remove any shared CSS special case whose only purpose was to neutralize a nested `.ui-confirmation` inside `.ui-modal`, unless another approved UI-kit example still requires it for a valid reason;
-- keep standalone `x-ui.confirmation` itself correct and available for standalone use.
-
-Apply this to all Stage 5 psychologist confirmation flows, including approve, reject, tariff change, enable/disable, psychologist delete, and document delete.
-
-Do not change the underlying routes, HTTP methods, authorization, domain operations, session invalidation, audit, or confirmation wording except where minimal wording cleanup is required to fit the proper body/footer structure.
-
-### 4. Restore the approved List page composition
-
-Correct the psychologist list layout to match `DESIGN_SYSTEM.md §6` exactly at the composition level:
-
-1. PageHeader;
-2. TableToolbar with a 24px gap from PageHeader;
-3. 16px gap between TableToolbar and Table;
-4. Table;
-5. Pagination immediately attached/rendered as the Table footer with 0px gap.
+- **Мои группы**;
+- **Мои данные**;
+- POST logout using the existing route/CSRF behavior.
 
 Requirements:
 
-- do not wrap Toolbar + Table + Pagination into one invented bordered shell if that removes the required Toolbar-to-Table gap;
-- the Table keeps its own approved border/radius/container appearance from §4.18;
-- Pagination visually belongs to the Table footer and does not gain a separate arbitrary card/shell;
-- preserve working search, desktop Filters, mobile Drawer Filters, chips, result count, empty/no-results behavior, non-selectable table mode, pagination URLs/query preservation, and responsive horizontal table behavior;
-- if shared Table/Pagination components need a small generic composition adjustment to achieve the approved pattern, implement it generically and keep existing UI-kit examples valid;
-- no psychologist-page-specific spacing, border, radius, or shadow values.
+- active navigation state follows the current section;
+- desktop uses the existing persistent Sidebar;
+- tablet/mobile use the existing AppShell Drawer/Topbar behavior;
+- do not add disabled/fake links for Stage 7+ features;
+- do not duplicate the complete shell markup per page;
+- no page-specific colors, spacing, icons or navigation variant outside the existing design system.
 
-Update `/ui-kit` only if needed to keep the canonical shared List/Table/Pagination presentation inspectable.
+If a small generic navigation helper/partial is needed to avoid unsafe raw HTML duplication, keep it generic and within the existing UI/layout architecture. Do not refactor the accepted admin layout unless the smallest safe reuse genuinely requires it.
 
-### 5. Preserve Stage 5 backend/security behavior
+### 3. **Мои группы** pre-Stage-7 empty state
 
-Do not change product/domain behavior while fixing UI.
+Implement the real cabinet landing section with a truthful empty state only.
 
-Explicitly preserve:
+Requirements:
 
-- admin-only psychologist CRUD;
-- protected profile-field allowlist;
-- `pending -> approved/rejected` domain transitions;
-- tariff and enabled/disabled actions;
-- `UserSessionInvalidator` behavior on reject/disable/delete;
-- append-only actor audit;
-- active-email uniqueness semantics;
-- private storage and `serve=false` behavior;
-- PDF/JPEG/PNG content/MIME validation;
-- document owner/admin access and IDOR protections;
-- no public `/api/v1`, email/onboarding, Stage 6 cabinet content, payment flow, or new role system.
+- PageHeader title: **Мои группы** with concise truthful supporting text;
+- use the shared `x-ui.empty-state` with an approved empty-data icon/state;
+- communicate that groups will appear in this section once they are added in the product flow;
+- no **Добавить группу** button or any other CTA pointing to an unimplemented route;
+- no fake group rows/cards, fake counts, fake statuses, fake moderation notices, toolbar, filters, pagination, applications, payments, or dates;
+- do not implement Group queries/serialization merely to pre-build Stage 7;
+- do not add Group policies/controllers/actions as part of this task.
 
-### 6. Tests, browser verification, and report
+The page must remain visually valid on desktop and mobile using only existing shared components/tokens.
 
-Add/update focused tests only where they provide meaningful regression protection for these corrections.
+### 4. **Мои данные** read-only profile page
 
-At minimum verify:
+Implement the current psychologist's questionnaire/profile as the approved Detail-page composition using shared Card + Description List primitives.
 
-- shared Description List renders the corrected canonical class/structure and Stage 5 detail still renders;
-- Stage 5 confirmation modals render actions through Modal footer and do not render nested standalone confirmation wrappers inside those modals;
-- psychologist list renders Toolbar, Table, and Pagination in the intended separate/attached composition without breaking search/filter/pagination behavior;
-- File Upload still renders the shared native file input/dropzone hooks and normal multipart upload tests remain green;
-- real browser drag-and-drop selection/upload if existing browser tooling supports synthetic drag/drop without adding repository dependencies;
-- desktop and mobile Stage 5 flows remain visually usable after the layout correction.
+Display, where present:
 
-Run the full existing project gate and preserve all Stage 5 backend/security tests.
+- surname, first name, middle name;
+- email and phone;
+- education type;
+- other education;
+- modality/program;
+- training center;
+- graduation year;
+- training hours;
+- license number;
+- license expiry date;
+- group-leading experience;
+- groups-held count;
+- documents-truth confirmation;
+- education-compliance confirmation;
+- webinar/live readiness;
+- personal-data-consent date/time;
+- personal-data-consent version.
 
-Update `.ai/report.md` with the exact four corrections, changed files, test/check results, browser verification actually performed, and any limitation. Update factual docs only if the shared UI implementation description materially changes; avoid documentation churn.
+Presentation requirements:
+
+- nullable/empty values render truthfully as `Не указано`;
+- questionnaire booleans render the same centralized yes/no/not-specified wording used by the accepted Stage 5 presentation, without raw `0/1`;
+- dates/date-times use existing date/time presentation conventions; display timestamps in configured `Europe/Minsk` presentation timezone;
+- do not show raw enum/database codes where a human-readable label already exists;
+- do not show tariff (`free`), admin flag, disabled flag, password/remember token, legacy `accept`, generated `active_email`, internal audit metadata, storage paths, or session information as profile data;
+- do not render Edit, Save, Upload, Delete, status-action, tariff-action, access-action, or password controls;
+- do not add a profile update endpoint.
+
+Reuse the corrected shared Description List. Do not create a cabinet-only Key-Value variant or page-specific CSS fork.
+
+### 5. Own private documents in **Мои данные**
+
+Render only the current psychologist's documents below the profile information.
+
+Requirements:
+
+- use the existing `x-ui.document-item` and centralized `UserDocumentType` label;
+- show original filename and safe metadata such as document category and size;
+- provide **Открыть** / **Скачать** through the existing authorized `documents.view` / `documents.download` routes;
+- do not expose `path`, filesystem disk name, private storage directory, or a `/storage/...` URL;
+- no upload control in the psychologist cabinet;
+- no delete control in the psychologist cabinet;
+- if there are no documents, render a truthful shared empty state rather than a broken/blank area;
+- no document mutation behavior is introduced.
+
+Preserve the existing document policy: owner can receive their bytes, another psychologist cannot. Do not weaken admin document access.
+
+### 6. Self-scope and IDOR protection
+
+Stage 6 must make cross-user access structurally difficult and test it explicitly.
+
+At minimum:
+
+- **Мои данные** has no route parameter selecting a user;
+- when two psychologists exist, the first psychologist's profile page renders the first user's fields/documents and does not render a unique marker belonging only to the second user;
+- a psychologist can open/download their own document;
+- the same psychologist receives 403/not-found equivalent for another psychologist's document and never receives the bytes;
+- an administrator cannot access psychologist-only cabinet routes;
+- a psychologist still receives denial for Stage 5 admin routes;
+- changing query parameters must not select another psychologist's profile because profile identity comes only from the authenticated user.
+
+Keep existing Stage 4 stale-session/access revocation and Stage 5 document-policy tests green.
+
+### 7. UI/design-system and responsive verification
+
+Use `DESIGN_SYSTEM.md` and `uikit/index.html` exactly as governance requires.
+
+Expected existing shared components are sufficient:
+
+- AppShell / Drawer navigation;
+- PageHeader;
+- Card;
+- Description List / Description Item;
+- Document Item;
+- Empty State;
+- Date;
+- normal text/link primitives.
+
+Do not add a new visual variant simply for the cabinet.
+
+Verify at least normal desktop and mobile (~390px):
+
+- navigation active states;
+- mobile Drawer access to both sections and logout;
+- **Мои группы** empty state fits without overflow;
+- **Мои данные** Description Lists collapse/read correctly;
+- document items/actions remain usable on mobile;
+- no horizontal page overflow;
+- no runtime CDN/build regression;
+- keyboard focus remains the accepted shared behavior.
+
+No UI-kit change is required unless a generic shared component actually changes. If no shared component changes, keep `/ui-kit` untouched and just preserve its tests.
+
+### 8. Tests
+
+Add focused feature/integration coverage, preferably in a dedicated Stage 6 cabinet test file.
+
+Cover at minimum:
+
+1. guest `/cabinet`, `/cabinet/groups`, and `/cabinet/profile` requests follow normal login redirect behavior;
+2. administrator receives the existing explicit role denial on psychologist cabinet product routes;
+3. approved enabled psychologist reaches `/cabinet`, is directed to **Мои группы**, and sees the Stage 6 empty state;
+4. **Мои группы** contains no fake Stage 7 create/edit/group action route or button;
+5. psychologist opens **Мои данные** and sees their own questionnaire values including representative nullable, boolean and date/time fields;
+6. profile page does not show another psychologist's unique data marker;
+7. profile page does not expose admin/security fields or mutation controls;
+8. own documents are listed with view/download links and no raw private path;
+9. profile with zero documents renders the approved empty document state;
+10. own document view/download remains authorized and another psychologist's document remains denied;
+11. existing `/admin` denial for psychologists remains green;
+12. existing disabled/rejected/soft-delete/stale-session behavior remains green;
+13. Stage 5 admin CRUD/document/audit behavior remains green;
+14. `/ui-kit` remains local/testing-only and unchanged unless a justified shared component modification occurs.
+
+Where useful, assert query behavior remains bounded and no per-document relationship N+1 is introduced by the profile page.
+
+### 9. Documentation and report
+
+Update only documentation made factual by the implementation:
+
+- `docs/architecture.md` — psychologist cabinet self-scope/read boundary and reuse of the existing private-document policy/controller;
+- `docs/development.md` — local Stage 6 URLs and concise manual verification using the development psychologist;
+- `docs/project-status.md` — Stage 6 implemented and Stage 7 next;
+- `.ai/report.md` — exact implementation, changed files, tests, browser checks and remaining gaps.
+
+Do not change `SPEC.md`; Stage 6 and the roadmap are already approved.
 
 ## Out Of Scope
 
-- Any Stage 6 psychologist cabinet product work.
-- Changes to CRUD/domain/status/audit/session business behavior.
-- New user fields or schema changes.
-- New document types or upload business rules.
-- AJAX upload or progress UI.
-- Multiple-file upload.
-- Email/onboarding/password setup.
-- Public API/integration routes.
-- Payment/bank functionality.
-- Redesigning unrelated Stage 3/5 components.
-- Changing `DESIGN_SYSTEM.md` to match the implementation; the design document already contains the required canonical rules.
-- Changing `uikit/index.html` or `uikit/support.js`.
-- Node/npm/Vite or new browser/frontend dependencies.
+- Stage 7 group CRUD, group forms, group detail, group moderation, group policies, group status actions, or group history UI.
+- **Добавить группу** or any fake/stub Stage 7 action.
+- Group application counters or application lists.
+- Group expiry/lifecycle/extension behavior.
+- Admin group management.
+- Editing psychologist profile data from the psychologist cabinet.
+- Uploading or deleting psychologist documents from the psychologist cabinet.
+- Password setup/reset/change UI.
+- Registration or public questionnaire intake.
+- Email/SMTP/queued notifications.
+- `/api/v1` external integrations.
+- Payments/bank integration.
+- New roles/permissions framework.
+- Schema migrations or domain-model changes unless an unexpected concrete blocker proves one strictly necessary and is reported instead of guessed.
+- New frontend dependencies, Node/npm/Vite, runtime CDN, Vue/React/Livewire/Inertia.
+- Redesign of accepted Stage 3/5 shared components.
 
 ## Constraints
 
-- Follow `WORKFLOW.md`, `AGENTS.md`, `DESIGN_SYSTEM.md`, and current `SPEC.md`.
-- Before implementation, inspect the exact relevant sections in `DESIGN_SYSTEM.md` and the corresponding `uikit/index.html` examples for File Upload, Key-Value/Description List, Modal/Confirmation, Table Toolbar/Table/Pagination, and List page composition.
-- Explicit numeric values and implementation rules from `DESIGN_SYSTEM.md` take priority over the visual reference.
-- Fix shared design-system primitives rather than creating page-specific copies or overrides.
-- Use only the existing Blade + local Bootstrap + project CSS + Vanilla JS stack.
-- Do not add dependencies, runtime CDN requests, Node/npm/Vite, or frontend build tooling.
-- Preserve all Stage 4 authentication and Stage 5 security behavior.
-- Keep the correction narrowly scoped to the four acceptance blockers.
+- Follow `WORKFLOW.md`, `AGENTS.md`, current `SPEC.md`, `DESIGN_SYSTEM.md`, and `uikit/index.html`.
+- Work only from current `main` and the current task; do not change `.ai/task.md` during implementation.
+- Preserve the accepted Stage 4 auth/access pipeline and Stage 5 CRUD/document-security behavior.
+- Current-user identity for **Мои данные** comes only from the authenticated request; never trust client-provided user IDs for self-profile selection.
+- Keep controllers thin and use explicit policy/gate authorization for self-profile access.
+- Do not duplicate private document delivery; reuse the existing authorized controller/routes.
+- Use only shared design-system components/tokens; no cabinet-specific visual primitive or arbitrary CSS value.
+- Do not invent future group UX while Stage 7 remains separate.
+- No new dependencies unless an actual blocker is proven and reported first.
+- No `uikit/` runtime dependency or modification.
+- No secrets, real personal data, uploaded local fixtures, screenshots, browser artifacts, logs or caches in the commit.
 
 ## Acceptance Criteria
 
-1. Dragging a valid file onto the shared File Upload selects that file in the native input and the existing form can submit it normally.
-2. File Upload prevents default browser file-navigation behavior during drag/drop and retains the approved drag-over/error visual states.
-3. File picker selection continues to work and uses the same filename display as drag/drop.
-4. No AJAX/multiple-file/progress behavior is introduced.
-5. The shared two-column Description List uses exactly `max-content max-content`, `justify-content:start`, and `8px 16px` gap on the canonical desktop/tablet presentation.
-6. The psychologist detail page uses the corrected shared Description List without page-specific layout overrides.
-7. Every Stage 5 Modal confirmation places message content in Modal Body and actions in Modal Footer; no standalone Confirmation shell is nested inside those Modal bodies.
-8. Desktop/tablet and mobile confirmation action ordering/width remain compliant with the existing design-system rules.
-9. The psychologist List page follows `PageHeader -> TableToolbar -> 16px gap -> Table -> Pagination`, with Pagination attached as the Table footer and no invented combined Toolbar/Table shell.
-10. Search, filters, chips, pagination state/query parameters, empty/no-results behavior, and responsive table behavior remain functional.
-11. `/ui-kit` continues to represent the corrected shared components and remains production-guarded.
-12. No Stage 5 backend/security/domain behavior changes or regressions are introduced.
-13. Existing auth/session, CRUD, audit, document security/MIME/IDOR, and UI-kit tests remain green.
-14. Full PHPUnit/MySQL suite, Pint, Larastan/PHPStan, platform requirements, applicable JS syntax check, and `git diff --check` pass.
-15. Browser verification covers the corrected desktop/mobile surfaces and real drag/drop if supported by the existing external browser tooling; any unsupported check is stated explicitly rather than claimed.
-16. Final diff contains only files required for this Stage 5 UI correction.
+1. `/cabinet` is a real Stage 6 psychologist product entry and resolves to **Мои группы** rather than the old auth acceptance page.
+2. The cabinet has a reusable responsive layout with real **Мои группы**, **Мои данные**, and POST logout navigation only.
+3. **Мои группы** shows a truthful shared empty state and contains no fake Stage 7 group CRUD/action UI.
+4. **Мои данные** displays only the authenticated psychologist's questionnaire/profile data in a read-only Detail composition.
+5. Nullable, boolean and date/time profile values are rendered human-readably through existing presentation conventions.
+6. The psychologist cabinet exposes no profile-edit, tariff, disable/status, password, audit, upload, or document-delete controls.
+7. The current psychologist's private documents are listed through shared Document Item and existing authorized view/download routes; private paths are not exposed.
+8. A psychologist cannot obtain another psychologist's profile data by URL/query manipulation and cannot obtain another psychologist's document bytes.
+9. Guest/admin/psychologist route boundaries remain correct; ineligible/stale users continue to lose access according to Stage 4.
+10. Stage 5 admin CRUD, status/audit/session revocation and private-document security remain green.
+11. Desktop and mobile cabinet navigation, empty state, profile data and document list conform to the accepted design system with no horizontal overflow.
+12. No Stage 7 group CRUD/moderation, public API, email/onboarding or payment behavior is introduced.
+13. Focused Stage 6 tests and the full isolated-MySQL suite pass.
+14. Pint, Larastan/PHPStan, platform requirements, applicable JS syntax check if JS changes, and `git diff --check` pass.
+15. `docs/project-status.md` records Stage 6 as implemented only after implementation and verification are actually complete, with Stage 7 as next.
+16. `.ai/report.md` accurately records actual verification and final diff contains only Stage 6-related files.
 
 ## Checks
 
 Run and report at minimum:
 
-- focused Stage 5 UI/component tests for corrected Description List, Modal confirmation composition, and List layout;
-- existing `AdminPsychologistCrudTest` and `PsychologistDocumentTest`;
-- existing auth/session security regressions;
-- existing and updated `UiKitPageTest`;
-- full `php artisan test` on isolated MySQL;
+- focused Stage 6 cabinet feature tests;
+- existing `AuthenticationAccessTest` and `StaleAuthenticatedSessionTest`;
+- existing Stage 5 admin CRUD and psychologist document tests;
+- existing `UiKitPageTest`;
+- full `php artisan test` on the isolated MySQL test database;
 - `composer check` including Pint and Larastan/PHPStan;
 - `composer check-platform-reqs`;
-- `node --check public/app.js` if Node is available externally without adding it as a project dependency;
-- local HTTP checks for psychologist list/detail and `/ui-kit`;
-- real browser desktop and mobile check of list spacing, filters, detail Description List, and confirmation modals;
-- real browser File Upload picker and drag/drop interaction if supported by existing tooling;
-- browser console/network inspection: no new errors/warnings and no runtime CDN requests;
+- `node --check public/app.js` only if JS changes;
+- local route inspection for `/cabinet`, `/cabinet/groups`, `/cabinet/profile` and existing document routes;
+- local HTTP/browser login as development psychologist;
+- desktop browser verification of **Мои группы** and **Мои данные**;
+- mobile browser verification around 390px, including Drawer navigation and document actions;
+- browser self-scope check with two psychologists/unique markers if safely possible;
+- browser console/network inspection: no errors/warnings caused by the task and no runtime CDN/build-tool requests;
 - `git diff --check`;
-- final `git status --short`, full diff, and staged-file inspection.
+- final `git status --short`, full diff and staged-file inspection.
 
 Final manual visual/product acceptance remains with the product owner.
 
@@ -230,23 +323,23 @@ Final manual visual/product acceptance remains with the product owner.
 
 Before implementation:
 
-- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, relevant Stage 5 `SPEC.md`, `DESIGN_SYSTEM.md`, and current Stage 5 report/status documentation;
-- inspect current `public/app.css`, `public/app.js`, `x-ui.file-upload`, `x-ui.description-list`, `x-ui.modal`, `x-ui.confirmation`, Table/Toolbar/Pagination components, psychologist list/detail views, and relevant UI tests;
-- inspect the matching `uikit/index.html` reference sections;
+- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, current `SPEC.md` Stage 6 and relevant §23/§28/§29 rules, `DESIGN_SYSTEM.md`, `docs/architecture.md`, `docs/development.md`, and `docs/project-status.md`;
+- inspect `routes/web.php`, current Stage 4 `/cabinet` view, `User`, `UserDocument`, `UserDocumentPolicy`, existing document controller/routes, Stage 5 admin profile/detail presentation, the existing UI components named in this task, and relevant auth/document tests;
+- inspect the approved `uikit/index.html` sections for navigation, Empty State, List/File Item, Key-Value/Description List and responsive behavior;
 - run `git log --oneline -5` and `git status --short`;
-- confirm `TASK-2026-08-19-11` is the current planned task created from `e06dd53b99938ee8280495747ef297f6947248c7` and Stage 5 is implemented but not accepted;
+- confirm `TASK-2026-08-19-12` is the current planned task created from `10c8d94825859f2d6612888ab50f08e69ecf73d3` and Stage 7 has not already started;
 - do not touch unknown local changes.
 
 Before commit:
 
 - complete all applicable focused/full/browser checks;
 - update `.ai/report.md` with actual results only;
-- inspect final Git status, full diff, and staged files;
-- stage only correction-related files;
-- ensure no screenshots, browser artifacts, test uploads, logs, caches, secrets, or unrelated files are committed.
+- inspect final Git status, full diff and staged files;
+- stage only Stage 6-related files;
+- ensure no secrets, real personal data, test uploads, screenshots, browser artifacts, logs, caches or unrelated files are committed.
 
 If the gate passes, commit with:
 
-`codex: TASK-2026-08-19-11 fix Stage 5 UI design-system gaps`
+`codex: TASK-2026-08-19-12 implement Stage 6 psychologist cabinet`
 
-If safe completion is impossible, report `partial`, `blocked`, or `failed` instead of weakening the design-system or existing security behavior.
+If a required product/design/security behavior cannot be safely implemented within this scope, report `partial`, `blocked`, or `failed` instead of starting Stage 7 or weakening existing boundaries.
