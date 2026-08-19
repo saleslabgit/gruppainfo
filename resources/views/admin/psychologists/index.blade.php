@@ -17,9 +17,10 @@
         'access' => ['enabled' => 'Включён', 'disabled' => 'Отключён'],
     ];
 @endphp
-<x-ui.page-header eyebrow="Администрирование" title="Психологи" description="Поиск, просмотр и управление анкетами психологов." />
+<div class="ui-list-page">
+    <x-ui.page-header eyebrow="Администрирование" title="Психологи" description="Поиск, просмотр и управление анкетами психологов." />
 
-<div class="ui-table-wrap">
+    <div class="ui-table-wrap">
     <x-ui.table-toolbar>
         <form method="GET" action="{{ route('admin.psychologists.index') }}">
             @foreach($activeFilters as $name => $filter)<input type="hidden" name="{{ $name }}" value="{{ $filter }}">@endforeach
@@ -51,16 +52,16 @@
         <x-ui.button class="ui-table-toolbar__action" href="{{ route('admin.psychologists.create') }}" size="small" icon="plus">Добавить</x-ui.button>
     </x-ui.table-toolbar>
 
-    @if($psychologists->isEmpty())
-        <div class="ui-table-empty">
-            @if(request()->hasAny(['search', 'status', 'tariff', 'access']))
-                По заданным условиям психологи не найдены.
-            @else
-                Психологов пока нет.
-            @endif
-        </div>
-    @else
-        <x-ui.table :selectable="false" :headers="['Психолог', 'Телефон', 'Статус', 'Тариф', 'Доступ', 'Регистрация', '']">
+    <x-ui.table :selectable="false" :headers="['Психолог', 'Телефон', 'Статус', 'Тариф', 'Доступ', 'Регистрация', '']">
+        @if($psychologists->isEmpty())
+            <div class="ui-table-empty">
+                @if(request()->hasAny(['search', 'status', 'tariff', 'access']))
+                    По заданным условиям психологи не найдены.
+                @else
+                    Психологов пока нет.
+                @endif
+            </div>
+        @else
             @foreach($psychologists as $psychologist)
                 <x-ui.table-row>
                     <div><a class="ui-table-primary" href="{{ route('admin.psychologists.show', $psychologist) }}">{{ $psychologist->fullName() }}</a><span class="ui-table-secondary">{{ $psychologist->email }}</span></div>
@@ -72,8 +73,9 @@
                     <div><x-ui.icon-button label="Открыть карточку" icon="chevron-right" href="{{ route('admin.psychologists.show', $psychologist) }}" /></div>
                 </x-ui.table-row>
             @endforeach
-        </x-ui.table>
-        <x-ui.pagination :paginator="$psychologists" />
-    @endif
+        @endif
+        <x-slot:footer><x-ui.pagination :paginator="$psychologists" /></x-slot:footer>
+    </x-ui.table>
+    </div>
 </div>
 @endsection

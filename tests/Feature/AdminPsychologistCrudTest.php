@@ -72,6 +72,54 @@ final class AdminPsychologistCrudTest extends TestCase
         self::assertLessThanOrEqual(6, $manyRowsQueryCount);
     }
 
+    public function test_stage_five_pages_use_approved_list_detail_and_modal_composition(): void
+    {
+        $admin = $this->user('admin@example.test', admin: true);
+        $psychologist = $this->user('target@example.test', [
+            'first_name' => 'Марина',
+            'status' => UserStatus::Pending,
+        ]);
+        UserDocument::query()->create([
+            'user_id' => $psychologist->getKey(),
+            'type' => 'diploma',
+            'path' => 'private/document.pdf',
+            'original_name' => 'document.pdf',
+            'mime_type' => 'application/pdf',
+            'size' => 10,
+        ]);
+
+        $listHtml = $this->actingAs($admin)->get(route('admin.psychologists.index'))
+            ->assertOk()
+            ->assertSee('ui-list-page', false)
+            ->assertSee('ui-table-wrap', false)
+            ->assertSeeInOrder(['ui-page-header', 'ui-table-toolbar', 'ui-table ui-table--no-select', 'ui-pagination'], false)
+            ->getContent();
+
+        self::assertStringContainsString('<div class="ui-table__body">', $listHtml);
+        self::assertMatchesRegularExpression('/<div class="ui-table ui-table--no-select">.*<nav aria-label="Пагинация" class="ui-pagination">/s', $listHtml);
+
+        $detailHtml = $this->actingAs($admin)->get(route('admin.psychologists.show', $psychologist))
+            ->assertOk()
+            ->assertSee('ui-description-list ui-description-list--two', false)
+            ->assertSee('data-ui-file-upload', false)
+            ->getContent();
+
+        self::assertStringNotContainsString('ui-confirmation', $detailHtml);
+        self::assertSame(6, substr_count($detailHtml, 'class="modal-footer"'));
+        foreach (['approve-psychologist', 'reject-psychologist', 'change-tariff', 'disable-psychologist', 'delete-psychologist', 'delete-document-'.$psychologist->documents->firstOrFail()->getKey()] as $modalId) {
+            self::assertMatchesRegularExpression('/id="'.preg_quote($modalId, '/').'".*class="modal-body">.*class="modal-footer">/s', $detailHtml);
+        }
+
+        $psychologist->update(['status' => UserStatus::Approved, 'disabled' => true]);
+        $disabledDetailHtml = $this->actingAs($admin)->get(route('admin.psychologists.show', $psychologist))
+            ->assertOk()
+            ->assertSee('id="enable-psychologist"', false)
+            ->getContent();
+
+        self::assertStringNotContainsString('ui-confirmation', $disabledDetailHtml);
+        self::assertMatchesRegularExpression('/id="enable-psychologist".*class="modal-body">.*class="modal-footer">/s', $disabledDetailHtml);
+    }
+
     public function test_admin_creates_and_edits_only_approved_profile_fields(): void
     {
         $admin = $this->user('admin@example.test', admin: true);

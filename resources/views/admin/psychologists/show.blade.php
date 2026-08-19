@@ -89,17 +89,38 @@
 </div>
 
 @if($psychologist->status === App\Domain\User\UserStatus::Pending)
-<x-ui.modal id="approve-psychologist" title="Принять психолога" size="small"><x-ui.confirmation title="Подтвердить принятие" message="Статус психолога изменится на «Принят»." ><x-slot:actions><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.approve', $psychologist) }}">@csrf<x-ui.button type="submit">Принять</x-ui.button></form></x-slot:actions></x-ui.confirmation></x-ui.modal>
-<x-ui.modal id="reject-psychologist" title="Отклонить психолога" size="small"><x-ui.confirmation danger title="Подтвердить отклонение" message="Статус изменится на «Отклонён», все активные сессии будут завершены."><x-slot:actions><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.reject', $psychologist) }}">@csrf<x-ui.button type="submit" variant="danger">Отклонить</x-ui.button></form></x-slot:actions></x-ui.confirmation></x-ui.modal>
+<x-ui.modal id="approve-psychologist" title="Принять психолога" size="small">
+    <p>Статус психолога изменится на «Принят».</p>
+    <x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.approve', $psychologist) }}">@csrf<x-ui.button type="submit">Принять</x-ui.button></form></x-slot:footer>
+</x-ui.modal>
+<x-ui.modal id="reject-psychologist" title="Отклонить психолога" size="small">
+    <p>Статус изменится на «Отклонён», все активные сессии будут завершены.</p>
+    <x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.reject', $psychologist) }}">@csrf<x-ui.button type="submit" variant="danger">Отклонить</x-ui.button></form></x-slot:footer>
+</x-ui.modal>
 @endif
-<x-ui.modal id="change-tariff" title="Сменить тариф" size="small"><x-ui.confirmation title="Подтвердить смену тарифа" message="Новый тариф: {{ $psychologist->free ? 'платный' : 'бесплатный' }}. Существующие группы не изменятся."><x-slot:actions><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.tariff', $psychologist) }}">@csrf @method('PATCH')<input type="hidden" name="free" value="{{ $psychologist->free ? 0 : 1 }}"><x-ui.button type="submit">Сменить</x-ui.button></form></x-slot:actions></x-ui.confirmation></x-ui.modal>
+<x-ui.modal id="change-tariff" title="Сменить тариф" size="small">
+    <p>Новый тариф: {{ $psychologist->free ? 'платный' : 'бесплатный' }}. Существующие группы не изменятся.</p>
+    <x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.tariff', $psychologist) }}">@csrf @method('PATCH')<input type="hidden" name="free" value="{{ $psychologist->free ? 0 : 1 }}"><x-ui.button type="submit">Сменить</x-ui.button></form></x-slot:footer>
+</x-ui.modal>
 @if($psychologist->disabled)
-<x-ui.modal id="enable-psychologist" title="Включить доступ" size="small"><x-ui.confirmation title="Подтвердить включение" message="Психолог снова сможет войти при наличии пароля и принятого статуса."><x-slot:actions><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.enable', $psychologist) }}">@csrf<x-ui.button type="submit">Включить</x-ui.button></form></x-slot:actions></x-ui.confirmation></x-ui.modal>
+<x-ui.modal id="enable-psychologist" title="Включить доступ" size="small">
+    <p>Психолог снова сможет войти при наличии пароля и принятого статуса.</p>
+    <x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.enable', $psychologist) }}">@csrf<x-ui.button type="submit">Включить</x-ui.button></form></x-slot:footer>
+</x-ui.modal>
 @else
-<x-ui.modal id="disable-psychologist" title="Отключить доступ" size="small"><x-ui.confirmation danger title="Подтвердить отключение" message="Все активные сессии психолога будут немедленно завершены."><x-slot:actions><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.disable', $psychologist) }}">@csrf<x-ui.button type="submit" variant="danger">Отключить</x-ui.button></form></x-slot:actions></x-ui.confirmation></x-ui.modal>
+<x-ui.modal id="disable-psychologist" title="Отключить доступ" size="small">
+    <p>Все активные сессии психолога будут немедленно завершены.</p>
+    <x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.disable', $psychologist) }}">@csrf<x-ui.button type="submit" variant="danger">Отключить</x-ui.button></form></x-slot:footer>
+</x-ui.modal>
 @endif
-<x-ui.modal id="delete-psychologist" title="Удалить психолога" size="small"><x-ui.confirmation danger title="Подтвердить удаление" message="Психолог исчезнет из списка, его сессии завершатся. Документы и история сохранятся."><x-slot:actions><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.destroy', $psychologist) }}">@csrf @method('DELETE')<x-ui.button type="submit" variant="danger">Удалить</x-ui.button></form></x-slot:actions></x-ui.confirmation></x-ui.modal>
+<x-ui.modal id="delete-psychologist" title="Удалить психолога" size="small">
+    <p>Психолог исчезнет из списка, его сессии завершатся. Документы и история сохранятся.</p>
+    <x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.destroy', $psychologist) }}">@csrf @method('DELETE')<x-ui.button type="submit" variant="danger">Удалить</x-ui.button></form></x-slot:footer>
+</x-ui.modal>
 @foreach($psychologist->documents as $document)
-<x-ui.modal id="delete-document-{{ $document->getKey() }}" title="Удалить документ" size="small"><x-ui.confirmation danger title="Подтвердить удаление" message="Файл «{{ $document->original_name }}» будет удалён без возможности восстановления."><x-slot:actions><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.documents.destroy', [$psychologist, $document]) }}">@csrf @method('DELETE')<x-ui.button type="submit" variant="danger">Удалить</x-ui.button></form></x-slot:actions></x-ui.confirmation></x-ui.modal>
+<x-ui.modal id="delete-document-{{ $document->getKey() }}" title="Удалить документ" size="small">
+    <p>Файл «{{ $document->original_name }}» будет удалён без возможности восстановления.</p>
+    <x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><form method="POST" action="{{ route('admin.psychologists.documents.destroy', [$psychologist, $document]) }}">@csrf @method('DELETE')<x-ui.button type="submit" variant="danger">Удалить</x-ui.button></form></x-slot:footer>
+</x-ui.modal>
 @endforeach
 @endsection

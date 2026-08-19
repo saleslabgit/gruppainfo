@@ -1,67 +1,56 @@
-# Report: TASK-2026-08-19-10
+# Report: TASK-2026-08-19-11
 
 Status: done
 
 ## Summary
 
-Implemented the complete Stage 5 internal administrative psychologist area. Administrators can list/search/filter/paginate psychologists, create and edit questionnaire profiles, inspect all stored fields, perform explicit approve/reject/tariff/access/delete actions, and manage private PDF/JPEG/PNG documents. All Stage 5 routes remain inside the accepted Stage 4 protected route group and add resource policies.
+Closed the four Stage 5 UI/design-system acceptance blockers without changing backend, authorization, audit, document-security, session, or domain behavior.
 
-Added append-only `gp_user_action_history` persistence and a small `PsychologistAdminService`. Status transition plus audit is atomic and still delegates to `UserStatusTransitionService`; reject, disable, and soft delete reuse `UserSessionInvalidator`. Generic profile updates accept only the explicit questionnaire allowlist and cannot mutate status, access, tariff, role, password, `accept`, or generated/system fields.
+The shared File Upload now transfers the first dropped file into its native single-file input with `DataTransfer`, dispatches the same change path used by picker selection, preserves the current selection for non-file drops, and prevents browser navigation during drag/drop. The shared two-column Description List now uses the canonical `max-content max-content`, start alignment, and `8px 16px` gap, while retaining a readable shared mobile collapse.
 
-Added private document delivery through an authorized controller only. Files use generated private paths, preserve safe metadata, are checked against PDF/JPEG/PNG by both Laravel rules and direct `fileinfo` byte inspection, and have no public/local serving route. Admin and owner access is policy-controlled; IDOR and nested-resource tampering are covered.
-
-Expanded the shared UI namespace with Chip, Filters/Filter Panel using the mobile Drawer, Description List, File Upload, and Document Item. `/ui-kit` demonstrates each new component. The admin pages compose the approved List, Form, and Detail patterns without page-specific CSS.
+All psychologist confirmation flows now compose their message through Modal Body and their cancel/primary-or-danger actions through Modal Footer. The psychologist list now uses the approved `PageHeader -> 24px -> TableToolbar -> 16px -> Table -> 0px -> Pagination` composition, with Pagination rendered inside the shared Table footer.
 
 ## Changed Files
 
-- `database/migrations/2026_08_19_000006_create_user_action_history_table.php`, `app/Models/UserActionHistory.php`, `app/Domain/User/UserAction.php` — actor-aware durable audit schema and types.
-- `app/Domain/User/PsychologistAdminService.php` — transactional create/status/tariff/access/delete coordination, audit, and session revocation.
-- `app/Domain/User/UserDocumentType.php`, `app/Domain/User/UserDocumentService.php`, `app/Support/UploadedDocumentMime.php` — centralized document categories, private storage lifecycle, and byte-level MIME detection.
-- `app/Policies/UserPolicy.php`, `app/Policies/UserDocumentPolicy.php`, `app/Providers/AppServiceProvider.php` — explicit psychologist/document authorization.
-- `app/Http/Controllers/Admin/*`, `app/Http/Controllers/UserDocumentController.php`, `app/Http/Requests/Admin/*`, `routes/web.php` — Stage 5 web endpoints, Form Requests, filtering, protected document responses, and mutations.
-- `app/Domain/User/UserStatus.php`, `app/Models/User.php`, `app/Models/UserDocument.php` — centralized status presentation, profile helpers/relations, and document enum casting.
-- `config/documents.php`, `config/filesystems.php`, `.env.example` — private disk delivery disabled and optional `DOCUMENT_MAX_UPLOAD_KB` hook.
-- `resources/views/layouts/admin.blade.php`, `resources/views/admin/*` — reusable admin layout and overview/list/create/detail/edit/document flows.
-- `resources/views/components/ui/*`, `resources/views/ui-kit.blade.php`, `public/app.css`, `public/app.js` — required shared Stage 5 components, responsive behavior, and local interaction code.
-- `tests/Feature/AdminPsychologistCrudTest.php`, `tests/Feature/PsychologistDocumentTest.php`, `tests/Feature/UiKitPageTest.php` — Stage 5 behavior, security, query-count, private storage, and UI-kit regressions.
-- `docs/architecture.md`, `docs/development.md`, `docs/project-status.md` — implemented Stage 5 boundaries, configuration/manual verification, current status, and next stage.
+- `public/app.js` — functional native-input drag/drop transfer, appropriate drag-leave handling, shared picker/drop filename update, and no-file preservation.
+- `public/app.css` — canonical Description List grid, generic List page composition, independent Toolbar/Table surfaces, attached Table footer, and compliant mobile Modal footer ordering/width.
+- `resources/views/components/ui/table.blade.php` — optional shared Table footer slot.
+- `resources/views/admin/psychologists/index.blade.php` — generic List page composition and Pagination inside the Table footer, including empty/no-results states.
+- `resources/views/admin/psychologists/show.blade.php` — approve, reject, tariff, enable/disable, psychologist delete, and document delete confirmations recomposed through Modal body/footer.
+- `resources/views/ui-kit.blade.php` — canonical inspectable Toolbar/Table/Pagination composition using the shared Table footer.
+- `tests/Feature/AdminPsychologistCrudTest.php` — rendered Stage 5 list/detail/modal composition regression coverage.
+- `tests/Feature/UiKitPageTest.php` — shared Description List and File Upload markup/CSS/JS hook regression coverage.
 
 ## Checks
 
-- Focused Stage 5 CRUD/list/filter/authorization/audit/session tests — passed.
-- Focused private upload/MIME/size/private-access/owner/IDOR/delete tests with `Storage::fake()` — passed.
-- Existing `AuthenticationAccessTest`, `StaleAuthenticatedSessionTest`, and `UserSessionInvalidatorTest` — passed.
-- Existing and expanded `UiKitPageTest` — passed, including production guard and new shared components.
-- `docker compose exec -T app composer check` — passed: Pint checked 92 files, Larastan/PHPStan reported no errors, and the isolated-MySQL suite passed with 66 tests / 718 assertions.
+- Focused Stage 5 UI, CRUD, document, auth/session, stale-session, invalidator, and UI-kit suite — passed with 39 tests / 313 assertions.
+- Final focused `AdminPsychologistCrudTest` and `UiKitPageTest` after the List page composition adjustment — passed with 11 tests / 146 assertions.
+- `docker compose exec -T app composer check` — passed on the final implementation: Pint checked 92 files, Larastan/PHPStan reported no errors, and the isolated-MySQL suite passed with 68 tests / 752 assertions.
 - `docker compose exec -T app composer check-platform-reqs` — passed for PHP 8.2.32 and every declared extension.
 - `node --check public/app.js` — passed.
+- Local HTTP checks — `/login` and `/ui-kit` returned HTTP 200; authenticated Chromium opened the psychologist list and detail successfully.
+- Real headless Chromium Stage 5 flow — passed at 1440px and 390px: list/table layout, mobile filter Drawer, shared Description List, confirmation Modal body/footer, mobile full-width primary-first ordering, picker filename update, real synthetic drag/drop into the native input, normal multipart upload, rendered uploaded document, and document deletion.
+- Exact browser layout check — passed at 1440px and 390px: PageHeader-to-Toolbar `24px`, Toolbar-to-Table `16px`, and Pagination as a direct visible Table footer with `0px` gap.
+- Browser console/network inspection during the full corrected flow — zero errors/warnings, zero failed requests, and zero requests outside the local application origin.
 - `git diff --check` — passed.
-- Route inspection — all psychologist CRUD/action/document mutations and reads are protected web routes under the accepted group; no `/api/v1` route exists. Owner/admin document view/download routes are also inside `stale-session -> auth -> eligible`.
-- Real headless Chromium flow against development MySQL — passed at 1440px and 390px: admin login, list, create, detail, edit, approve, separate reject fixture, tariff change, disable/enable, private PDF upload and authenticated byte response, document delete, psychologist soft delete, mobile Drawer filters, and no horizontal page overflow.
-- Access-revocation browser check — passed: an already authenticated development psychologist was disabled by the admin, and the next `/cabinet` request redirected that browser to `/login`; the seed psychologist was then re-enabled.
-- Browser console/network inspection — zero errors/warnings and zero requests outside the local Stage 5 server; no CDN/build-tool regression.
-- Browser fixtures, private test file, temporary database sessions, temporary config cache, and temporary server were removed after verification; development seed users remain enabled and active.
+- Temporary Playwright specs/results and the uploaded browser fixture were removed; no browser artifacts or test uploads remain.
 
 ## Facts
 
-- New psychologists are always non-admin, pending, enabled, passwordless, and do not trigger email. Initial tariff is the only significant state selected at creation.
-- Active email validation targets the generated `active_email` semantics; active duplicates fail and soft-deleted addresses can be reused.
-- The list renders no relationships and remains bounded as row count increases; detail eager-loads education type and documents.
-- Only `pending -> approved` and `pending -> rejected` are exposed. Approved users are disabled independently; `rejected -> pending` is not exposed.
-- Tariff changes do not modify existing groups. Soft delete preserves documents and history.
-- Consent datetime input is interpreted in `Europe/Minsk`, normalized to UTC for storage, and rendered through the existing display convention.
-- The private local disk has framework serving disabled; document bytes are returned only by the authorized controller with stored safe content type, original filename, and `nosniff`.
-- `uikit/index.html` and `uikit/support.js` remain unchanged and reference-only.
+- Dropping multiple files keeps native single-file semantics by transferring only the first file; no multiple-file, AJAX, or progress workflow was introduced.
+- Non-file drops are prevented from navigating and leave the current native input selection unchanged.
+- Standalone `x-ui.confirmation` remains available and unchanged for valid standalone confirmation surfaces; only its invalid nesting inside Stage 5 modals was removed.
+- `uikit/index.html`, `uikit/support.js`, `DESIGN_SYSTEM.md`, routes, controllers, requests, policies, domain services, models, migrations, and document configuration remain unchanged.
+- Existing search, combined filters, chips, result count, query-preserving pagination, empty/no-results behavior, responsive table scrolling, private multipart upload validation, and Stage 5 security behavior remain covered and green.
 
 ## Assumptions
 
-- The project continues to use the required database session driver in deployed/local Stage 5 environments. `.env.example` already sets it; the existing ignored local `.env` in this workspace still had the older `file` value, so browser revocation verification used an isolated temporary HTTP process with cached `database` session configuration without modifying the user's `.env`.
+- The existing mobile Description List collapse below 768px remains the approved readability behavior referenced by the task; desktop and tablet use the exact canonical two-column values.
 
 ## Unknowns
 
-- The numeric product limit for document uploads remains unset. `DOCUMENT_MAX_UPLOAD_KB` enforces a configured value and is covered by a test; when empty, PHP/framework upload ceilings apply while MIME/content validation remains mandatory.
+- None.
 
 ## Risks / Next Step
 
-- No known implementation or security gap remains for Stage 5. The product owner remains the final manual visual/UX tester.
-- The next roadmap stage is Stage 6, psychologist cabinet product content.
+- No known implementation gap remains for this correction. Final manual visual/product acceptance remains with the product owner.

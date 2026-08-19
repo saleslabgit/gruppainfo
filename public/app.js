@@ -122,9 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-ui-file-upload]").forEach((upload) => {
         const input = upload.querySelector("[data-ui-file-input]");
         const label = upload.querySelector("[data-ui-file-label]");
+        const defaultLabel = label.textContent;
 
         input.addEventListener("change", () => {
-            label.textContent = input.files[0]?.name ?? "Выберите файл";
+            label.textContent = input.files[0]?.name ?? defaultLabel;
         });
 
         ["dragenter", "dragover"].forEach((eventName) => {
@@ -134,10 +135,26 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        ["dragleave", "drop"].forEach((eventName) => {
-            upload.addEventListener(eventName, () => {
+        upload.addEventListener("dragleave", (event) => {
+            if (!upload.contains(event.relatedTarget)) {
                 upload.classList.remove("is-dragging");
-            });
+            }
+        });
+
+        upload.addEventListener("drop", (event) => {
+            event.preventDefault();
+            upload.classList.remove("is-dragging");
+
+            const droppedFiles = event.dataTransfer?.files;
+
+            if (!droppedFiles?.length) {
+                return;
+            }
+
+            const transfer = new DataTransfer();
+            transfer.items.add(droppedFiles[0]);
+            input.files = transfer.files;
+            input.dispatchEvent(new Event("change", { bubbles: true }));
         });
     });
 });

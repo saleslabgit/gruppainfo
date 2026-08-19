@@ -744,13 +744,24 @@ a,
 }
 .ui-table-wrap {
     margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.ui-list-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.ui-list-page > .ui-page-header,
+.ui-list-page > .ui-table-wrap {
+    margin: 0;
+}
+.ui-table {
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-shell);
     overflow: hidden;
     background: #fff;
-}
-.ui-table {
-    border-top: 1px solid var(--color-border-default);
 }
 .ui-table__scroll {
     overflow-x: auto;
@@ -801,6 +812,9 @@ a,
 }
 .ui-table-toolbar {
     padding: 20px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-shell);
+    background: #fff;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -958,15 +972,13 @@ a,
     color: var(--color-text-secondary);
     font-size: 14.5px;
 }
-.ui-modal .ui-confirmation {
-    width: 100%;
-    padding: 0;
-    border: 0;
-}
 .ui-modal .modal-footer {
     padding: 16px 20px;
     border-color: var(--color-border-default);
     gap: 10px;
+}
+.ui-modal .modal-footer form {
+    display: inline-flex;
 }
 .ui-confirmation {
     width: 340px;
@@ -1103,8 +1115,12 @@ a,
 }
 .ui-description-list--two {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px 32px;
+    grid-template-columns: max-content max-content;
+    justify-content: start;
+    gap: 8px 16px;
+}
+.ui-description-list--two .ui-description-list__row {
+    display: contents;
 }
 .ui-file-upload > label {
     width: 100%;
@@ -1569,7 +1585,10 @@ a,
         border: 0;
     }
     .ui-description-list--two {
-        grid-template-columns: 1fr;
+        display: flex;
+    }
+    .ui-description-list--two .ui-description-list__row {
+        display: flex;
     }
     .ui-description-list__row {
         flex-direction: column;
@@ -1639,16 +1658,20 @@ a,
     .ui-confirmation {
         width: 100%;
     }
-    .ui-modal .modal-footer,
+    .ui-modal .modal-footer {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
     .ui-confirmation__actions {
         align-items: stretch;
         flex-direction: column;
     }
     .ui-modal .modal-footer > .ui-button,
+    .ui-modal .modal-footer > form,
+    .ui-modal .modal-footer > form .ui-button,
     .ui-confirmation__actions > .ui-button {
         width: 100%;
     }
-    .ui-modal .modal-footer > :is(.ui-button--primary, .ui-button--danger),
     .ui-confirmation__actions > :is(.ui-button--primary, .ui-button--danger) {
         order: -1;
     }

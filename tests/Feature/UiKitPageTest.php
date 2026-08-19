@@ -90,4 +90,31 @@ class UiKitPageTest extends TestCase
         $this->assertStringContainsString('aria-current="page">5</span>', $middlePageHtml);
         $this->assertStringContainsString('ui-pagination__ellipsis', $middlePageHtml);
     }
+
+    public function test_stage_five_shared_components_keep_canonical_structure_and_behavior_hooks(): void
+    {
+        $descriptionHtml = Blade::render(
+            '<x-ui.description-list :columns="2"><x-ui.description-item label="Имя">Анна</x-ui.description-item></x-ui.description-list>',
+        );
+        $uploadHtml = Blade::render(
+            '<x-ui.file-upload name="document" label="Выберите или перетащите файл" />',
+        );
+        $css = (string) file_get_contents(public_path('app.css'));
+        $javascript = (string) file_get_contents(public_path('app.js'));
+
+        $this->assertStringContainsString('ui-description-list ui-description-list--two', $descriptionHtml);
+        $this->assertStringContainsString('<div class="ui-description-list__row"><dt>Имя</dt><dd>Анна</dd></div>', $descriptionHtml);
+        $this->assertStringContainsString('grid-template-columns: max-content max-content;', $css);
+        $this->assertStringContainsString('justify-content: start;', $css);
+        $this->assertStringContainsString('gap: 8px 16px;', $css);
+
+        $this->assertStringContainsString('data-ui-file-upload', $uploadHtml);
+        $this->assertStringContainsString('type="file"', $uploadHtml);
+        $this->assertStringContainsString('data-ui-file-input', $uploadHtml);
+        $this->assertStringContainsString('data-ui-file-label', $uploadHtml);
+        $this->assertStringContainsString('event.dataTransfer?.files', $javascript);
+        $this->assertStringContainsString('transfer.items.add(droppedFiles[0])', $javascript);
+        $this->assertStringContainsString('input.files = transfer.files', $javascript);
+        $this->assertStringContainsString('event.preventDefault()', $javascript);
+    }
 }
