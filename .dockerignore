@@ -1,0 +1,7 @@
+.env
+.git
+.idea
+.phpunit.cache
+.vscode
+storage/logs/*
+vendor

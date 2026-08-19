@@ -1,0 +1,102 @@
+# Разработка
+
+## Окружение
+
+Единственная обязательная host-зависимость — Docker с Docker Compose. Compose запускает:
+
+| Сервис | Версия | Назначение |
+|---|---:|---|
+| `app` | PHP 8.2.32 FPM | Laravel, Composer и CLI-команды |
+| `web` | Nginx 1.28.0 Alpine | HTTP на `localhost:8080` |
+| `db` | MySQL 8.4.7 | development- и test-схемы |
+
+Исходный код подключается в контейнер как обычные файлы репозитория. Composer-зависимости, Composer cache и MySQL-данные хранятся в именованных Docker volumes и не коммитятся.
+
+## Первый и последующие запуски
+
+```bash
+docker compose up --build -d
+```
+
+При первом запуске entrypoint:
+
+1. копирует `.env.example` в игнорируемый `.env`, если файла ещё нет;
+2. выполняет `composer install`;
+3. генерирует локальный `APP_KEY`, если он отсутствует;
+4. готовит writable-каталоги Laravel;
+5. выполняет `php artisan migrate --force`;
+6. запускает PHP-FPM.
+
+MySQL имеет healthcheck; `app` запускается только после готовности базы, а Nginx — после готовности PHP-FPM.
+
+Проверить состояние и остановить окружение:
+
+```bash
+docker compose ps
+docker compose down
+```
+
+## Переменные окружения
+
+Локальные безопасные значения находятся в `.env.example`. Development-схема — `gruppainfo`, test-схема — `gruppainfo_test`. Обе создаются при первом запуске MySQL, а пользователь `gruppainfo` получает доступ к обеим.
+
+`phpunit.xml` принудительно задаёт test-схему, поэтому запущенный в контейнере `php artisan test` не использует development-схему и не использует SQLite.
+
+Для production создайте отдельный `.env`, используйте реальные секреты, задайте `APP_ENV=production`, `APP_DEBUG=false`, production URL и production MySQL-реквизиты. Docker Compose и его локальные пароли не предназначены для production.
+
+## Composer
+
+Composer доступен внутри `app`; host-установка не нужна:
+
+```bash
+docker compose exec app composer install
+docker compose exec app composer update
+docker compose exec app composer check-platform-reqs
+```
+
+`composer.json` эмулирует production PHP 8.2.32 через `config.platform.php`. Требуемые расширения: `ctype`, `curl`, `dom`, `fileinfo`, `filter`, `hash`, `iconv`, `json`, `libxml`, `mbstring`, `openssl`, `pcre`, `pdo`, `pdo_mysql`, `phar`, `session`, `tokenizer`, `xml`, `xmlwriter`.
+
+## Проверки
+
+Полный текущий тестовый набор на MySQL:
+
+```bash
+docker compose exec app php artisan test
+```
+
+Форматирование в check-режиме:
+
+```bash
+docker compose exec app ./vendor/bin/pint --test
+```
+
+Larastan/PHPStan использует `phpstan.neon` и фиксированный уровень 5:
+
+```bash
+docker compose exec app ./vendor/bin/phpstan analyse --memory-limit=512M
+```
+
+Проверка PHP-платформы:
+
+```bash
+docker compose exec app composer check-platform-reqs
+```
+
+Composer-скрипт `composer check` последовательно запускает Pint, Larastan и тесты.
+
+## Frontend-ресурсы
+
+Bootstrap 5.3.8 хранится в `public/vendor/bootstrap` вместе с лицензией. Собственные файлы — `public/app.css` и `public/app.js`. Они подключаются напрямую из Blade; `app.css` подключается после Bootstrap. Frontend-сборки нет.
+
+Новые runtime CSS/JS-файлы также должны размещаться непосредственно в `public/`. Не добавляйте `package.json`, npm, Vite или CDN-ссылки.
+
+## Проверенная диагностика
+
+Если страница не открывается, сначала проверьте health/status и логи:
+
+```bash
+docker compose ps
+docker compose logs app db web
+```
+
+При изменении `Dockerfile` повторно выполните обычную команду запуска с `--build`.

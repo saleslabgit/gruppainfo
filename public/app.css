@@ -1,0 +1,12 @@
+:root {
+    color-scheme: light;
+}
+
+body {
+    min-height: 100vh;
+    background: #f4f6f8;
+}
+
+.stage-one-card {
+    max-width: 48rem;
+}
