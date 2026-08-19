@@ -18,7 +18,7 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 });
 
-Route::middleware(['auth', 'eligible'])->group(function (): void {
+Route::middleware(['stale-session', 'auth', 'eligible'])->group(function (): void {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function (): void {

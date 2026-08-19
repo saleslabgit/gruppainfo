@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserIsEligible;
+use App\Http\Middleware\RevokeStaleAuthenticatedSession;
+use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,7 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'eligible' => EnsureUserIsEligible::class,
             'role' => EnsureUserHasRole::class,
+            'stale-session' => RevokeStaleAuthenticatedSession::class,
         ]);
+
+        $middleware->prependToPriorityList(
+            AuthenticatesRequests::class,
+            RevokeStaleAuthenticatedSession::class,
+        );
 
         $middleware->redirectUsersTo(
             static fn (Request $request): string => $request->user()?->admin
