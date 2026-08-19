@@ -924,6 +924,10 @@ a,
     font-size: 17px;
     font-weight: 600;
 }
+.ui-modal .modal-header .ui-icon-button {
+    flex: none;
+    margin-left: auto;
+}
 .ui-modal .modal-body {
     padding: 20px;
     color: var(--color-text-secondary);

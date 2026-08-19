@@ -6,6 +6,8 @@ Status: done
 
 Corrected the Stage 3 visual acceptance and reusable-component gaps without starting Stage 4. Shared form controls now use one layout-stable focus edge and halo, composite Search/Password controls focus only their outer shell, form composition uses the canonical 8px/12px rhythm, and Select retains its open-focus state while exposing separated option surfaces.
 
+A user-reported follow-up corrected the shared Modal header so its reusable close Icon Button is pinned to the right edge instead of touching the title.
+
 Added the shared 160ms/ease-out motion layer with reduced-motion handling, 4px navigation separation, generic Card trailing-margin protection, equal-height UI-kit confirmation composition, responsive Modal/Confirmation action ordering, accurate readonly styling, and an accessible Vanilla JS password reveal control.
 
 Replaced the hard-coded Pagination demo with a paginator-driven Blade component that derives range, total, current/previous/next state, URLs, page windows, and ellipses from `LengthAwarePaginator`. The UI-kit now supplies deterministic first-page and middle-page paginator examples.
@@ -13,7 +15,7 @@ Replaced the hard-coded Pagination demo with a paginator-driven Blade component 
 ## Changed Files
 
 - `DESIGN_SYSTEM.md` — canonical layout-stable focus implementation, 8px/12px form rhythm, Select and navigation gaps, motion tokens/reduced-motion rule, and Card trailing-content rule.
-- `public/app.css` — shared focus, motion, form rhythm, Select/open state, navigation gap, Card margin reset, Pagination links, confirmation layout, readonly/password, and mobile action styles.
+- `public/app.css` — shared focus, motion, form rhythm, Select/open state, navigation gap, Card margin reset, Pagination links, confirmation layout, readonly/password, Modal header alignment, and mobile action styles.
 - `public/app.js` — Select open-state synchronization and accessible password reveal/hide behavior.
 - `resources/views/components/ui/input.blade.php` — reusable password shell, Lucide eye toggle, and accessible state/labels.
 - `resources/views/components/ui/pagination.blade.php` — reusable paginator-driven range, links, current state, ellipses, and unavailable controls.
@@ -40,6 +42,7 @@ Replaced the hard-coded Pagination demo with a paginator-driven Blade component 
 - Pagination — first/middle ranges, current states, previous/next URLs, ellipses, and mobile fit verified from supplied paginator data.
 - Password Input — keyboard Enter and pointer click both toggled `password`/`text`, `aria-pressed`, accessible label, and Lucide icon state.
 - Browser console/network — no errors or warnings caused by the changes, no external/CDN requests.
+- Modal follow-up at 1000×700 — computed header width was 480px; the 40px close control moved from immediately after the title to the right header inset while preserving component dimensions.
 - `git diff --check` — passed; Git emitted only the repository's existing `SPEC.md` CRLF normalization warning, and `SPEC.md` is unchanged.
 
 ## Facts

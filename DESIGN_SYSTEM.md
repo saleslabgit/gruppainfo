@@ -420,7 +420,7 @@ Info `background:#E4EDF5` title `#2C5A82`; Success `background:#E2F2E8` title `#
 ### 4.27 Modal
 
 **Sizes** (fixed width, not max-width): Small `360px`; Medium `480px`; Large `640px`.
-**Anatomy**: Header (title `17px/600` + `18px` close icon) → Body (`14.5px` `color:#71695F`) → Footer (actions right-aligned, `gap:10px`).
+**Anatomy**: Header (title `17px/600` + `18px` close icon aligned to the right edge with automatic intervening space) → Body (`14.5px` `color:#71695F`) → Footer (actions right-aligned, `gap:10px`).
 `border-radius:16px`, `box-shadow:shadow-modal`. Header `padding:18px 20px` + `border-bottom:1px solid #EBE9E2`. Body `padding:20px`. Footer `padding:16px 20px` + `border-top:1px solid #EBE9E2`.
 **Usage patterns** (same visual shell): informational (body + single action), form (body holds form fields), confirmation (short body + two actions), destructive confirmation (primary action rendered in Danger Button color).
 **Mobile**: `width:calc(100% - 32px)`, `margin:0 16px`.
