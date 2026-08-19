@@ -4,10 +4,17 @@
     @else
         <x-ui.timeline>
             @foreach($group->statusHistory->sortByDesc('created_at') as $entry)
+                @php
+                    $actorName = match ($entry->actor_type) {
+                        'system' => 'Система',
+                        'user' => $entry->actor?->fullName() ?? 'Удалённый пользователь',
+                        default => 'Неизвестный автор',
+                    };
+                @endphp
                 <x-ui.timeline-item
                     :title="$entry->to_status->label()"
                     :variant="$entry->to_status->badgeVariant()"
-                    :meta="($entry->actor?->fullName() ?? 'Система').' · '.App\Support\DateTimeFormatter::format($entry->created_at)"
+                    :meta="$actorName.' · '.App\Support\DateTimeFormatter::format($entry->created_at)"
                     :comment="$entry->comment"
                 />
             @endforeach

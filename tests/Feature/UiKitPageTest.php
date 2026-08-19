@@ -57,6 +57,8 @@ class UiKitPageTest extends TestCase
 
         $this->assertStringContainsString('ui-money-input__control', $money);
         $this->assertStringContainsString('ui-money-input__currency', $money);
+        $this->assertStringContainsString('.ui-money-input:focus-within { border-color: #ff714a; box-shadow: 0 0 0 1px #ff714a, 0 0 0 4px #ffe1d3; }', $css);
+        $this->assertStringContainsString('.ui-money-input__control:focus-visible { border-color: transparent !important; box-shadow: none !important; }', $css);
         $this->assertStringContainsString('ui-timeline__marker--info', $timeline);
         $this->assertStringContainsString('ui-timeline__comment', $timeline);
         $this->assertStringContainsString('flex: 0 0 12px;', $css);

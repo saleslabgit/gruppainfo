@@ -54,6 +54,20 @@ abstract class GroupDataRequest extends FormRequest
         return $data;
     }
 
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Укажите название группы.',
+            'description.required' => 'Добавьте описание группы.',
+            'schedule.required' => 'Укажите расписание.',
+            'format_id.required' => 'Выберите формат группы.',
+            'meeting_duration_minutes.required' => 'Укажите длительность встречи.',
+            'participant_count.required' => 'Укажите количество участников.',
+            'gender_id.required' => 'Выберите пол участников.',
+            'price_per_meeting.required' => 'Укажите стоимость встречи.',
+        ];
+    }
+
     protected function prepareForValidation(): void
     {
         $normalized = [];

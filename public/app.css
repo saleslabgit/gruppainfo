@@ -1450,6 +1450,7 @@ a,
 .ui-money-input:focus-within { border-color: #ff714a; box-shadow: 0 0 0 1px #ff714a, 0 0 0 4px #ffe1d3; }
 .ui-money-input.is-invalid { border-color: #d14545; box-shadow: none; }
 .ui-money-input__control { background: transparent; border: 0; color: #3c3834; min-width: 0; outline: 0; padding: 0; width: 100%; }
+.ui-money-input__control:focus-visible { border-color: transparent !important; box-shadow: none !important; }
 .ui-money-input__currency { color: #9c948a; margin-left: 12px; }
 
 .ui-timeline__item { display: flex; gap: 16px; }

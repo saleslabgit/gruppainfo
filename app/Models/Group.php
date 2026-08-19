@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Domain\Group\GroupStatus;
+use App\Domain\Payment\PaymentStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -51,7 +52,7 @@ final class Group extends Model
 
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'owner_id')->withTrashed();
     }
 
     public function applications(): HasMany
@@ -62,6 +63,11 @@ final class Group extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function successfulNonRefundedPayments(): HasMany
+    {
+        return $this->payments()->where('status', PaymentStatus::Succeeded->value);
     }
 
     public function statusHistory(): HasMany

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Domain\Group\GroupStatus;
-use App\Domain\Payment\PaymentStatus;
 use App\Models\Group;
 use App\Models\User;
 
@@ -47,7 +46,7 @@ final class GroupPolicy
             return false;
         }
 
-        return ! $group->payments()->where('status', PaymentStatus::Succeeded->value)->exists();
+        return ! $group->successfulNonRefundedPayments()->exists();
     }
 
     public function moderate(User $actor, Group $group): bool
@@ -58,6 +57,7 @@ final class GroupPolicy
     public function cleanup(User $actor, Group $group): bool
     {
         return $actor->admin && ! $group->trashed()
-            && in_array($group->status, [GroupStatus::Draft, GroupStatus::AwaitingPayment], true);
+            && in_array($group->status, [GroupStatus::Draft, GroupStatus::AwaitingPayment], true)
+            && ! $group->successfulNonRefundedPayments()->exists();
     }
 }

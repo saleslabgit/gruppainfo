@@ -29,7 +29,12 @@ final class DatabaseSeederTest extends TestCase
             ['education_type', 'gender', 'group_format'],
             Dictionary::query()->orderBy('code')->pluck('code')->all(),
         );
-        self::assertSame(0, DictionaryItem::query()->count());
+        self::assertSame(2, DictionaryItem::query()->count());
+        self::assertSame(
+            ['development-test-format', 'development-test-gender'],
+            DictionaryItem::query()->orderBy('code')->pluck('code')->all(),
+        );
+        self::assertSame(2, DictionaryItem::query()->where('active', true)->count());
         self::assertSame(7, Setting::query()->count());
 
         $expectedSettings = [
@@ -76,6 +81,7 @@ final class DatabaseSeederTest extends TestCase
             ])->assertSuccessful();
 
             self::assertSame(0, User::query()->count());
+            self::assertSame(0, DictionaryItem::query()->count());
         } finally {
             $this->app->instance('env', 'testing');
         }

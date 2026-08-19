@@ -8,6 +8,14 @@
     </x-slot:actions>
 </x-ui.page-header>
 <div class="ui-detail-stack">
+    @if($errors->any())
+        <x-ui.alert variant="danger" title="Группа не отправлена на модерацию">
+            <ul>
+                @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+            </ul>
+            @can('update', $group)<x-ui.button href="{{ route('cabinet.groups.edit', $group) }}" variant="secondary" size="small">Перейти к редактированию</x-ui.button>@endcan
+        </x-ui.alert>
+    @endif
     @if($group->status === App\Domain\Group\GroupStatus::Revision && $group->moderator_comment)<x-ui.alert variant="warning" title="Требуется доработка">{{ $group->moderator_comment }}</x-ui.alert>@endif
     @if($group->status === App\Domain\Group\GroupStatus::Rejected && $group->rejection_reason)<x-ui.alert variant="danger" title="Группа отклонена">{{ $group->rejection_reason }}</x-ui.alert>@endif
     <x-ui.card variant="section" title="Группа">

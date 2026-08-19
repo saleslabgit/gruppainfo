@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Domain\Group\GroupStatus;
+use App\Domain\Payment\PaymentStatus;
 use App\Domain\Settings\SettingKey;
 use App\Domain\Settings\SettingService;
 use App\Domain\Settings\SettingType;
@@ -12,6 +13,7 @@ use App\Domain\User\UserStatus;
 use App\Models\Dictionary;
 use App\Models\DictionaryItem;
 use App\Models\Group;
+use App\Models\GroupStatusHistory;
 use App\Models\Payment;
 use App\Models\Setting;
 use App\Models\User;
@@ -136,6 +138,88 @@ final class AdminGroupWorkflowTest extends TestCase
         self::assertTrue($draft->fresh()->trashed());
         $this->actingAs($admin)->delete(route('admin.groups.destroy', $moderation))->assertForbidden();
         self::assertFalse($moderation->fresh()->trashed());
+    }
+
+    public function test_successful_payment_blocks_admin_cleanup_and_exposes_only_safe_payment_facts(): void
+    {
+        $admin = $this->user('admin@example.test', ['admin' => true]);
+        $owner = $this->user('owner@example.test');
+        $group = $this->group($owner, GroupStatus::Draft);
+        Payment::query()->create([
+            'owner_id' => $owner->getKey(), 'group_id' => $group->getKey(), 'type' => 'placement',
+            'amount' => 12345, 'currency' => 'BYN', 'transaction_id' => 'safe-transaction-42',
+            'status' => PaymentStatus::Succeeded, 'paid_at' => '2026-08-20 08:00:00',
+            'bank_response' => ['secret' => 'must-not-render'],
+        ]);
+
+        $this->actingAs($admin)->get(route('admin.groups.show', $group))
+            ->assertOk()
+            ->assertSee('Удаление группы заблокировано')
+            ->assertSee('123,45 BYN')
+            ->assertSee('safe-transaction-42')
+            ->assertDontSee('must-not-render')
+            ->assertDontSee('data-bs-target="#cleanup-group"', false);
+        $this->actingAs($admin)->delete(route('admin.groups.destroy', $group))->assertForbidden();
+        self::assertFalse($group->fresh()->trashed());
+
+        $awaitingPayment = $this->group($owner, GroupStatus::AwaitingPayment);
+        Payment::query()->create([
+            'owner_id' => $owner->getKey(), 'group_id' => $awaitingPayment->getKey(), 'type' => 'placement',
+            'amount' => 100, 'status' => PaymentStatus::Succeeded,
+        ]);
+        $this->actingAs($admin)->delete(route('admin.groups.destroy', $awaitingPayment))->assertForbidden();
+        self::assertFalse($awaitingPayment->fresh()->trashed());
+
+        $group->payments()->update(['status' => PaymentStatus::Refunded]);
+        $this->actingAs($admin)->delete(route('admin.groups.destroy', $group))->assertRedirect(route('admin.groups.index'));
+        self::assertTrue($group->fresh()->trashed());
+    }
+
+    public function test_paid_moderation_rejection_warns_about_manual_refund_but_remains_available(): void
+    {
+        $admin = $this->user('admin@example.test', ['admin' => true]);
+        $owner = $this->user('owner@example.test');
+        $group = $this->group($owner, GroupStatus::Moderation, ['free' => false]);
+        Payment::query()->create([
+            'owner_id' => $owner->getKey(), 'group_id' => $group->getKey(), 'type' => 'placement',
+            'amount' => 5000, 'currency' => 'BYN', 'transaction_id' => 'reject-payment-7',
+            'status' => PaymentStatus::Succeeded, 'paid_at' => '2026-08-20 08:00:00',
+        ]);
+
+        $this->actingAs($admin)->get(route('admin.groups.show', $group))
+            ->assertOk()->assertSee('Нужен ручной возврат')->assertSee('50,00 BYN')->assertSee('reject-payment-7')
+            ->assertSee(route('admin.groups.reject', $group), false);
+        $this->actingAs($admin)->post(route('admin.groups.reject', $group), ['comment' => 'Отказ после оплаты'])->assertRedirect();
+        self::assertSame(GroupStatus::Rejected, $group->fresh()->status);
+    }
+
+    public function test_deleted_owner_and_history_actor_remain_truthful_without_n_plus_one(): void
+    {
+        $admin = $this->user('admin@example.test', ['admin' => true]);
+        $owner = $this->user('deleted-owner@example.test', ['first_name' => 'Анна', 'last_name' => 'Смирнова']);
+        $group = $this->group($owner, GroupStatus::Moderation, ['name' => 'Группа удалённого владельца']);
+        GroupStatusHistory::query()->create([
+            'group_id' => $group->getKey(), 'from_status' => GroupStatus::Draft,
+            'to_status' => GroupStatus::Moderation, 'actor_type' => 'user', 'actor_id' => $owner->getKey(),
+            'created_at' => now('UTC')->subMinute(),
+        ]);
+        GroupStatusHistory::query()->create([
+            'group_id' => $group->getKey(), 'from_status' => GroupStatus::Moderation,
+            'to_status' => GroupStatus::Approved, 'actor_type' => 'system', 'actor_id' => null,
+            'created_at' => now('UTC'),
+        ]);
+        $owner->delete();
+
+        $this->actingAs($admin)->get(route('admin.groups.index'))->assertOk()
+            ->assertSee('Группа удалённого владельца')->assertSee('deleted-owner@example.test');
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $this->actingAs($admin)->get(route('admin.groups.show', $group))->assertOk()
+            ->assertSee('Смирнова Анна')->assertSee('deleted-owner@example.test')->assertSee('Система');
+        $count = count(DB::getQueryLog());
+        DB::disableQueryLog();
+        self::assertLessThanOrEqual(10, $count);
     }
 
     public function test_admin_list_search_filters_sort_pagination_and_query_count_are_bounded(): void

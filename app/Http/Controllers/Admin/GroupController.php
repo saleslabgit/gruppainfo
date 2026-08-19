@@ -78,7 +78,7 @@ final class GroupController extends Controller
     public function show(Group $group): View
     {
         Gate::authorize('view', $group);
-        $group->load(['owner', 'format', 'gender', 'statusHistory.actor']);
+        $group->load(['owner', 'format', 'gender', 'statusHistory.actor', 'successfulNonRefundedPayments']);
 
         return view('admin.groups.show', compact('group'));
     }

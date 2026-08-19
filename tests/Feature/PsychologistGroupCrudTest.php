@@ -12,6 +12,7 @@ use App\Models\DictionaryItem;
 use App\Models\Group;
 use App\Models\Payment;
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -72,9 +73,12 @@ final class PsychologistGroupCrudTest extends TestCase
         $owner = $this->user('owner@example.test');
         $group = $this->group($owner);
 
-        $this->actingAs($owner)->post(route('cabinet.groups.submit', $group))
-            ->assertSessionHasErrors(['name', 'description', 'schedule', 'format_id', 'meeting_duration_minutes', 'participant_count', 'gender_id', 'price_per_meeting']);
+        $this->actingAs($owner)->from(route('cabinet.groups.show', $group))->followingRedirects()->post(route('cabinet.groups.submit', $group))
+            ->assertOk()->assertSee('Группа не отправлена на модерацию')
+            ->assertSee('Укажите название группы.')->assertSee('Перейти к редактированию')
+            ->assertSee(route('cabinet.groups.edit', $group), false);
         self::assertSame(GroupStatus::Draft, $group->fresh()->status);
+        self::assertSame(0, $group->statusHistory()->count());
 
         $group->update($this->storedPayload($format, $gender));
         $this->actingAs($owner)->post(route('cabinet.groups.submit', $group))->assertSessionDoesntHaveErrors();
@@ -84,6 +88,35 @@ final class PsychologistGroupCrudTest extends TestCase
             'group_id' => $group->getKey(), 'from_status' => 'draft', 'to_status' => 'moderation',
             'actor_id' => $owner->getKey(), 'actor_type' => 'user',
         ]);
+    }
+
+    public function test_normal_testing_seed_supports_session_login_edit_and_submit_flow(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $email = (string) config('seed.psychologist.email');
+        $password = (string) config('seed.psychologist.password');
+
+        $this->post(route('login.store'), ['email' => $email, 'password' => $password])->assertRedirect();
+        $this->post(route('cabinet.groups.store'))->assertRedirect();
+        $owner = User::query()->where('email', $email)->firstOrFail();
+        $group = Group::query()->whereBelongsTo($owner, 'owner')->firstOrFail();
+        $format = DictionaryItem::query()->where('code', 'development-test-format')->firstOrFail();
+        $gender = DictionaryItem::query()->where('code', 'development-test-gender')->firstOrFail();
+
+        $this->get(route('cabinet.groups.edit', $group))->assertOk()
+            ->assertSee('Технический тестовый формат')
+            ->assertSee('Техническая тестовая аудитория');
+        $this->put(route('cabinet.groups.update', $group), $this->groupPayload($format, $gender))->assertRedirect();
+        $this->followingRedirects()->post(route('cabinet.groups.submit', $group))
+            ->assertOk()->assertSee('Группа отправлена на модерацию.');
+
+        self::assertSame(GroupStatus::Moderation, $group->fresh()->status);
+        self::assertSame(1, $group->statusHistory()->count());
+        $this->assertDatabaseHas('gp_group_status_history', [
+            'group_id' => $group->getKey(), 'from_status' => 'draft', 'to_status' => 'moderation',
+            'actor_type' => 'user', 'actor_id' => $owner->getKey(),
+        ]);
+        $this->get(route('cabinet.groups.show', $group))->assertOk()->assertSee('На модерации');
     }
 
     public function test_psychologist_policy_prevents_idor_and_limits_edit_delete(): void
