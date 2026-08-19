@@ -4,7 +4,7 @@
     "type": "project",
     "description": "Psychologist cabinet and administration application.",
     "keywords": ["laravel", "framework"],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.2",
         "ext-ctype": "*",
