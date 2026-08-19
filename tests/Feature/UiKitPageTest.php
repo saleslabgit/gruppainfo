@@ -29,6 +29,9 @@ class UiKitPageTest extends TestCase
             ->assertSee('ui-description-list', false)
             ->assertSee('data-ui-file-upload', false)
             ->assertSee('ui-document-item', false)
+            ->assertSee('stage-seven-components', false)
+            ->assertSee('ui-money-input', false)
+            ->assertSee('ui-timeline', false)
             ->assertSee('readonly', false)
             ->assertSee('/vendor/lucide/lucide.min.js', false)
             ->assertDontSee('fonts.googleapis.com', false)
@@ -44,6 +47,21 @@ class UiKitPageTest extends TestCase
             '/vendor/montserrat/Montserrat-VariableFont_wght.ttf',
             (string) file_get_contents(public_path('app.css')),
         );
+    }
+
+    public function test_stage_seven_money_input_and_timeline_have_canonical_structure(): void
+    {
+        $money = Blade::render('<x-ui.money-input name="price" value="12,50" />');
+        $timeline = Blade::render('<x-ui.timeline><x-ui.timeline-item title="На модерации" meta="Психолог · сегодня" variant="info" comment="Комментарий" /></x-ui.timeline>');
+        $css = (string) file_get_contents(public_path('app.css'));
+
+        $this->assertStringContainsString('ui-money-input__control', $money);
+        $this->assertStringContainsString('ui-money-input__currency', $money);
+        $this->assertStringContainsString('ui-timeline__marker--info', $timeline);
+        $this->assertStringContainsString('ui-timeline__comment', $timeline);
+        $this->assertStringContainsString('flex: 0 0 12px;', $css);
+        $this->assertStringContainsString('gap: 16px;', $css);
+        $this->assertStringContainsString('padding-bottom: 24px;', $css);
     }
 
     public function test_ui_kit_is_not_available_in_production(): void

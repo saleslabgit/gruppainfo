@@ -57,11 +57,17 @@ docker compose down
 
 Это локальные значения по умолчанию из `.env.example`; при env-переопределении используйте настроенные значения. Logout выполняется только POST-формой внутри защищённой области. Порог login rate limit при необходимости настраивается через `AUTH_LOGIN_MAX_ATTEMPTS` и `AUTH_LOGIN_DECAY_SECONDS` (по умолчанию 5 попыток и 60 секунд).
 
-Stage 6 cabinet routes:
+Cabinet and Stage 7 group routes:
 
 - `/cabinet` — вход с перенаправлением в основной раздел;
-- `/cabinet/groups` — **Мои группы**, до Stage 7 показывает truthful empty state;
+- `/cabinet/groups` — ownership-scoped **Мои группы**;
+- `/cabinet/groups/{group}` и `/cabinet/groups/{group}/edit` — карточка и доступное по статусу редактирование;
 - `/cabinet/profile` — read-only **Мои данные** и приватные документы текущего психолога.
+- `/admin/groups` — административный список, поиск, фильтры, сортировка и пагинация;
+- `/admin/groups/create`, `/admin/groups/{group}`, `/admin/groups/{group}/edit` — создание, карточка и редактирование;
+- отдельные POST actions `/revision`, `/reject`, `/approve`, `/activate` выполняют только state-machine переходы.
+
+Формы групп читают только активные элементы справочников `group_format` и `gender`. Production seed намеренно не создаёт их значения; для local ручной проверки добавьте временные элементы напрямую или будущим Stage 8 UI и удалите их после проверки. Stage 7 не создаёт платежи и для платного тарифа создаёт группу сразу в `draft`.
 
 Приватные документы психологов хранятся на disk `local` в `storage/app/private`. Необязательный `DOCUMENT_MAX_UPLOAD_KB` задаёт максимальный размер одного файла в килобайтах. Числовое продуктовое значение пока не утверждено, поэтому переменная по умолчанию пуста и Laravel/PHP применяют системный upload ceiling; allowlist PDF/JPEG/PNG и проверка фактического MIME действуют независимо от этого значения.
 
@@ -167,6 +173,24 @@ docker compose exec app php artisan test tests/Feature/AdminPsychologistCrudTest
 
 ```bash
 docker compose exec app php artisan test tests/Feature/PsychologistCabinetTest.php tests/Feature/AuthenticationAccessTest.php tests/Feature/StaleAuthenticatedSessionTest.php tests/Feature/PsychologistDocumentTest.php
+```
+
+## Ручная проверка Stage 7
+
+С временными активными значениями `group_format` и `gender` проверьте desktop и ширину около 390px:
+
+1. психолог создаёт черновик, сохраняет все поля и отправляет его на модерацию;
+2. администратор на `/admin/groups` находит группу, отправляет её на доработку с комментарием;
+3. психолог видит заметный комментарий и Timeline, исправляет данные и повторно отправляет группу;
+4. на отдельных временных группах администратор проверяет отклонение с причиной и approve → ручную activation с внешним ID и рассчитанными датами;
+5. проверьте owner IDOR, доступные по статусу actions, search/filter/sort/pagination и manual draft cleanup;
+6. убедитесь в Console/Network, что нет ошибок, `/api/v1`, bank redirects, CDN или внешних runtime-запросов;
+7. удалите все временные справочные значения, группы и платежные safety-fixtures.
+
+Сфокусированные Stage 7 проверки:
+
+```bash
+docker compose exec app php artisan test tests/Feature/PsychologistGroupCrudTest.php tests/Feature/AdminGroupWorkflowTest.php tests/Feature/UiKitPageTest.php
 ```
 
 ## Проверенная диагностика

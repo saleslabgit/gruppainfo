@@ -778,6 +778,11 @@ a,
 .ui-table--no-select .ui-table__row {
     grid-template-columns: 2fr 1.35fr 1fr 1fr 1fr 1fr 60px;
 }
+.ui-table--no-select.ui-table--columns-8 .ui-table__header,
+.ui-table--no-select.ui-table--columns-8 .ui-table__row {
+    grid-template-columns: 2fr 1.35fr 1fr 1fr 1fr 1fr 1fr 60px;
+    min-width: 1040px;
+}
 .ui-table--no-select .ui-table__row > div:first-child,
 .ui-table--no-select .ui-table__header > div:first-child {
     position: static;
@@ -1431,6 +1436,36 @@ a,
     justify-content: flex-end;
     gap: 12px;
 }
+
+.ui-money-input {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ebe9e2;
+    border-radius: 10px;
+    display: flex;
+    height: 40px;
+    justify-content: space-between;
+    padding: 0 14px;
+}
+.ui-money-input:focus-within { border-color: #ff714a; box-shadow: 0 0 0 1px #ff714a, 0 0 0 4px #ffe1d3; }
+.ui-money-input.is-invalid { border-color: #d14545; box-shadow: none; }
+.ui-money-input__control { background: transparent; border: 0; color: #3c3834; min-width: 0; outline: 0; padding: 0; width: 100%; }
+.ui-money-input__currency { color: #9c948a; margin-left: 12px; }
+
+.ui-timeline__item { display: flex; gap: 16px; }
+.ui-timeline__rail { align-items: center; display: flex; flex: 0 0 20px; flex-direction: column; }
+.ui-timeline__marker { background: #9c948a; border-radius: 999px; flex: 0 0 12px; height: 12px; width: 12px; }
+.ui-timeline__marker--success { background: #2e9960; }
+.ui-timeline__marker--warning { background: #c97a17; }
+.ui-timeline__marker--danger { background: #d14545; }
+.ui-timeline__marker--info { background: #3d77ad; }
+.ui-timeline__connector { background: #ebe9e2; flex: 1; margin-top: 4px; width: 1px; }
+.ui-timeline__content { padding-bottom: 24px; }
+.ui-timeline__item:last-child .ui-timeline__content { padding-bottom: 0; }
+.ui-timeline__item:last-child .ui-timeline__connector { display: none; }
+.ui-timeline__title { font-size: 14px; font-weight: 500; }
+.ui-timeline__meta { color: #9c948a; font-size: 13px; margin-top: 2px; }
+.ui-timeline__comment { background: #f5f4f0; border-radius: 8px; font-size: 14px; margin-top: 6px; padding: 10px 12px; }
 .ui-state-panel {
     display: flex;
     flex-direction: column;

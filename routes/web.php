@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\GroupController as AdminGroupController;
+use App\Http\Controllers\Admin\GroupModerationController;
 use App\Http\Controllers\Admin\PsychologistActionController;
 use App\Http\Controllers\Admin\PsychologistController;
 use App\Http\Controllers\Admin\PsychologistDocumentController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Cabinet\GroupController as CabinetGroupController;
 use App\Http\Controllers\CabinetController;
 use App\Http\Controllers\UserDocumentController;
 use App\Support\DateTimeFormatter;
@@ -29,6 +32,11 @@ Route::middleware(['stale-session', 'auth', 'eligible'])->group(function (): voi
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function (): void {
         Route::view('/', 'admin.index')->name('index');
         Route::resource('psychologists', PsychologistController::class);
+        Route::resource('groups', AdminGroupController::class);
+        Route::post('groups/{group}/revision', [GroupModerationController::class, 'revision'])->name('groups.revision');
+        Route::post('groups/{group}/reject', [GroupModerationController::class, 'reject'])->name('groups.reject');
+        Route::post('groups/{group}/approve', [GroupModerationController::class, 'approve'])->name('groups.approve');
+        Route::post('groups/{group}/activate', [GroupModerationController::class, 'activate'])->name('groups.activate');
         Route::post('psychologists/{psychologist}/approve', [PsychologistActionController::class, 'approve'])->name('psychologists.approve');
         Route::post('psychologists/{psychologist}/reject', [PsychologistActionController::class, 'reject'])->name('psychologists.reject');
         Route::patch('psychologists/{psychologist}/tariff', [PsychologistActionController::class, 'tariff'])->name('psychologists.tariff');
@@ -40,7 +48,13 @@ Route::middleware(['stale-session', 'auth', 'eligible'])->group(function (): voi
 
     Route::middleware('role:psychologist')->prefix('cabinet')->name('cabinet.')->group(function (): void {
         Route::get('/', [CabinetController::class, 'index'])->name('index');
-        Route::get('/groups', [CabinetController::class, 'groups'])->name('groups');
+        Route::get('/groups', [CabinetGroupController::class, 'index'])->name('groups');
+        Route::post('/groups', [CabinetGroupController::class, 'store'])->name('groups.store');
+        Route::get('/groups/{group}', [CabinetGroupController::class, 'show'])->name('groups.show');
+        Route::get('/groups/{group}/edit', [CabinetGroupController::class, 'edit'])->name('groups.edit');
+        Route::put('/groups/{group}', [CabinetGroupController::class, 'update'])->name('groups.update');
+        Route::post('/groups/{group}/submit', [CabinetGroupController::class, 'submit'])->name('groups.submit');
+        Route::delete('/groups/{group}', [CabinetGroupController::class, 'destroy'])->name('groups.destroy');
         Route::get('/profile', [CabinetController::class, 'profile'])->name('profile');
     });
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Domain\Group\GroupStatus;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +14,10 @@ use Illuminate\Support\Str;
 
 /**
  * @property GroupStatus $status
+ * @property User $owner
+ * @property CarbonImmutable|null $published_at
+ * @property CarbonImmutable|null $expires_at
+ * @property CarbonImmutable|null $expiry_warning_sent_at
  */
 final class Group extends Model
 {

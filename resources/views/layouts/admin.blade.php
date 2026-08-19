@@ -2,9 +2,12 @@
 
 @section('content')
 @php
+    $psychologistsActive = request()->routeIs('admin.psychologists.*') ? ' is-active' : '';
+    $groupsActive = request()->routeIs('admin.groups.*') ? ' is-active' : '';
     $navigation = new Illuminate\Support\HtmlString(
         '<div class="ui-nav-label">Администратор</div>'.
-        '<a class="ui-nav-item is-active" href="'.route('admin.psychologists.index').'"><i data-lucide="users"></i>Психологи</a>'.
+        '<a class="ui-nav-item'.$psychologistsActive.'" href="'.route('admin.psychologists.index').'"><i data-lucide="users"></i>Психологи</a>'.
+        '<a class="ui-nav-item'.$groupsActive.'" href="'.route('admin.groups.index').'"><i data-lucide="folder"></i>Группы</a>'.
         '<form class="ui-nav-logout" method="POST" action="'.route('logout').'">'.csrf_field().'<button class="ui-nav-item" type="submit"><i data-lucide="log-out"></i>Выйти</button></form>'
     );
 @endphp

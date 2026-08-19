@@ -1,58 +1,64 @@
-# Report: TASK-2026-08-19-12
+# Report: TASK-2026-08-19-13
 
 Status: done
 
 ## Summary
 
-Implemented the Stage 6 psychologist cabinet without starting Stage 7. `/cabinet` now redirects to the real **Мои группы** section, and the reusable responsive cabinet layout exposes only **Мои группы**, **Мои данные**, and POST logout.
+Implemented the complete Stage 7 internal group CRUD and moderation workflow. Psychologists now create direct `draft` groups for either tariff, save partial drafts, submit complete data, see feedback/history, revise/resubmit, list/view every own group, and soft-delete only policy-permitted groups. Administrators can create groups for active psychologists, list/search/filter/sort/paginate, view/edit content, moderate through the existing state machine, manually clean up draft states, and activate approved groups with configured placement dates and an optional external catalog ID.
 
-The groups section renders the approved truthful empty state with no group queries or fake CRUD controls. The read-only profile derives its psychologist only from the authenticated request, explicitly authorizes `UserPolicy::viewOwnProfile`, eager-loads `educationType` and `documents`, and presents the approved questionnaire fields through shared Description List, Date, Document Item, and Empty State components. Existing private document view/download routes and owner-or-admin policy remain the only byte-delivery boundary.
+All status changes remain inside `GroupStatusTransitionService`. `GroupWorkflowService` coordinates row locking, repeated authorization, side-field updates, and outer transactions. No Stage 7 action creates a payment, redirects to a bank, or reaches `awaiting_payment`. Shared Money Input and Timeline components were implemented from the approved design system and demonstrated on `/ui-kit`.
 
 ## Changed Files
 
-- `app/Http/Controllers/CabinetController.php` — thin cabinet redirect, groups page, authenticated self-profile read, explicit authorization, and eager loading.
-- `app/Policies/UserPolicy.php` — separate self-only `viewOwnProfile` ability without weakening admin `view` semantics.
-- `routes/web.php` — real `/cabinet`, `/cabinet/groups`, and `/cabinet/profile` controller routes inside the accepted psychologist middleware pipeline.
-- `resources/views/layouts/cabinet.blade.php` — shared AppShell navigation with desktop Sidebar/mobile Drawer, active states, and POST logout.
-- `resources/views/cabinet/groups.blade.php` — truthful pre-Stage-7 groups empty state.
-- `resources/views/cabinet/profile.blade.php` — read-only own questionnaire and private-document presentation.
-- `resources/views/cabinet/index.blade.php` — removed the obsolete Stage 4 auth acceptance view.
-- `tests/Feature/PsychologistCabinetTest.php` — focused Stage 6 boundaries, self-scope/IDOR, presentation, empty state, and document coverage.
-- `tests/Feature/AuthenticationAccessTest.php` and `tests/Feature/StaleAuthenticatedSessionTest.php` — updated accepted `/cabinet` behavior from an inline page to redirecting to the groups section.
-- `docs/architecture.md` — cabinet self-scope/read boundary and reused document-delivery policy/controller.
-- `docs/development.md` — Stage 6 URLs, manual desktop/mobile flow, and focused checks.
-- `docs/project-status.md` — Stage 6 implemented and Stage 7 recorded as next.
+- `app/Domain/Group/GroupStatus.php`, `GroupWorkflowService.php` — centralized Russian labels/badge variants and atomic Stage 7 workflow coordination.
+- `app/Policies/GroupPolicy.php`, `app/Models/Group.php`, `bootstrap/app.php` — ownership/status/payment guards, model type facts, and safe stale/invalid-transition response.
+- `app/Support/MoneyParser.php` — exact string-based BYN-to-minor-unit conversion without floats.
+- `app/Http/Requests/**Group*.php` — explicit authorization, partial/complete group validation, active dictionary constraints, protected-field exclusion, moderation comments, activation input, and mutation requests.
+- `app/Http/Controllers/Cabinet/GroupController.php`, `app/Http/Controllers/Admin/GroupController.php`, `GroupModerationController.php` — thin psychologist/admin CRUD, list and action endpoints.
+- `routes/web.php`, `CabinetController.php` — protected Stage 7 routes and removal of the obsolete empty-only handler.
+- `resources/views/cabinet/groups/**`, `resources/views/admin/groups/**`, `resources/views/groups/**` — approved List/Form/Detail group pages, shared form/history compositions and compliant action modals.
+- `resources/views/components/ui/money-input.blade.php`, `timeline*.blade.php`, `table.blade.php`, `textarea.blade.php`, `public/app.css`, `resources/views/ui-kit.blade.php` — generic Money Input/Timeline, eight-column table support, explicit textarea IDs, responsive styles and UI-kit examples.
+- `resources/views/layouts/admin.blade.php`, `layouts/cabinet.blade.php` — real group navigation/active states and cabinet flash feedback.
+- `tests/Feature/PsychologistGroupCrudTest.php`, `AdminGroupWorkflowTest.php`, `PsychologistCabinetTest.php`, `UiKitPageTest.php` — Stage 7 workflow, policy/IDOR, payment absence, activation, filters, query bounds and shared-component coverage.
+- `docs/architecture.md`, `docs/development.md`, `docs/project-status.md` — implemented Stage 7 boundaries, routes/manual verification, unresolved thresholds and Stage 8 next step.
+- Removed the obsolete `resources/views/cabinet/groups.blade.php`; the real group views now live under `resources/views/cabinet/groups/`.
 
 ## Checks
 
-- Focused Stage 6, auth/access, stale-session, Stage 5 document/admin CRUD, and UI-kit tests — passed with 43 tests / 386 assertions.
-- `docker compose exec -T app composer check` — passed on the final implementation: Pint checked 94 files, Larastan/PHPStan reported no errors, and the isolated-MySQL suite passed with 73 tests / 829 assertions.
+- Focused Stage 7 tests (`PsychologistGroupCrudTest`, `AdminGroupWorkflowTest`, `UiKitPageTest`) — passed: 17 tests / 176 assertions.
+- Existing Stage 4–6/domain regression subsets (`AdminPsychologistCrudTest`, `DomainModelTest`, `PsychologistCabinetTest`, `StatusTransitionServiceTest`) — passed: 23 tests / 396 assertions.
+- Final `docker compose exec -T app composer check` — passed: Pint checked 112 files, Larastan/PHPStan reported no errors, isolated-MySQL suite passed with 86 tests / 957 assertions.
 - `docker compose exec -T app composer check-platform-reqs` — passed for PHP 8.2.32 and every declared extension.
-- `php artisan route:list --path=cabinet` — confirmed only `/cabinet`, `/cabinet/groups`, and `/cabinet/profile`, with no profile user identifier.
-- `php artisan route:list --path=documents` — confirmed reuse of existing authorized view/download routes and unchanged admin document mutations.
-- Real Chromium authenticated cabinet flow — passed at 1440px and 390px: `/cabinet` redirect, groups empty state, active navigation, mobile Drawer access to both sections and POST logout, read-only profile, zero horizontal page overflow, zero console warnings/errors, and zero external/CDN requests.
-- Real Chromium document fixture flow — passed at 1440px and 390px: Document Item and both actions remained visible/usable, view returned the private bytes, and download used the original filename. The exact temporary development database row, file, directory, Playwright spec, results, and download artifacts were removed after verification.
-- `git diff --check` — passed before final staging.
-- `node --check public/app.js` — not applicable because no JavaScript changed.
+- `php artisan route:list --path=groups --except-vendor` — confirmed 18 protected admin/cabinet group routes; `/api/v1` route inspection returned no matching routes. No payment/bank routes were added.
+- Real Chromium workflow at 1440px and 390px — passed: psychologist create/save/submit; admin revision; visible psychologist feedback and Timeline; edit/resubmit; approve/activate with calculated dates/external ID; separate rejection with visible reason; admin search/status/sort query; mobile Drawer/Timeline; no page-level horizontal overflow, console errors, or external/CDN requests.
+- Temporary browser dictionary values, groups/history, Playwright spec and results were removed. Post-cleanup development DB counts for both temporary group names and dictionary codes were `0`.
+- `git diff --check` — passed.
+- `node --check public/app.js` — not applicable because JavaScript did not change.
 
 ## Facts
 
-- Profile identity has no route parameter and ignores arbitrary `user_id` / `psychologist_id` query values because the controller selects only `Request::user()`.
-- The new policy ability requires a non-admin actor to be the same non-trashed model instance selected for display.
-- No Group query, controller, policy, serialization, CTA, toolbar, status, or moderation behavior was added.
-- No profile, document, status, tariff, access, or password mutation endpoint/control was added to the cabinet.
-- Nullable values use `Не указано`; booleans use `Да` / `Нет` / `Не указано`; consent date-time uses the shared Europe/Minsk formatter.
-- Private storage paths, disk names, `/storage/...` URLs, admin/security fields, and another psychologist's fields/documents are not rendered.
-- `DESIGN_SYSTEM.md`, `uikit/`, shared components, CSS, JS, dependencies, migrations, and domain models remain unchanged.
+- Both `free=true` and `free=false` psychologists create a direct `draft`; `group.free` preserves the owner tariff snapshot and `gp_payments` remains unchanged.
+- Psychologist ownership is derived only from the authenticated user; client owner filters and psychologist owner writes are absent.
+- Draft/revision updates accept incomplete values but validate every supplied value. Submission validates all required business fields and combines content persistence with the transition atomically.
+- Dictionary IDs must be active items of the active `group_format` or `gender` dictionary.
+- Protected/system fields are absent from validated group data. Admin generic edit also cannot change ownership, tariff snapshot, status or publication fields.
+- Revision/rejection comments are trimmed, required and written to both the current field and immutable transition history. Previous history is not overwritten.
+- Activation locks the current row, reads a positive `placement_duration_days`, transitions only `approved → active`, stores the duration snapshot, sets UTC publication/expiry timestamps, clears the warning timestamp and stores a trimmed optional external ID in one transaction.
+- Psychologist/admin list relations and history actors are eager-loaded; focused tests bound query counts.
+- Admin manual cleanup is limited to `draft` and existing `awaiting_payment`; it does not expose generic deletion of moderation/approved/active/expired groups.
 
 ## Assumptions
 
-- The accepted Stage 5 yes/no/not-specified labels and date-only license presentation remain the approved presentation conventions reused by Stage 6.
+- A zero meeting price remains structurally valid because the approved task explicitly requires positive integers only for duration and participant count and does not define a positive minimum price.
+- Existing generic Modal responsive behavior remains the approved implementation used by the new moderation/activation dialogs.
 
 ## Unknowns
 
-- None.
+- The numeric minimum length for a rejection reason remains undefined. Stage 7 enforces a required, trimmed, non-empty reason and does not invent `min:N`.
+- The age threshold for an “abandoned draft” quick filter remains undefined. Stage 7 provides normal `draft` filtering and manual draft cleanup but no fabricated age filter.
+- Production dictionary item values for `group_format` and `gender` remain unapproved and unseeded.
 
 ## Risks / Next Step
 
-- No known implementation gap remains. Stage 7 can replace the groups empty data region with the separately approved ownership-protected group CRUD/moderation flow. Final manual visual/product acceptance remains with the product owner.
+- No known Stage 7 implementation blocker remains. Product-owner visual/product acceptance is still required.
+- Stage 8 can add dictionary/settings CRUD and complete the remaining administrative surfaces without changing the Stage 7 state-machine or no-bank boundary.

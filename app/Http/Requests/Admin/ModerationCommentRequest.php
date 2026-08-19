@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests\Admin;
+
+use App\Models\Group;
+use Illuminate\Foundation\Http\FormRequest;
+
+final class ModerationCommentRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        $group = $this->route('group');
+
+        return $group instanceof Group && ($this->user()?->can('moderate', $group) ?? false);
+    }
+
+    public function rules(): array
+    {
+        return ['comment' => ['required', 'string']];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->exists('comment')) {
+            $this->merge(['comment' => trim((string) $this->input('comment'))]);
+        }
+    }
+}

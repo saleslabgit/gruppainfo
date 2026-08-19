@@ -15,6 +15,32 @@ enum GroupStatus: string
     case Active = 'active';
     case Expired = 'expired';
 
+    public function label(): string
+    {
+        return match ($this) {
+            self::AwaitingPayment => 'Ожидает оплаты',
+            self::Draft => 'Черновик',
+            self::Moderation => 'На модерации',
+            self::Revision => 'На доработке',
+            self::Rejected => 'Отклонена',
+            self::Approved => 'Одобрена, ожидает публикации',
+            self::Active => 'Активная',
+            self::Expired => 'Закончена',
+        };
+    }
+
+    public function badgeVariant(): string
+    {
+        return match ($this) {
+            self::Draft, self::AwaitingPayment => 'neutral',
+            self::Moderation => 'info',
+            self::Revision, self::Approved => 'warning',
+            self::Rejected => 'danger',
+            self::Active => 'success',
+            self::Expired => 'neutral',
+        };
+    }
+
     public function canTransitionTo(self $target): bool
     {
         return match ($this) {

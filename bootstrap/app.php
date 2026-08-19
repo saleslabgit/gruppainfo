@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Exceptions\InvalidStatusTransition;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\EnsureUserIsEligible;
 use App\Http\Middleware\RevokeStaleAuthenticatedSession;
@@ -34,5 +35,11 @@ return Application::configure(basePath: dirname(__DIR__))
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(static function (InvalidStatusTransition $exception, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Недопустимый переход статуса.'], 409);
+            }
+
+            return back()->with('error', 'Статус записи уже изменился или действие для него недоступно.');
+        });
     })->create();

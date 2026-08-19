@@ -47,6 +47,12 @@
         <div class="ui-demo ui-form-stack"><x-ui.file-upload name="sample-document" label="Выберите или перетащите файл" /><div class="ui-document-list"><x-ui.document-item name="Диплом.pdf" meta="Диплом · 1,2 МБ" view-href="#" download-href="#" /></div></div>
     </section>
 
+    <section class="ui-kit-section" id="stage-seven-components">
+        <h2>Компоненты групп</h2><p class="ui-section-description">Общий денежный ввод и история статусов.</p>
+        <div class="ui-demo"><x-ui.form-field label="Стоимость встречи" name="sample-price"><x-ui.money-input name="sample-price" value="125,00" /></x-ui.form-field></div>
+        <div class="ui-demo"><x-ui.timeline><x-ui.timeline-item title="Одобрена, ожидает публикации" variant="success" meta="Администратор · 20.08.2026, 12:00" /><x-ui.timeline-item title="На доработке" variant="warning" meta="Администратор · 19.08.2026, 10:30" comment="Уточните расписание встреч." /><x-ui.timeline-item title="На модерации" variant="info" meta="Психолог · 18.08.2026, 09:15" /></x-ui.timeline></div>
+    </section>
+
     <x-ui.modal id="sample-modal" title="Информационное окно"><p>Modal использует общий production-компонент и локальный Bootstrap bundle.</p><x-slot:footer><x-ui.button data-bs-dismiss="modal">Понятно</x-ui.button></x-slot:footer></x-ui.modal>
     <x-ui.modal id="confirm-modal" title="Удалить запись?" size="small"><p>Это действие нельзя отменить.</p><x-slot:footer><x-ui.button variant="secondary" data-bs-dismiss="modal">Отмена</x-ui.button><x-ui.button variant="danger">Удалить</x-ui.button></x-slot:footer></x-ui.modal>
 </x-ui.app-shell>

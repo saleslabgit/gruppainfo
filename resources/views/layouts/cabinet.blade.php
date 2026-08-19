@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $groupsActive = request()->routeIs('cabinet.groups') ? ' is-active' : '';
+    $groupsActive = request()->routeIs('cabinet.groups*') ? ' is-active' : '';
     $profileActive = request()->routeIs('cabinet.profile') ? ' is-active' : '';
     $navigation = new Illuminate\Support\HtmlString(
         '<div class="ui-nav-label">Психолог</div>'.
@@ -12,6 +12,8 @@
     );
 @endphp
 <x-ui.app-shell :navigation="$navigation">
+    @if(session('status'))<x-ui.alert class="ui-flash" variant="success" title="{{ session('status') }}" />@endif
+    @if(session('error'))<x-ui.alert class="ui-flash" variant="danger" title="{{ session('error') }}" />@endif
     @yield('cabinet-content')
 </x-ui.app-shell>
 @endsection

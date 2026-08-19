@@ -37,7 +37,7 @@ final class PsychologistCabinetTest extends TestCase
         }
     }
 
-    public function test_cabinet_entry_redirects_to_truthful_groups_empty_state(): void
+    public function test_cabinet_entry_redirects_to_stage_seven_groups_empty_state(): void
     {
         $psychologist = $this->user('psychologist@example.test');
 
@@ -48,13 +48,13 @@ final class PsychologistCabinetTest extends TestCase
             ->assertOk()
             ->assertSee('Мои группы')
             ->assertSee('Пока нет групп')
-            ->assertSee('Добавленные группы появятся в этом разделе.')
+            ->assertSee('Создайте первый черновик группы.')
             ->assertSee('Мои данные')
             ->assertSee('ui-nav-item is-active', false)
             ->assertSee(route('logout'), false);
 
         $html = $response->getContent();
-        self::assertStringNotContainsString('Добавить группу', $html);
+        self::assertStringContainsString('Добавить группу', $html);
         self::assertStringNotContainsString('/cabinet/groups/create', $html);
         self::assertStringNotContainsString('Редактировать', $html);
     }

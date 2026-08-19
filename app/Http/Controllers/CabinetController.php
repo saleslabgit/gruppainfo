@@ -17,11 +17,6 @@ final class CabinetController extends Controller
         return redirect()->route('cabinet.groups');
     }
 
-    public function groups(): View
-    {
-        return view('cabinet.groups');
-    }
-
     public function profile(Request $request): View
     {
         /** @var User $psychologist */
