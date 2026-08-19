@@ -48,6 +48,24 @@ final class StatusTransitionServiceTest extends TestCase
         }
     }
 
+    public function test_stale_user_cannot_overwrite_current_status(): void
+    {
+        $user = $this->createUser('stale-user@example.test', UserStatus::Pending);
+        $current = User::query()->findOrFail($user->getKey());
+        $stale = User::query()->findOrFail($user->getKey());
+        $service = new UserStatusTransitionService;
+
+        $transitioned = $service->transition($current, UserStatus::Approved);
+        self::assertSame(UserStatus::Approved, $transitioned->status);
+
+        try {
+            $service->transition($stale, UserStatus::Rejected);
+            self::fail('A stale user overwrote the current approved status.');
+        } catch (InvalidStatusTransition) {
+            self::assertSame(UserStatus::Approved, User::query()->findOrFail($user->getKey())->status);
+        }
+    }
+
     public function test_payment_service_enforces_every_transition(): void
     {
         $service = new PaymentStatusTransitionService;
@@ -76,6 +94,32 @@ final class StatusTransitionServiceTest extends TestCase
                     }
                 }
             }
+        }
+    }
+
+    public function test_stale_payment_cannot_overwrite_current_status(): void
+    {
+        $owner = $this->createUser('stale-payment-owner@example.test', UserStatus::Approved);
+        $group = $this->createGroup($owner, GroupStatus::Draft);
+        $payment = Payment::query()->create([
+            'owner_id' => $owner->getKey(),
+            'group_id' => $group->getKey(),
+            'type' => 'placement',
+            'amount' => 100,
+            'status' => PaymentStatus::Pending,
+        ]);
+        $current = Payment::query()->findOrFail($payment->getKey());
+        $stale = Payment::query()->findOrFail($payment->getKey());
+        $service = new PaymentStatusTransitionService;
+
+        $transitioned = $service->transition($current, PaymentStatus::Succeeded);
+        self::assertSame(PaymentStatus::Succeeded, $transitioned->status);
+
+        try {
+            $service->transition($stale, PaymentStatus::Failed);
+            self::fail('A stale payment overwrote the current succeeded status.');
+        } catch (InvalidStatusTransition) {
+            self::assertSame(PaymentStatus::Succeeded, Payment::query()->findOrFail($payment->getKey())->status);
         }
     }
 
