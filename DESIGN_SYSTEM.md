@@ -1,6 +1,8 @@
 # Gruppa Info — Design System Specification
 
-Implementation-ready specification extracted from the approved UI Kit (`Gruppa Info UI Kit.dc.html`). This document is the single source of truth for numeric values and implementation rules. Every value below is a single fixed number — no ranges, no "or", no "approximately". Where the source UI Kit contains no component or pattern to derive a value from at all, the item is listed in **Unresolved design values** at the end with no implementation rule attached — do not invent a value for it.
+Implementation-ready specification extracted from the approved visual UI Kit in `uikit/index.html`. This document is the source of truth for visual numeric values and design implementation rules. Every value below is a single fixed number — no ranges, no "or", no "approximately". Where the source UI Kit contains no component or pattern to derive a value from at all, the item is listed in **Unresolved design values** at the end with no implementation rule attached — do not invent a value for it.
+
+The files in `uikit/` are reference artifacts, not Laravel runtime code or dependencies. This document governs visual and design decisions only; it does not override project-wide architecture, security, stack, runtime, or asset-delivery constraints.
 
 Font: **Montserrat** (400, 500, 600, 700) — the only font in the system. Icon library: **Lucide** only.
 
@@ -155,7 +157,7 @@ One fixed radius value per component — no shared ambiguous "md/lg" range:
 
 ### 1.8 Icons
 
-- Library: Lucide, via CDN. No other icon library is permitted.
+- Library: Lucide only. In production it must be delivered locally in accordance with the project architecture; the delivery mechanism is not defined by this design specification. No other icon library is permitted.
 - Stroke-width: `1.75` for all standalone and inline icons. `2` for spinner icons (`loader-2`). `2.5` for the checkmark glyph inside 20×20px Checkbox and inside the 13px table-row checkbox.
 - Icon size is fixed per usage context — the full set of sizes used in this system is: `13, 14, 15, 16, 17, 18, 19, 20, 22, 24, 26, 28, 30` px. Each component section in §4 states its exact icon size; do not pick a size not already assigned to that component.
 - Icon + text gap: `8px` inside buttons; `6px` inside all other inline contexts (chips, tabs badges, list metadata, breadcrumbs, dropdown items, filters, toolbar).
@@ -594,7 +596,7 @@ Progress: value(0-100), variant(default|success)
 9. Do not change layout based on personal preference — follow §2 and §6 exactly.
 10. Do not "improve" or restyle a component while implementing it.
 11. If no pattern in this document covers a needed screen, report that the Design System has no answer — do not invent one.
-12. The reference UI Kit (`Gruppa Info UI Kit.dc.html`) takes priority over developer assumption in any visual conflict this document does not already resolve.
+12. The reference UI Kit (`uikit/index.html`) takes priority over developer assumption in any visual conflict this document does not already resolve.
 13. This document takes priority over the UI Kit file for every numeric value and implementation rule.
 
 ---
@@ -632,7 +634,7 @@ Progress: value(0-100), variant(default|success)
 
 ## Unresolved design values
 
-The following do not exist anywhere in the source UI Kit — there is no value to fix, and none is assigned. Confirm with the designer before building:
+The following do not exist anywhere in the source UI Kit (`uikit/index.html`) — there is no value to fix, and none is assigned. Confirm with the designer before building:
 
 1. **Input / Select / Textarea size variants** — no Small or Large form-control exists in the source; every field is 40px. If a denser or larger control is needed, it must be designed first.
 2. **Table compact density** — only one row density (14px text, 14px/20px padding) exists; no compact row spec exists.

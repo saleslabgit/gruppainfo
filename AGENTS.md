@@ -137,6 +137,20 @@ Never claim something was tested unless it was actually tested.
 
 # Code Quality Rules
 
+## UI / Design System
+
+For every interface or frontend task, before implementation:
+
+- read `DESIGN_SYSTEM.md`;
+- inspect the relevant approved visual reference in `uikit/index.html`;
+- identify the shared design-system components and tokens that the task must reuse.
+
+Implement UI by composing shared reusable Blade components and approved tokens, not page-specific visual copies. Use only the approved component variants, spacing, typography, colors, radii, states, responsive behavior, and page patterns. Do not restyle or "improve" approved components based on personal preference, and do not introduce a new visual variant or one-off design primitive without an explicit approved design-system change.
+
+For visual questions, explicit numeric values and implementation rules in `DESIGN_SYSTEM.md` take priority over `uikit/index.html`; the visual reference governs approved visual intent not already resolved by that document. If a required pattern or value is absent or explicitly unresolved, stop and report the gap for a user decision rather than inventing it.
+
+Treat `uikit/` as reference material only, not production runtime code or a dependency. Continue to obey all project-level stack, architecture, security, runtime, and asset-delivery constraints; a design reference cannot silently override them.
+
 ## Prefer Explicit Code
 
 Use clear, direct code.

@@ -1,49 +1,52 @@
-# Report: TASK-2026-08-19-04
+# Report: TASK-2026-08-19-05
 
 Status: done
 
 ## Summary
 
-Hardened user and payment status transitions against stale Eloquent instances. Both services now reload and lock the current database row inside a transaction, validate the requested transition against that locked state, update only the locked model, and refresh the caller-visible model after a successful commit.
+Established repository governance for future UI work without implementing Stage 3. Planning, acceptance, and Codex implementation rules now require the approved design specification and visual reference, define their precedence, prohibit invented visual rules, preserve project-wide technical constraints, and keep `uikit/` outside the Laravel runtime.
 
-Added focused MySQL regression coverage proving that stale user and payment instances cannot overwrite newer statuses. Existing status matrices, group transition behavior, schema, and project documentation remain unchanged.
+Normalized the canonical visual-reference path in the design specification and resolved its Lucide CDN wording in favor of architecture-compliant local production asset delivery without selecting or implementing a delivery mechanism. Architecture and status documentation now expose the design-system boundary while stating that Stage 3 remains pending.
 
 ## Changed Files
 
-- `app/Domain/User/UserStatusTransitionService.php` — validates and writes user status against a freshly row-locked record in a database transaction, then refreshes the supplied model.
-- `app/Domain/Payment/PaymentStatusTransitionService.php` — applies the same transaction and row-lock protection to payments.
-- `tests/Feature/StatusTransitionServiceTest.php` — adds stale user/payment regression tests and verifies successful transitions return the committed status.
-- `.ai/report.md` — replaces the prior task report with this correction report.
+- `WORKFLOW.md` — adds mandatory design-source consultation and conformance checks for UI planning and acceptance.
+- `AGENTS.md` — adds mandatory design-system implementation behavior for interface/frontend tasks.
+- `DESIGN_SYSTEM.md` — normalizes the visual reference to `uikit/index.html`, scopes design authority, marks `uikit/` as reference-only, and aligns Lucide production delivery with the no-CDN architecture.
+- `docs/architecture.md` — documents canonical design sources, shared Blade composition, and the runtime boundary.
+- `docs/project-status.md` — records that approved Stage 3 sources exist while implementation remains pending.
+- `.ai/report.md` — replaces the previous task report with this governance report.
 
 ## Checks
 
-- Focused `php artisan test --filter='stale_(user|payment)'` on the isolated MySQL test database — passed: 2 tests, 4 assertions.
-- `docker compose exec -T app composer check` — passed:
-  - Pint check passed for 60 files;
-  - Larastan/PHPStan level 5 passed with no errors;
-  - full isolated-MySQL suite passed: 28 tests, 431 assertions.
+- Inspected all changed governance Markdown for source-of-truth and precedence wording — no contradictory wording found.
+- Searched changed governance documents for `DESIGN_SYSTEM.md`, `uikit/index.html`, obsolete `Gruppa Info UI Kit.dc.html`, and `via CDN` references — canonical references are present and obsolete/conflicting wording was removed.
+- Inspected the changed-file list — only governance/report Markdown files changed; no application, runtime, frontend implementation, `uikit/`, or `SPEC.md` file changed.
 - `git diff --check` — passed.
-- Docker service inspection — `app` and `db` healthy; `web` running.
-- Final diff and staged-file inspection — completed before commit; only the two transition services, their focused test file, and this report are included.
+- Final Git status, full diff, and staged-file inspection — completed before commit; only the six task files are included.
+- Laravel tests, Pint, Larastan, and browser acceptance were not run because this task changes documentation/governance only, as permitted by the task.
 
 ## Facts
 
-- User and payment services now follow the existing group-service concurrency pattern: transaction, `lockForUpdate()`, validation against the locked row, and update of that row only.
-- A stale `pending` user can no longer overwrite an `approved` database status with `rejected`.
-- A stale `pending` payment can no longer overwrite a `succeeded` database status with `failed`.
-- Rejected stale transitions leave the committed database state unchanged.
-- Successful transitions refresh and return the caller-provided model with the committed target status.
-- No enum values, transition matrices, group transition code, database schema, dependencies, or project documentation changed.
+- Explicit visual numeric values and design implementation rules in `DESIGN_SYSTEM.md` take priority over `uikit/index.html`.
+- `uikit/index.html` remains the approved visual reference for intent not already resolved by the design specification.
+- Missing or explicitly unresolved required design decisions must be surfaced for user approval and cannot be invented.
+- Project architecture, security, stack, runtime, and asset-delivery constraints remain in force.
+- `uikit/` remains reference material and is not a Laravel runtime dependency.
+- Lucide remains the only approved icon library; no dependency or asset-delivery implementation was added.
+- Stage 3 UI code, shared Blade design-system components, and product UI remain unimplemented.
+- No approved visual token or value changed.
 
 ## Assumptions
 
-- The existing group transition implementation is the approved concurrency pattern, as stated by the task.
+- None beyond those recorded in `.ai/task.md`.
 
 ## Unknowns
 
-- None that affect this correction.
+- The production-local Lucide delivery mechanism remains intentionally undecided for a future implementation task.
+- Design values listed as unresolved in `DESIGN_SYSTEM.md` remain unresolved.
 
 ## Risks / Next Step
 
-- No known acceptance gap remains for this task.
-- Browser/runtime acceptance was not run because the task changes domain concurrency logic only and explicitly does not require a browser pass.
+- No known acceptance gap remains for this governance task.
+- Stage 3 implementation requires a separate approved task and must follow the newly documented governance.
