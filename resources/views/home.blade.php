@@ -3,6 +3,7 @@
 @section('title', 'Gruppa Info — Stage 1')
 
 @section('content')
+    <main class="container py-5">
     <div class="stage-one-card card border-0 shadow-sm mx-auto">
         <div class="card-body p-4 p-md-5">
             <span class="badge text-bg-success mb-3">Stage 1 ready</span>
@@ -26,4 +27,5 @@
             </p>
         </div>
     </div>
+    </main>
 @endsection

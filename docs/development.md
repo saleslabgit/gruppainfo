@@ -106,9 +106,18 @@ docker compose exec app composer check-platform-reqs
 
 Composer-скрипт `composer check` последовательно запускает Pint, Larastan и тесты.
 
-## Frontend-ресурсы
+## Frontend-ресурсы и UI-kit
 
-Bootstrap 5.3.8 хранится в `public/vendor/bootstrap` вместе с лицензией. Собственные файлы — `public/app.css` и `public/app.js`. Они подключаются напрямую из Blade; `app.css` подключается после Bootstrap. Frontend-сборки нет.
+Bootstrap 5.3.8 хранится в `public/vendor/bootstrap` вместе с лицензией. Montserrat 9.000 взят из официального репозитория Google Fonts как `Montserrat-VariableFont_wght.ttf`; локальный файл обслуживает веса 400, 500, 600 и 700, лицензия OFL лежит рядом. Закрепляющая SHA-256 сумма font-файла: `0f7b311b2f3279e4eef9b2f968bcdbab6e28f4daeb1f049f4f278a902bcd82f7`. Lucide 1.31.0 взят из официального npm-distribution как browser-ready UMD-файл; ISC-лицензия также лежит рядом, SHA-256 distribution-файла: `f96167bbf0e73ae1031328116cc36ba633c71953d0ccce2e4b5cfc17c420f869`.
+
+Собственные файлы — `public/app.css` и `public/app.js`. Они подключаются напрямую из Blade; `app.css` подключается после Bootstrap. Frontend-сборки и runtime CDN-запросов нет.
+
+В окружениях `local` и `testing` baseline проверяется на `/ui-kit`. При `APP_ENV=production` маршрут возвращает 404. Страница использует production-компоненты из `resources/views/components/ui` и предназначена для проверки desktop/mobile layout, focus и интерактивных состояний. Минимальная ручная проверка:
+
+1. открыть `http://localhost:8080/ui-kit` на desktop и при ширине 390px;
+2. проверить sidebar/mobile drawer, custom select, dropdown и modal;
+3. пройти интерактивные элементы клавишей Tab и проверить видимый focus;
+4. убедиться через Network, что Bootstrap, Montserrat, Lucide и project assets загружаются только с текущего host.
 
 Новые runtime CSS/JS-файлы также должны размещаться непосредственно в `public/`. Не добавляйте `package.json`, npm, Vite или CDN-ссылки.
 

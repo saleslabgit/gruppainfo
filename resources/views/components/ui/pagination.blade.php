@@ -1,0 +1,2 @@
+@props(['range' => '1–20 из 20'])
+<nav aria-label="Пагинация" {{ $attributes->class('ui-pagination') }}><span>{{ $range }}</span><div class="ui-pagination__pages"><button type="button" disabled aria-label="Предыдущая страница"><x-ui.icon name="chevron-left" size="15" /></button><button type="button" aria-current="page">1</button><button type="button">2</button><span>…</span><button type="button" aria-label="Следующая страница"><x-ui.icon name="chevron-right" size="15" /></button></div></nav>

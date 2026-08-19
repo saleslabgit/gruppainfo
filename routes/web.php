@@ -10,3 +10,9 @@ Route::get('/', function () {
         'samplePrice' => MoneyFormatter::format(12500),
     ]);
 });
+
+Route::get('/ui-kit', function () {
+    abort_unless(app()->environment(['local', 'testing']), 404);
+
+    return view('ui-kit');
+})->name('ui-kit');

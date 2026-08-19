@@ -1,0 +1,2 @@
+@props(['id', 'title', 'size' => 'medium', 'footer' => null])
+<div class="modal fade" id="{{ $id }}" tabindex="-1" aria-labelledby="{{ $id }}-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered ui-modal ui-modal--{{ $size }}"><div class="modal-content"><header class="modal-header"><h2 class="modal-title" id="{{ $id }}-title">{{ $title }}</h2><x-ui.icon-button label="Закрыть" icon="x" data-bs-dismiss="modal" /></header><div class="modal-body">{{ $slot }}</div>@if($footer)<footer class="modal-footer">{{ $footer }}</footer>@endif</div></div></div>
