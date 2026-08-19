@@ -1,333 +1,282 @@
-# Task: TASK-2026-08-19-07
+# Task: TASK-2026-08-19-08
 
 Status: planned
-Created from: 91193a555848be8024a4ae2476e35bb51e91415a
+Created from: 54dd02157cce63ee4aec0bbaa6d802b12d4b18f9
 
 ## Title
 
-Fix Stage 3 visual acceptance and reusable-component gaps
+Build Stage 4 authentication and access foundation
 
 ## Goal
 
-Correct the Stage 3 baseline before acceptance.
+Implement the revised Stage 4 from `SPEC.md`: a complete internal session-authentication and access-control foundation that can be tested entirely inside the Laravel application before any external form, email-onboarding, SMTP, or bank integration is introduced.
 
-`TASK-2026-08-19-06` implemented the design-system foundation, but product-owner visual review and ChatGPT acceptance review found concrete visual and reusable-component gaps. Fix those gaps without starting Stage 4, without redesigning unrelated components, and without broadening the deferred component catalogue.
-
-The result must remain a single shared design system governed by `DESIGN_SYSTEM.md` and `uikit/index.html`. Where the latest product-owner feedback below changes an existing visual rule, update `DESIGN_SYSTEM.md` so the correction becomes the new durable source of truth rather than a UI-kit-only patch.
+After this task, the development administrator and a development psychologist must be able to log in through the real application UI, reach only their permitted protected area, log out safely, and lose access immediately when the account becomes ineligible. The result must provide reusable authentication/session boundaries for the upcoming internal CRUD stages without implementing Stage 5 administrator CRUD or Stage 6 cabinet functionality.
 
 ## Facts
 
-- Current `main` at task creation is `91193a555848be8024a4ae2476e35bb51e91415a` (`codex: TASK-2026-08-19-06 implement design system foundation`).
-- Stage 1 and Stage 2 are accepted.
-- Stage 3 baseline is implemented but **not accepted yet**.
-- The current `/ui-kit` is the acceptance surface for this correction.
-- The product owner reviewed `/ui-kit` at a wide desktop viewport and reported seven visual issues listed below.
-- ChatGPT review also found reusable-component and responsive gaps listed below.
-- Latest product-owner visual feedback has priority over older design documentation where the two conflict.
-- `DESIGN_SYSTEM.md` must be updated minimally when a newly approved visual rule changes the existing system.
-- `uikit/` remains reference-only and must not become a runtime dependency.
-- No Node/npm/Vite/runtime-CDN/frontend framework may be introduced.
+- Current `main` at task creation is `54dd02157cce63ee4aec0bbaa6d802b12d4b18f9`.
+- Stage 1, Stage 2, and Stage 3 are completed and accepted.
+- `SPEC.md` has been reordered to an internal-first roadmap: Stage 4–10 build and test the internal product before public-site forms, email, and bank integration.
+- Current Stage 4 is **Authentication & Access Foundation** only. External questionnaire intake is now Stage 11; email/password setup is Stage 12; bank integration starts at Stage 13.
+- `App\Models\User` already extends Laravel `Authenticatable`, uses `gp_users`, casts `status` to `UserStatus`, and hashes `password` through the model cast.
+- Laravel's configured `web` guard already uses the session driver and the Eloquent `User` provider.
+- Sessions already use the `database` driver by default.
+- The existing `sessions` table has nullable indexed `user_id`, so per-user session invalidation can be implemented without a new session schema.
+- Development/testing seeding currently creates an approved, enabled administrator only.
+- The current UI baseline includes reusable password input, buttons, alerts/cards, application shell primitives, responsive behavior, local Montserrat/Lucide, and no frontend build step.
+- The design system and UI Kit are mandatory for all new interface work.
+- No product login/logout, protected admin/cabinet routes, role middleware, or application-level access-revocation middleware currently exists.
 
 ## Assumptions
 
-- Fix visual problems at the shared component/token level whenever the issue is systemic; do not patch only the demo markup if the same defect would appear on product pages.
-- If an issue exists only because the UI-kit displays multiple examples side-by-side, fix the comparison/demo layout without adding an unnecessary fixed size to the production component.
-- Reuse the existing approved spacing scale. For the newly requested separation between adjacent select/navigation items, use the existing `4px` spacing token rather than inventing a new spacing value.
-- Add a minimal shared motion system for interactive micro-transitions. Use one project token pair: `160ms` duration with `ease-out`; respect `prefers-reduced-motion: reduce`. Do not animate layout dimensions.
+- Use Laravel's existing session authentication directly. Do not add Breeze, Jetstream, Fortify, Sanctum, starter kits, authentication packages, or another guard/provider unless an actual repository constraint proves the default `web` guard insufficient.
+- Use one login form for both roles. After successful authentication, redirect an administrator to the minimal protected admin acceptance surface and a psychologist to the minimal protected cabinet acceptance surface.
+- The normal product rule for protected access is: active non-deleted `User`, `status=approved`, `disabled=false`. The same eligibility rule applies to administrator accounts unless a later approved requirement changes it.
+- `admin` remains the role discriminator for Stage 4. Do not introduce a role/permission package or a new roles table.
+- A small reusable session-invalidating service/helper is justified because Stage 5 must invoke the same behavior when an administrator disables/deletes an account. Use the existing database-session structure rather than a generic security framework.
+- Development/testing psychologist credentials may be seeded idempotently like the existing administrator. They must never be created in production environments.
+- Minimal `/admin` and `/cabinet` pages exist only as authentication/authorization acceptance surfaces. Do not build the Stage 5 admin CRUD or Stage 6 psychologist dashboard here.
 
 ## Unknowns
 
-None that block this correction.
+None that block this task.
 
 ## Scope
 
-### 1. Form focus treatment — product-owner issues 1 and 2
+### 1. Session login
 
-The owner reports an unclear/broken inner outline on focused fields, including:
-
-- normal text input (`#name`, `.ui-input`);
-- search input inside `.ui-search`.
-
-Correct the focus system so form controls have **one clean visible focus treatment**, with no double/internal outline, no nested ring, and no layout shift.
-
-Requirements:
-
-- preserve an accessible, clearly visible primary-colored focus indication and the approved subtle halo;
-- apply focus to the correct visual control shell;
-- composite controls such as Search must use the outer shell (`:focus-within` or equivalent) and must not apply a second focus border/ring to the inner native input;
-- normal Input/Textarea/Select must not visually shrink because a thicker border is inserted inside the control;
-- update `DESIGN_SYSTEM.md` focus wording where necessary so the new owner-approved treatment is canonical;
-- do not remove keyboard focus visibility.
-
-The same principle must be applied consistently to implemented form controls, not just the two examples marked by the owner.
-
-### 2. Form composition rhythm — ChatGPT review
-
-The current `.ui-field` uses one `6px` gap for everything, while the canonical form-composition rule is:
-
-- Label → Control: `8px`;
-- Control → Helper/Error: `12px`;
-- Helper and Error are mutually exclusive.
-
-Implement the `8px / 12px` rhythm explicitly instead of one generic gap.
-
-`DESIGN_SYSTEM.md` currently contains older conflicting `6px` label/helper wording in component sections. Normalize those conflicting lines to the canonical §5 form-composition rhythm so future implementations do not regress.
-
-### 3. Select option separation and open-focus state — product-owner issue 4 + ChatGPT review
-
-The owner reports that Select options have no visual separation and hover visually merges with the selected option.
-
-Requirements:
-
-- add `4px` vertical separation between adjacent options inside the Select panel;
-- keep the selected item clearly distinct from a hovered unselected item;
-- hover/focus must not visually join two adjacent rounded option surfaces;
-- while the Select is open, the trigger must retain the approved open/focus treatment even when keyboard focus moves into an option;
-- keyboard ArrowUp/ArrowDown/Escape/selection behavior must remain correct;
-- update `DESIGN_SYSTEM.md` Select rules with the approved option gap/open-focus clarification.
-
-### 4. Sidebar navigation separation — product-owner issue 5
-
-The owner reports that hovered navigation items visually merge with the active item.
-
-Requirements:
-
-- add `4px` vertical separation between adjacent sidebar/drawer navigation items;
-- active and hovered items must remain visually separate rounded surfaces;
-- desktop Sidebar and mobile Drawer navigation must use the same shared rule;
-- update `DESIGN_SYSTEM.md` navigation rule accordingly.
-
-### 5. Shared motion / transitions — product-owner issue 6
-
-The owner explicitly requires smooth transitions on buttons and other interactive elements across the application.
-
-Add a small shared motion layer to the design system:
-
-- `--motion-duration-fast: 160ms`;
-- `--motion-ease-standard: ease-out`.
-
-Apply transitions consistently to implemented interactive baseline components where state changes are visual, including at minimum:
-
-- buttons and icon buttons;
-- links/navigation items;
-- Input/Textarea/Search/Select shells;
-- Select and Dropdown items;
-- pagination controls;
-- interactive cards;
-- table-row hover state;
-- other existing baseline interactive controls where the same treatment is appropriate.
-
-Transition only visual micro-interaction properties such as `color`, `background-color`, `border-color`, `box-shadow`, and `opacity` where applicable. Do not animate width/height/layout geometry.
-
-Respect `prefers-reduced-motion: reduce` by effectively disabling nonessential project-defined transitions/animations.
-
-Do not replace or fight Bootstrap's existing Modal/Offcanvas transition mechanism unless a concrete visual defect requires it.
-
-Add the motion rule/tokens to `DESIGN_SYSTEM.md` so this is a permanent site-wide rule.
-
-### 6. Confirmation patterns shown at inconsistent sizes — product-owner issue 3
-
-On the UI-kit page, the two side-by-side confirmation examples have visibly different heights because their text wraps differently.
-
-Correct the comparison presentation so paired confirmation examples in the same UI-kit row appear as equal-height cards.
-
-Important boundary:
-
-- keep the production Confirmation component's approved `340px` width and content-driven intrinsic height;
-- do **not** invent a global fixed confirmation height;
-- equalize the side-by-side demo/comparison layout through its parent layout or an appropriate reusable equal-height layout treatment.
-
-### 7. Card body phantom bottom spacing — product-owner issue 7
-
-The owner reports an unexplained bottom gap inside the Section Card body.
-
-Remove default descendant margins that create phantom extra space at the bottom of Card content.
+Implement a normal Laravel web login flow using the existing `web` guard.
 
 At minimum:
 
-- the final child inside Card body/header/footer must not introduce an unintended trailing margin;
-- preserve intentional component padding from `DESIGN_SYSTEM.md`;
-- solve this generically for the Card component rather than only changing the sample paragraph.
+- `GET /login` for guests;
+- `POST /login` with CSRF and server-side validation;
+- email + password authentication through Laravel's authentication facilities;
+- a generic authentication error that does not reveal whether an email exists;
+- session ID regeneration after successful login;
+- login throttling/rate limiting keyed safely by credentials/IP using normal Laravel facilities;
+- already-authenticated users should not use the guest login flow as an alternate navigation path.
 
-### 8. Production-ready Pagination — ChatGPT review blocker
+Do not add registration, public questionnaire intake, forgot-password/setup-email behavior, or external API auth in this task.
 
-The current `x-ui.pagination` hard-codes pages `1`, `2`, `…` and is a demo rather than a reusable application component.
+### 2. Logout
 
-Replace it with a real generic pagination component suitable for upcoming Laravel list pages.
+Implement logout as a protected POST action:
+
+- call Laravel logout through the active guard;
+- invalidate the current session;
+- regenerate the CSRF token;
+- redirect to the login/public surface with a clear result;
+- do not expose state-changing logout through GET.
+
+### 3. Access eligibility middleware
+
+Add reusable middleware for every protected application request after normal authentication.
+
+For the authenticated user, protected access is allowed only when:
+
+- the user still exists and is not soft-deleted;
+- `status === UserStatus::Approved`;
+- `disabled === false`.
+
+If an authenticated session becomes ineligible:
+
+- terminate authentication immediately on the next protected request;
+- invalidate the current session and regenerate the CSRF token;
+- redirect to login with a clear but non-sensitive access message;
+- never leave an ineligible user authenticated in a protected response.
+
+Do not write `status` directly from this middleware. It only enforces current state.
+
+### 4. Role boundaries
+
+Create explicit protected route boundaries for the two current roles.
+
+Use simple middleware/authorization appropriate to the current two-role model:
+
+- `/admin` route group: authenticated + access-eligible + `admin=true`;
+- `/cabinet` route group: authenticated + access-eligible + psychologist role (`admin=false`);
+- guest access redirects to login;
+- a psychologist attempting admin routes receives 403 (or the project's equivalent explicit denial) rather than data leakage;
+- do not create a permissions framework.
+
+Create only minimal role-specific acceptance pages using the shared design system. They should make the current signed-in identity/role and logout action testable, but must not implement Stage 5/6 product content.
+
+### 5. Reusable per-user session invalidation
+
+Implement the smallest shared mechanism needed to invalidate all active database sessions for one `User`.
 
 Requirements:
 
-- no hard-coded page numbers or totals in the production component;
-- primary API should work naturally with Laravel paginator data (prefer accepting a Laravel paginator object or an equally reusable generic pagination state that can be built from it without page-specific code);
-- render current page, previous/next availability, page links/ellipsis as applicable, and range/total information from real state;
-- preserve the visual specification for pagination;
-- use links/URLs for real navigation rather than inert demo-only buttons when URLs are available;
-- keep a deterministic UI-kit example by constructing/passing demo pagination data **from the UI-kit page/test**, not embedding fake data inside the component;
-- add focused tests proving different current-page/total states render correctly.
+- operate against the configured database session table/connection rather than hard-coding unrelated infrastructure assumptions;
+- use the existing indexed `sessions.user_id` relationship;
+- be callable independently of the current request so Stage 5 can invoke it when disabling/deleting users;
+- safely handle a user with zero or multiple sessions;
+- do not add Redis/session packages or a generic session-management subsystem;
+- do not add remember-me UI in this task. If the implementation also rotates an existing remember token for defense in depth, keep it simple and test the actual behavior claimed.
 
-### 9. Mobile Modal / Confirmation actions — ChatGPT review blocker
+Add direct automated coverage proving multiple sessions belonging to the target user are removed without removing another user's sessions.
 
-The design system requires mobile action groups in forms/modals to stack vertically, use full-width buttons, and show the primary/destructive action first visually.
+### 6. Development/testing psychologist seed
 
-Fix the responsive baseline for:
+Add an idempotent development/testing-only psychologist seed analogous to `DevelopmentAdminSeeder`.
 
-- `.modal-footer` action groups;
-- `.ui-confirmation__actions`;
-- any shared action-row primitive already used for the same pattern.
+Requirements:
 
-Desktop/tablet ordering must remain the approved Secondary-left / Primary-or-Danger-right arrangement.
+- create one approved, enabled, non-admin psychologist with a known local-only password;
+- expose the values through the existing `config/seed.php` pattern, with sensible `.test`/local-only defaults and optional env overrides;
+- call it only in `local`/`testing`, never production;
+- repeat seeding must update/create safely without duplicates;
+- do not create a product-facing manual password feature to support testing.
 
-On mobile:
+Keep the existing development administrator seed behavior intact.
 
-- buttons are full width;
-- actions stack vertically;
-- Primary/Danger appears first visually;
-- spacing follows existing design tokens.
+### 7. Login and acceptance UI
 
-Do not introduce duplicate mobile-only component markup if CSS/shared component structure can solve the behavior cleanly.
+Use the actual Stage 3 design system and reusable Blade components.
 
-### 10. Input password and readonly states — ChatGPT review blocker
+At minimum:
 
-The baseline Input must be usable by the upcoming authentication stage.
+- login page uses the approved form/card/button/alert primitives and password reveal behavior already implemented;
+- validation/authentication errors are presented through shared components;
+- minimal admin/cabinet acceptance pages use the existing responsive shell/page structure where appropriate;
+- logout is available through a proper POST form/action;
+- desktop and mobile behavior must conform to `DESIGN_SYSTEM.md` and `uikit/index.html`.
 
-Implement the already-specified states that are currently missing/inaccurate:
+If a genuinely necessary generic UI component is missing, add it to the shared UI namespace/design system before using it. Do not create page-specific visual substitutes.
 
-- `readonly` must use the approved readonly presentation (`#71695F` text), not disabled text styling;
-- `type=password` must include the specified trailing eye control/icon and allow the user to reveal/hide the password;
-- the password toggle must be keyboard-accessible and have a meaningful accessible label/state;
-- preserve the 40px control shell and approved suffix-icon sizing/position;
-- do not add a new form-control size.
+### 8. Authentication and authorization tests
 
-Use minimal Vanilla JS in the existing direct-runtime file for the password toggle.
+Add focused feature/integration tests on the existing MySQL test environment.
 
-### 11. UI-kit acceptance coverage
+Cover at minimum:
 
-Update `/ui-kit` so every corrected behavior can be inspected without product pages.
+1. guest can render login;
+2. approved enabled development-equivalent psychologist credentials authenticate and redirect to cabinet;
+3. approved enabled administrator credentials authenticate and redirect to admin;
+4. wrong password fails with a generic error and no authenticated session;
+5. pending user cannot authenticate into protected product access;
+6. rejected user cannot authenticate into protected product access;
+7. disabled approved user cannot authenticate into protected product access;
+8. psychologist cannot access admin routes;
+9. administrator cannot accidentally use psychologist-only cabinet route if the role boundary is intentionally exclusive;
+10. guest protected-route request is redirected to login;
+11. POST logout invalidates the session and protected routes become inaccessible;
+12. an already-authenticated user who becomes disabled is logged out on the next protected request;
+13. an already-authenticated user whose current state is otherwise no longer eligible is denied/revoked on the next protected request;
+14. per-user session invalidation deletes all target sessions and preserves unrelated sessions;
+15. login rate limiting activates after the configured threshold and resets/behaves correctly after successful authentication as appropriate to the chosen standard Laravel pattern;
+16. production seeding does not create the development psychologist.
 
-At minimum expose/test examples for:
+Where practical, assert session regeneration/security behavior rather than merely response status.
 
-- focused normal Input and focused Search without an inner/double outline;
-- correct Label→Control→Helper/Error rhythm;
-- Select with separated options and distinct hover/selected/open focus behavior;
-- adjacent active/hover sidebar navigation items;
-- transitions on representative interactive controls;
-- equal-height side-by-side Confirmation examples;
-- Section Card body with no phantom trailing gap;
-- Pagination in at least two meaningful states;
-- readonly Input and password reveal/hide behavior;
-- mobile Modal/Confirmation action stacking.
+### 9. Documentation and report
 
-Do not turn the UI-kit page into product functionality.
+Update only documentation made factual by this implementation:
 
-### 12. Design-system and documentation synchronization
+- `docs/architecture.md` — authentication/access middleware and session invalidation boundary;
+- `docs/development.md` — local login URLs and development admin/psychologist seed credentials/config variables without adding real secrets;
+- `docs/project-status.md` — Stage 4 implemented state and Stage 5 as next stage;
+- `.env.example` / `config/seed.php` only as required for local seed configuration;
+- `.ai/report.md` — factual Stage 4 report, changed files, tests, browser verification, and remaining gaps.
 
-Update `DESIGN_SYSTEM.md` only where the latest owner-approved visual feedback changes or resolves a rule:
-
-- form-control focus treatment;
-- canonical 8px/12px form rhythm where old 6px wording conflicts;
-- Select option `4px` gap/open-focus behavior;
-- Sidebar/Drawer nav-item `4px` gap;
-- shared 160ms/ease-out motion rule and reduced-motion behavior;
-- generic Card trailing-content margin rule if needed to prevent future recurrence.
-
-Do not rewrite unrelated tokens/components.
-
-Update `docs/project-status.md`, `docs/architecture.md`, or `docs/development.md` only if needed to keep factual Stage 3 implementation/verification guidance current. Do not add documentation churn.
-
-Replace `.ai/report.md` with the factual report for this correction.
+Do not change the newly approved Stage 4–15 roadmap in `SPEC.md` unless implementation exposes a direct factual contradiction that cannot be resolved otherwise.
 
 ## Out Of Scope
 
-- Stage 4 authentication/integration implementation.
-- Admin or psychologist product pages.
-- New business/domain behavior.
-- Implementing deferred design-system catalogue components unrelated to these fixes.
-- Redesigning unrelated approved components or tokens.
-- Changing `uikit/index.html` / `uikit/support.js`.
-- Adding Node/npm/Vite, runtime CDN dependencies, frontend frameworks, or new build tooling.
-- Broad CSS refactoring not required to fix the listed issues.
-- Page-specific forks of shared components.
+- Public psychologist questionnaire API or any `/api/v1` integration route.
+- HMAC, `X-Timestamp`, `X-Request-Id`, integration secret, public-site documentation.
+- Incoming participant application API.
+- SMTP, mail sending, queued email jobs, password setup/reset emails or tokens.
+- Product registration UI.
+- Stage 5 psychologist CRUD or document management screens.
+- Stage 6 real psychologist cabinet pages/data presentation.
+- Group CRUD/moderation.
+- Dictionaries/settings CRUD.
+- Scheduler/lifecycle/application workflows.
+- Bank/payment integration.
+- New role/permission framework or authentication package.
+- Remember-me UX unless already required by an existing explicit project requirement (none currently is).
+- Product-facing ability for an administrator to assign/set a psychologist password manually.
+- Node/npm/Vite/runtime CDN/frontend framework changes.
+- Unrelated domain/schema refactoring.
 
 ## Constraints
 
-- Follow `WORKFLOW.md`, `AGENTS.md`, and the updated `DESIGN_SYSTEM.md` governance.
-- Treat the latest product-owner feedback in this task as an approved design correction and update `DESIGN_SYSTEM.md` where required.
-- Keep all fixes shared/reusable where the defect is systemic.
-- Keep `uikit/` reference-only.
-- Preserve local Bootstrap, local Montserrat, local Lucide, and no-build runtime architecture.
-- Preserve Stage 2 domain behavior and Stage 3 environment guard for `/ui-kit`.
-- Do not commit screenshots, the visual-review ZIP, local browser artifacts, logs, caches, or secrets.
+- Follow `WORKFLOW.md`, `AGENTS.md`, current `SPEC.md`, `DESIGN_SYSTEM.md`, and `uikit/index.html`.
+- Use current Laravel 12 APIs and the existing `web` session guard/provider.
+- Keep authentication/session logic out of Blade templates.
+- Keep controllers thin; access rules belong in middleware/services/policies as appropriate.
+- Preserve the existing `UserStatus` enum and approved transition matrix; Stage 4 enforces status but does not redefine it.
+- Preserve database session storage.
+- Do not write `accept` directly or introduce it into authentication logic.
+- Do not expose whether a login email exists through error text.
+- Do not weaken CSRF/session security for convenience.
+- Do not create local-only users in production.
+- Do not add new dependencies unless an actual blocker is proven and reported first.
+- Keep the diff limited to authentication/access foundation, local test identity support, relevant shared UI use, tests, report, and factual docs.
 
 ## Acceptance Criteria
 
-1. Focused Input/Textarea/Search/Select controls have one clean visible focus treatment with no inner/double outline or layout shift.
-2. Search uses its outer shell for focus; the nested native search input does not get a second ring.
-3. Form rhythm is `8px` Label→Control and `12px` Control→Helper/Error, with no conflicting `6px` implementation/documentation rule remaining for that composition.
-4. Select options have `4px` separation; hover/focus never visually merges with the selected option; trigger retains open-focus treatment while the list is open.
-5. Sidebar and mobile Drawer navigation items have `4px` separation and distinct active/hover surfaces.
-6. Shared interactive baseline components use the approved `160ms ease-out` motion tokens, and reduced-motion users do not receive nonessential project animations/transitions.
-7. Side-by-side UI-kit Confirmation examples render equal-height without imposing an arbitrary global fixed height on the production component.
-8. Section Card content has no unintended trailing bottom margin beyond approved component padding.
-9. Pagination is data-driven/reusable and can render real Laravel pagination state; no page numbers/totals are hard-coded in the production component.
-10. Mobile Modal and Confirmation action groups stack full-width with Primary/Danger first visually; desktop/tablet Secondary-left / Primary-or-Danger-right remains correct.
-11. Readonly Input uses approved readonly styling and is visually distinct from disabled.
-12. Password Input has an accessible reveal/hide control using the approved icon system and minimal Vanilla JS.
-13. `/ui-kit` demonstrates all corrected states and remains unavailable in production.
-14. `DESIGN_SYSTEM.md` records the newly approved focus, form rhythm, spacing, and motion rules so later pages cannot regress.
-15. No Stage 4/product functionality or deferred unrelated component is implemented.
-16. Existing local asset/no-CDN/no-build constraints remain intact.
-17. Full automated project checks pass and browser verification covers the corrected desktop/mobile interactions.
-18. `.ai/report.md` accurately records all fixes, checks, remaining unresolved design values, and user visual acceptance as still pending.
-19. Final diff contains only files necessary for this Stage 3 correction.
+1. A real shared login page authenticates approved/enabled admin and psychologist users through Laravel's existing session guard.
+2. Successful login regenerates the session and redirects by role to the correct protected acceptance surface.
+3. Failed login uses a generic error and does not authenticate the user.
+4. Login is rate-limited using standard Laravel facilities.
+5. Logout is POST+CSRF, invalidates the current session, regenerates the token, and removes protected access.
+6. Every protected request requires a non-deleted, approved, enabled current user.
+7. A user who becomes ineligible while logged in loses access on the next protected request.
+8. `/admin` is inaccessible to psychologists; `/cabinet` is restricted to the psychologist role according to the defined Stage 4 boundary.
+9. A reusable service/helper can invalidate every database session belonging to one user without deleting other users' sessions.
+10. Development/testing seeding creates an approved psychologist with configurable local credentials and remains idempotent; production does not seed that account.
+11. Login/admin/cabinet acceptance UI uses shared design-system components with no page-specific design fork.
+12. No public integration route, email/password-setup flow, Stage 5 CRUD, or Stage 6 product page is implemented.
+13. Existing Stage 1–3 behavior remains green, including `/ui-kit` environment protection and design-system checks.
+14. Focused auth/access tests and the full MySQL test suite pass.
+15. Pint, Larastan/PHPStan, platform requirements, and applicable runtime/browser checks pass.
+16. `docs/project-status.md` accurately records Stage 4 as implemented only after the implementation is actually complete.
+17. `.ai/report.md` accurately records what was implemented and actually verified.
+18. Final diff contains only files required by Stage 4.
 
 ## Checks
 
 Run and report at minimum:
 
-- focused feature/component tests for Pagination data states and `/ui-kit` production guard;
+- focused authentication/access feature tests;
+- focused per-user database session invalidation test;
+- seed/idempotency/environment tests for the development psychologist;
 - full `php artisan test` on the isolated MySQL test database;
 - `composer check` including Pint and Larastan/PHPStan;
 - `composer check-platform-reqs`;
-- JS syntax check for `public/app.js`;
-- local HTTP `/ui-kit` response check;
-- real-browser desktop verification, including a wide viewport comparable to the owner's review (`2174×937`) and a normal desktop viewport;
-- real-browser mobile verification around `390×844`;
-- verify Input and Search focus computed styles and visually confirm there is no inner/double outline;
-- verify Select open/hover/selected states and option separation;
-- verify active + hovered nav items remain visually separate;
-- verify representative computed `transition-duration` / easing and `prefers-reduced-motion` behavior;
-- verify paired Confirmation examples have equal rendered height on the acceptance page;
-- verify Section Card body has no unintended trailing margin;
-- verify Pagination URLs/state change correctly from supplied paginator data;
-- verify password toggle by keyboard and click, including accessible label/state;
-- verify mobile Modal/Confirmation action width/order;
-- browser console/network inspection: no errors/warnings caused by the changes and no runtime CDN requests;
 - `git diff --check`;
+- local HTTP/browser check for `/login`, successful admin login, successful psychologist login, role denial, logout, and access revocation;
+- browser desktop and mobile verification of login and minimal protected acceptance pages if existing browser tooling is available;
+- browser console/network inspection to ensure no runtime CDN/build-tool regression;
 - final `git status --short`, full diff, and staged-file inspection.
 
-Final visual acceptance remains with the product owner.
+The user remains the product tester for final visual acceptance of the new login/access surfaces.
 
 ## Hard Workflow Gate
 
 Before implementation:
 
-- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, `DESIGN_SYSTEM.md`, relevant Stage 3 `SPEC.md`, and current Stage 3 documentation;
-- inspect the current `/ui-kit` implementation and relevant shared Blade components/CSS/JS;
-- inspect `uikit/index.html` where needed for unchanged visual intent;
+- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, current `SPEC.md` Stage 4 and relevant §7/§29 rules, `DESIGN_SYSTEM.md`, `docs/architecture.md`, `docs/development.md`, and `docs/project-status.md`;
+- inspect `User`, `UserStatus`, current transition services, `config/auth.php`, `config/session.php`, framework/session migrations, current seeders/config, routes, middleware bootstrap, existing Stage 3 UI components, and relevant tests;
+- inspect `uikit/index.html` for the login/form/shell visual intent as required by governance;
 - run `git log --oneline -5` and `git status --short`;
-- confirm `TASK-2026-08-19-07` is the current planned task and `TASK-2026-08-19-06` has already been implemented but not accepted;
+- confirm `TASK-2026-08-19-08` is the current planned task created from `54dd02157cce63ee4aec0bbaa6d802b12d4b18f9` and has not already been completed;
 - do not touch unknown local changes.
 
 Before commit:
 
-- complete the required automated/browser checks;
-- update `.ai/report.md` with actual results;
+- complete all applicable automated/runtime/browser checks;
+- update `.ai/report.md` with actual results only;
 - inspect final Git status, full diff, and staged files;
-- stage only files related to this correction;
-- ensure no screenshots, review ZIPs, browser artifacts, secrets, logs, caches, or unrelated files are included.
+- stage only files related to this task;
+- ensure no secrets, browser artifacts, screenshots, logs, caches, external integration test data, or unrelated files are included.
 
 If the gate passes, commit with:
 
-`codex: TASK-2026-08-19-07 fix Stage 3 visual acceptance gaps`
+`codex: TASK-2026-08-19-08 build authentication and access foundation`
 
 If safe completion is impossible, report `partial`, `blocked`, or `failed` instead of claiming success.
