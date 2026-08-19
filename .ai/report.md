@@ -1,69 +1,66 @@
-# Report: TASK-2026-08-19-07
+# Report: TASK-2026-08-19-08
 
 Status: done
 
 ## Summary
 
-Corrected the Stage 3 visual acceptance and reusable-component gaps without starting Stage 4. Shared form controls now use one layout-stable focus edge and halo, composite Search/Password controls focus only their outer shell, form composition uses the canonical 8px/12px rhythm, and Select retains its open-focus state while exposing separated option surfaces.
+Implemented the Stage 4 internal authentication and access foundation on Laravel's existing `web` session guard. Approved/enabled administrators and psychologists use one rate-limited login, receive role-safe redirects, access only their protected area, and log out through a CSRF-protected POST action that invalidates the session and regenerates the token.
 
-A user-reported follow-up corrected the shared Modal header so its reusable close Icon Button is pinned to the right edge instead of touching the title.
+Protected requests now reload and enforce the current user state. Soft-deleted, non-approved, or disabled users are logged out on their next protected request. Explicit administrator/psychologist middleware boundaries return 403 for cross-role access. Added a reusable database-session invalidator that removes all sessions for one user through the configured session connection/table.
 
-Added the shared 160ms/ease-out motion layer with reduced-motion handling, 4px navigation separation, generic Card trailing-margin protection, equal-height UI-kit confirmation composition, responsive Modal/Confirmation action ordering, accurate readonly styling, and an accessible Vanilla JS password reveal control.
-
-Replaced the hard-coded Pagination demo with a paginator-driven Blade component that derives range, total, current/previous/next state, URLs, page windows, and ellipses from `LengthAwarePaginator`. The UI-kit now supplies deterministic first-page and middle-page paginator examples.
+Added an idempotent local/testing psychologist seed, minimal responsive `/login`, `/admin`, and `/cabinet` acceptance surfaces composed from the shared Stage 3 UI components, focused auth/session/seed coverage, and factual architecture/development/status documentation.
 
 ## Changed Files
 
-- `DESIGN_SYSTEM.md` — canonical layout-stable focus implementation, 8px/12px form rhythm, Select and navigation gaps, motion tokens/reduced-motion rule, and Card trailing-content rule.
-- `public/app.css` — shared focus, motion, form rhythm, Select/open state, navigation gap, Card margin reset, Pagination links, confirmation layout, readonly/password, Modal header alignment, and mobile action styles.
-- `public/app.js` — Select open-state synchronization and accessible password reveal/hide behavior.
-- `resources/views/components/ui/input.blade.php` — reusable password shell, Lucide eye toggle, and accessible state/labels.
-- `resources/views/components/ui/pagination.blade.php` — reusable paginator-driven range, links, current state, ellipses, and unavailable controls.
-- `resources/views/ui-kit.blade.php` — inspectable corrected states, two paginator examples, and equal-height confirmation comparison.
-- `routes/web.php` — deterministic UI-kit-only `LengthAwarePaginator` state supplied to the shared component.
-- `tests/Feature/UiKitPageTest.php` — focused first/middle paginator-state coverage plus corrected UI-kit state assertions.
+- `.env.example`, `config/auth.php`, `config/seed.php` — login throttling and local psychologist seed configuration.
+- `bootstrap/app.php`, `routes/web.php` — middleware aliases, guest redirect behavior, login/logout routes, and protected role groups.
+- `app/Http/Controllers/Auth/AuthenticatedSessionController.php` — login form, session regeneration, role-safe redirect, and secure logout flow.
+- `app/Http/Requests/Auth/LoginRequest.php` — validation, eligible credential constraints, generic authentication failure, and email/IP rate limiting.
+- `app/Http/Middleware/EnsureUserIsEligible.php` — fresh user-state enforcement and immediate session revocation.
+- `app/Http/Middleware/EnsureUserHasRole.php` — explicit administrator/psychologist boundary.
+- `app/Domain/User/UserSessionInvalidator.php` — reusable configured database-session deletion for one user.
+- `database/seeders/DatabaseSeeder.php`, `database/seeders/DevelopmentPsychologistSeeder.php` — local/testing-only psychologist seed.
+- `resources/views/auth/login.blade.php`, `resources/views/admin/index.blade.php`, `resources/views/cabinet/index.blade.php` — Stage 4 acceptance UI.
+- `public/app.css` — shared form/action composition and responsive form action behavior.
+- `tests/Feature/AuthenticationAccessTest.php`, `tests/Feature/UserSessionInvalidatorTest.php`, `tests/Feature/DatabaseSeederTest.php` — focused Stage 4 coverage.
+- `docs/architecture.md`, `docs/development.md`, `docs/project-status.md` — implemented authentication/session boundaries, local use, and project stage.
+- `.ai/report.md` — this factual completion report.
 
 ## Checks
 
-- `docker compose exec app php artisan test --filter=UiKitPageTest` — passed, 3 tests / 29 assertions.
-- `docker compose exec app composer check` — passed: Pint checked 61 files, Larastan/PHPStan reported no errors, and the full isolated-MySQL suite passed with 31 tests / 460 assertions.
+- Focused auth/access, session invalidation, and seed tests — passed before the full gate; 21 tests / 127 assertions at that checkpoint.
+- `docker compose exec app composer check` — passed after the final implementation: Pint checked 69 files, Larastan/PHPStan reported no errors, and the full isolated-MySQL suite passed with 52 tests / 567 assertions.
 - `docker compose exec app composer check-platform-reqs` — passed for PHP 8.2.32 and all required extensions.
-- `node --check public/app.js` — passed.
-- Local HTTP `GET http://127.0.0.1:8080/ui-kit` — 200.
-- Real Chromium at 2174×937 and 1440×1000 — shared components and wide/normal desktop layout visually inspected; desktop Sidebar present and desktop Confirmation/Modal actions remained Secondary-left / Primary-or-Danger-right.
-- Real Chromium at 390×844 — mobile layout visually inspected; Sidebar hidden; Pagination fit its container; Confirmation and Modal actions stacked full-width with Primary/Danger visually first.
-- Input focus computed styles — retained `1px` geometry and 40px height, with primary border plus outer 1px primary edge and 3px halo; no layout shift.
-- Search focus computed styles — outer shell carried the focus edge/halo; nested native input had `0px` border and no box-shadow.
-- Select interaction — 4px option gap; selected/hovered surfaces remained distinct; open trigger retained its focus treatment; ArrowUp/ArrowDown/Escape and Enter selection passed.
-- Navigation — adjacent active and forced-hover acceptance examples had a computed 4px gap in the shared desktop/mobile navigation rule.
-- Motion — representative controls computed to `0.16s` / `ease-out`; an emulated `prefers-reduced-motion: reduce` context computed `0s` project transitions.
-- Confirmation comparison — paired rendered heights were both 197px without a production fixed-height rule.
-- Section Card — final body paragraph computed `margin-bottom:0px`.
-- Pagination — first/middle ranges, current states, previous/next URLs, ellipses, and mobile fit verified from supplied paginator data.
-- Password Input — keyboard Enter and pointer click both toggled `password`/`text`, `aria-pressed`, accessible label, and Lucide icon state.
-- Browser console/network — no errors or warnings caused by the changes, no external/CDN requests.
-- Modal follow-up at 1000×700 — computed header width was 480px; the 40px close control moved from immediately after the title to the right header inset while preserving component dimensions.
-- `git diff --check` — passed; Git emitted only the repository's existing `SPEC.md` CRLF normalization warning, and `SPEC.md` is unchanged.
+- `git diff --check` — passed.
+- Laravel route inspection — `/login` GET/POST, `/admin`, and `/cabinet` registered as expected; logout is POST-only in `routes/web.php`.
+- Local HTTP `GET http://127.0.0.1:8080/login` — 200.
+- Real Chromium desktop verification — psychologist login redirected to `/cabinet`; psychologist request to `/admin` returned 403; POST logout returned to `/login`; administrator login redirected to `/admin`.
+- Real Chromium access-revocation verification — the local psychologist was temporarily set to `disabled=true`; the next `/cabinet` request redirected to `/login` with the non-sensitive access message and ended authentication. The seed account was restored immediately to `disabled=false`.
+- Real Chromium responsive verification — at 1280px the desktop sidebar and protected surfaces rendered correctly; at 390×844 the mobile topbar replaced the sidebar and login/logout actions were full width without horizontal overflow.
+- Browser console/network inspection on a clean login page — zero errors/warnings; Bootstrap, Montserrat, Lucide, project CSS/JS, and the page loaded only from `127.0.0.1:8080`, all with 200 responses.
+- A temporary standalone `npx playwright test` runner attempt could not resolve its test module; no repository artifact was retained. The required browser flows were completed through the available connected Playwright browser tooling.
+- Final development seed — completed successfully for both local accounts.
 
 ## Facts
 
-- All systemic visual fixes are implemented in shared production components/styles; the UI-kit only supplies acceptance data and comparison layout.
-- Pagination's production component contains no demo totals or page state and uses real paginator URLs.
-- Bootstrap Modal/Offcanvas transitions were not overridden; reduced-motion handling is scoped to project-defined transitions and spinner animation.
-- `uikit/index.html` and `uikit/support.js` remain unchanged and are not runtime dependencies.
-- No Node/npm/Vite/runtime-CDN dependency, product page, authentication flow, or other Stage 4 behavior was added.
+- No authentication package, new guard/provider, dependency, schema migration, remember-me UI, registration, password reset/setup, email, public API, CRUD, bank integration, Node/Vite, or CDN runtime was added.
+- Login attempts require an active, non-deleted `approved` and enabled user; unknown email and wrong password return the same generic message.
+- Login throttling defaults to five attempts per 60 seconds and is configurable through the documented environment variables.
+- Successful login always redirects to the authenticated user's own role surface, even if the session contains an intended URL for the other role.
+- Eligibility middleware reloads the user from storage on every protected request before role authorization.
+- `UserSessionInvalidator` requires the database session driver and uses the configured session connection and table.
+- Development/testing seeding creates one approved enabled non-admin psychologist idempotently and creates neither development account in production.
 
 ## Assumptions
 
-- A compact page window consisting of boundaries plus pages adjacent to the current page is the simplest reusable Pagination strategy that preserves ellipses and fits the existing mobile surface.
-- UI-kit paginator objects are route-supplied acceptance fixtures; future product list pages will pass their query paginator directly to the same component.
+- The existing mutually exclusive `admin` boolean remains the complete Stage 4 role discriminator.
+- Local `.test` credentials from `.env.example` are development/testing fixtures only and are not production secrets.
 
 ## Unknowns
 
-- Final visual acceptance remains with the product owner.
-- Existing unresolved design values outside this correction remain unresolved; this task did not add or resolve any unrelated catalogue value.
+- Final visual/product acceptance of the new login and protected acceptance surfaces remains with the product owner.
 
 ## Risks / Next Step
 
-- No known implementation or verification gap remains for this Stage 3 correction.
-- The product owner should perform final visual acceptance of `/ui-kit` at desktop and mobile widths before Stage 3 is accepted and Stage 4 begins.
+- No known implementation or automated/runtime verification gap remains for Stage 4.
+- Stage 5 can reuse `UserSessionInvalidator` when disable/reject/delete operations are introduced.

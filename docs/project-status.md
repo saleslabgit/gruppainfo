@@ -1,6 +1,6 @@
 # Статус проекта
 
-Текущий реализованный и принятый этап: **Stage 3 — фундамент дизайн-системы и baseline UI-kit**.
+Текущий реализованный этап: **Stage 4 — авторизация и контроль доступа**. Финальная продуктовая/визуальная приёмка остаётся за пользователем.
 
 ## Работает сейчас
 
@@ -30,10 +30,17 @@
 - development/testing UI-kit на `/ui-kit`, недоступный при `APP_ENV=production`;
 - браузерно проверенные desktop/mobile layout, custom select, modal, drawer, password input, pagination и keyboard focus;
 - Stage 3 прошёл техническую и ручную визуальную приёмку.
+- единый login для администратора и психолога на стандартном Laravel `web` guard;
+- POST logout с инвалидацией сессии и ротацией CSRF token;
+- защищённые `/admin` и `/cabinet` с взаимоисключающими role boundaries;
+- повторная проверка `approved`/`disabled`/soft-delete на каждом защищённом запросе и немедленный отзыв доступа;
+- переиспользуемая инвалидация всех database sessions одного пользователя;
+- idempotent development/testing seed психолога вместе с существующим development-администратором;
+- минимальные responsive acceptance surfaces Stage 4 на общих UI-компонентах.
 
 ## Намеренно не реализовано
 
-Последующая продуктовая функциональность ещё не реализована. Пока нет login/logout, защищённых admin/cabinet route groups, административного CRUD, кабинета психолога, CRUD групп, обработки заявок, scheduler-задач, публичного HTTP API, email-onboarding, SMTP-интеграции, платёжного адаптера, банковского webhook-контроллера и внешних интеграций.
+Последующая продуктовая функциональность ещё не реализована. Пока нет административного CRUD, продуктового наполнения кабинета психолога, CRUD групп, обработки заявок, scheduler-задач, публичного HTTP API, email-onboarding, SMTP-интеграции, платёжного адаптера, банковского webhook-контроллера и внешних интеграций. Страницы `/admin` и `/cabinet` пока служат только для проверки auth/access foundation.
 
 Специализированные компоненты полного каталога (`Stepper`, `Choice Card`, `Timeline`, `Metric`, `Progress`, document/upload patterns, tabs/breadcrumbs/popover/tooltip/toast/chips/switch и другие не требуемые baseline элементы) намеренно отложены. При первой продуктовой необходимости компонент сначала добавляется в общий UI namespace по `DESIGN_SYSTEM.md`, затем используется экраном; page-specific замены запрещены.
 
@@ -62,6 +69,6 @@
 
 ## Следующий этап
 
-Следующий этап по актуальному `SPEC.md` — **Stage 4: авторизация и контроль доступа**.
+Следующий этап по актуальному `SPEC.md` — **Stage 5: административный CRUD психологов**.
 
-Stage 4 реализует только внутренние login/logout, role/access boundaries, проверку `approved`/`disabled` на защищённых запросах, отзыв активных database sessions и development/testing психолога для ручной проверки. Внешняя анкета, `/api/v1`, password setup email и SMTP в Stage 4 не входят.
+Stage 5 использует готовые admin/access boundaries и `UserSessionInvalidator` для отзыва сессий при disable/reject/delete. Внешняя анкета, `/api/v1`, password setup email и SMTP остаются последующими этапами.

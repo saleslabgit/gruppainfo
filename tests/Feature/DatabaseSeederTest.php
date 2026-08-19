@@ -56,5 +56,28 @@ final class DatabaseSeederTest extends TestCase
         self::assertFalse($admin->free);
         self::assertFalse((bool) $admin->getRawOriginal('accept'));
         self::assertTrue(Hash::check((string) config('seed.admin.password'), (string) $admin->password));
+
+        self::assertSame(1, User::query()->where('admin', false)->count());
+        $psychologist = User::query()->where('email', (string) config('seed.psychologist.email'))->firstOrFail();
+        self::assertSame(UserStatus::Approved, $psychologist->status);
+        self::assertFalse($psychologist->admin);
+        self::assertFalse($psychologist->disabled);
+        self::assertTrue(Hash::check((string) config('seed.psychologist.password'), (string) $psychologist->password));
+    }
+
+    public function test_production_seed_does_not_create_development_accounts(): void
+    {
+        $this->app->instance('env', 'production');
+
+        try {
+            $this->artisan('db:seed', [
+                '--class' => DatabaseSeeder::class,
+                '--force' => true,
+            ])->assertSuccessful();
+
+            self::assertSame(0, User::query()->count());
+        } finally {
+            $this->app->instance('env', 'testing');
+        }
     }
 }

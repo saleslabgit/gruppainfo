@@ -9,14 +9,22 @@
 - `app/Models` — Eloquent-модели таблиц `gp_*` с явными именами таблиц и связями;
 - `app/Providers` — провайдеры Laravel;
 - `app/Support` — небольшие общие технические классы форматирования;
-- `routes/web.php` — публичный технический маршрут и защищённая окружением UI-kit поверхность;
+- `routes/web.php` — публичные, гостевые и защищённые role-specific web-маршруты, а также защищённая окружением UI-kit поверхность;
 - `resources/views/components/ui` — общие Blade-примитивы дизайн-системы;
 - `resources/views` — Blade-layout и страницы;
 - `public` — document root и все готовые CSS/JS-файлы;
 - `config` — конфигурация Laravel;
 - `tests` — unit- и feature-тесты.
 
-Stage 3 добавляет визуальный фундамент и baseline-компоненты без продуктовых HTTP-сценариев. Аутентификация, авторизация, продуктовые страницы и внешние интеграции ещё не реализованы.
+Stage 4 добавляет внутреннюю session-аутентификацию и границы доступа без административного CRUD, наполнения кабинета и внешних интеграций.
+
+## Аутентификация и доступ
+
+Единый login использует стандартный Laravel `web` guard с Eloquent provider и session driver. `LoginRequest` выполняет server-side validation, допускает вход только для активного `approved`/enabled пользователя и ограничивает попытки по нормализованной паре email/IP. После успешного входа session ID регенерируется, а пользователь направляется в `/admin` или `/cabinet` по признаку `admin`.
+
+Все защищённые маршруты последовательно проходят `auth`, `eligible` и role middleware. `eligible` заново читает пользователя, включая soft-deleted записи, и немедленно завершает текущую сессию, если запись удалена, статус больше не `approved` или установлен `disabled`. Role middleware оставляет две явные взаимоисключающие границы: administrator и psychologist; нарушение границы возвращает 403.
+
+`App\Domain\User\UserSessionInvalidator` удаляет все записи настроенной database session table для одного пользователя через настроенное session connection. Сервис не зависит от текущего HTTP request и является точкой повторного использования для disable/reject/delete в Stage 5.
 
 ## Доменная модель
 

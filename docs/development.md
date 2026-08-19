@@ -29,7 +29,7 @@ docker compose up --build -d
 
 MySQL имеет healthcheck; `app` запускается только после готовности базы, а Nginx — после готовности PHP-FPM.
 
-После первого запуска создайте начальные справочники, настройки и development-администратора:
+После первого запуска создайте начальные справочники, настройки и development-учётные записи администратора и психолога:
 
 ```bash
 docker compose exec app php artisan db:seed
@@ -48,7 +48,14 @@ docker compose down
 
 Локальные безопасные значения находятся в `.env.example`. Development-схема — `gruppainfo`, test-схема — `gruppainfo_test`. Обе создаются при первом запуске MySQL, а пользователь `gruppainfo` получает доступ к обеим. Сессии и очереди по умолчанию используют database-драйверы; их таблицы создаются миграциями.
 
-Локальная seed-учётная запись настраивается через `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` и `SEED_ADMIN_FIRST_NAME`. Значения из `.env.example` нельзя использовать вне development/testing. При `APP_ENV=production` development-администратор не создаётся.
+Локальные seed-учётные записи настраиваются через `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `SEED_ADMIN_FIRST_NAME` и аналогичные `SEED_PSYCHOLOGIST_EMAIL`, `SEED_PSYCHOLOGIST_PASSWORD`, `SEED_PSYCHOLOGIST_FIRST_NAME`. Значения из `.env.example` предназначены только для development/testing. При `APP_ENV=production` эти учётные записи не создаются.
+
+После `php artisan db:seed` вход доступен по `http://localhost:8080/login`:
+
+- администратор: `admin@example.test` / `local-development-only`, после входа `/admin`;
+- психолог: `psychologist@example.test` / `local-development-only`, после входа `/cabinet`.
+
+Это локальные значения по умолчанию из `.env.example`; при env-переопределении используйте настроенные значения. Logout выполняется только POST-формой внутри защищённой области. Порог login rate limit при необходимости настраивается через `AUTH_LOGIN_MAX_ATTEMPTS` и `AUTH_LOGIN_DECAY_SECONDS` (по умолчанию 5 попыток и 60 секунд).
 
 `phpunit.xml` принудительно задаёт test-схему, поэтому запущенный в контейнере `php artisan test` не использует development-схему и не использует SQLite.
 

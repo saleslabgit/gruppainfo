@@ -16,7 +16,10 @@ final class DatabaseSeeder extends Seeder
         ]);
 
         if (app()->environment(['local', 'testing'])) {
-            $this->call(DevelopmentAdminSeeder::class);
+            $this->call([
+                DevelopmentAdminSeeder::class,
+                DevelopmentPsychologistSeeder::class,
+            ]);
         }
     }
 }
