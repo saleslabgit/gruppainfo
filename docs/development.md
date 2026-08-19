@@ -29,6 +29,14 @@ docker compose up --build -d
 
 MySQL имеет healthcheck; `app` запускается только после готовности базы, а Nginx — после готовности PHP-FPM.
 
+После первого запуска создайте начальные справочники, настройки и development-администратора:
+
+```bash
+docker compose exec app php artisan db:seed
+```
+
+Seed идемпотентен. Он не создаёт элементы справочников и не задаёт цены размещения/продления: эти значения пока не утверждены.
+
 Проверить состояние и остановить окружение:
 
 ```bash
@@ -38,11 +46,19 @@ docker compose down
 
 ## Переменные окружения
 
-Локальные безопасные значения находятся в `.env.example`. Development-схема — `gruppainfo`, test-схема — `gruppainfo_test`. Обе создаются при первом запуске MySQL, а пользователь `gruppainfo` получает доступ к обеим.
+Локальные безопасные значения находятся в `.env.example`. Development-схема — `gruppainfo`, test-схема — `gruppainfo_test`. Обе создаются при первом запуске MySQL, а пользователь `gruppainfo` получает доступ к обеим. Сессии и очереди по умолчанию используют database-драйверы; их таблицы создаются миграциями.
+
+Локальная seed-учётная запись настраивается через `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` и `SEED_ADMIN_FIRST_NAME`. Значения из `.env.example` нельзя использовать вне development/testing. При `APP_ENV=production` development-администратор не создаётся.
 
 `phpunit.xml` принудительно задаёт test-схему, поэтому запущенный в контейнере `php artisan test` не использует development-схему и не использует SQLite.
 
 Для production создайте отдельный `.env`, используйте реальные секреты, задайте `APP_ENV=production`, `APP_DEBUG=false`, production URL и production MySQL-реквизиты. Docker Compose и его локальные пароли не предназначены для production.
+
+Production-обработчик database-очереди должен запускаться под process manager либо периодически командой:
+
+```bash
+php artisan queue:work --stop-when-empty
+```
 
 ## Composer
 
@@ -62,6 +78,12 @@ docker compose exec app composer check-platform-reqs
 
 ```bash
 docker compose exec app php artisan test
+```
+
+Для ручной проверки создания базы с нуля используйте только одноразовую/test-схему. Следующая команда полностью удаляет данные `gruppainfo_test` и никогда не должна направляться на development или production:
+
+```bash
+docker compose exec -e APP_ENV=testing -e DB_DATABASE=gruppainfo_test app php artisan migrate:fresh --seed --force
 ```
 
 Форматирование в check-режиме:
