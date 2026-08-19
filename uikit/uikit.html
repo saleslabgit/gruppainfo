@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"></link>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F5F4F0; }
+  a { color: #FF714A; }
+  a:hover { color: #D14B29; }
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;background:#F5F4F0;font-family:'Montserrat',sans-serif;color:#3C3834">
+
+<nav style="position:fixed;top:0;left:0;width:264px;height:100vh;overflow-y:auto;background:#FFFFFF;border-right:1px solid #EBE9E2;padding:28px 18px 60px;flex-shrink:0">
+  <div style="padding:0 10px 20px">
+    <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em">Gruppa Info</div>
+    <div style="font-size:12.5px;font-weight:500;color:#9C948A;margin-top:2px">UI Kit &amp; Design System</div>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Foundations</div>
+    <a href="#colors" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Цвета</a>
+    <a href="#typography" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Типографика</a>
+    <a href="#spacing" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Spacing</a>
+    <a href="#sizes" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Размеры</a>
+    <a href="#radius" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Radius</a>
+    <a href="#borders" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Borders</a>
+    <a href="#shadows" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Shadows</a>
+    <a href="#icons" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Иконки</a>
+    <a href="#focus" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Focus</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Actions</div>
+    <a href="#buttons" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Кнопки</a>
+    <a href="#links" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Ссылки</a>
+    <a href="#icon-buttons" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Icon Button</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Forms</div>
+    <a href="#input" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Input</a>
+    <a href="#textarea" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Textarea</a>
+    <a href="#select" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Select</a>
+    <a href="#checkbox" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Checkbox</a>
+    <a href="#radio" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Radio</a>
+    <a href="#switch" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Switch</a>
+    <a href="#datetime" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Дата / время</a>
+    <a href="#money" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Сумма</a>
+    <a href="#upload" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Загрузка файла</a>
+    <a href="#form-layout" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Form Layout</a>
+    <a href="#labels" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Label / Helper / Error</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Data Display</div>
+    <a href="#badge" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Badge</a>
+    <a href="#chips" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Chips</a>
+    <a href="#card" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Card</a>
+    <a href="#divider" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Divider</a>
+    <a href="#table" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Table</a>
+    <a href="#table-toolbar" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Table Toolbar</a>
+    <a href="#list-item" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">List Item</a>
+    <a href="#keyvalue" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Key-Value</a>
+    <a href="#avatar" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Avatar</a>
+    <a href="#metric" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Metric</a>
+    <a href="#timeline" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Timeline</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Navigation</div>
+    <a href="#sidebar-nav" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Sidebar</a>
+    <a href="#topbar" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Topbar</a>
+    <a href="#breadcrumbs" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Breadcrumbs</a>
+    <a href="#tabs" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Tabs</a>
+    <a href="#pagination" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Pagination</a>
+    <a href="#dropdown" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Dropdown Menu</a>
+    <a href="#search" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Search Input</a>
+    <a href="#filters" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Filters</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Feedback</div>
+    <a href="#alert" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Alert</a>
+    <a href="#toast" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Toast</a>
+    <a href="#tooltip" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Tooltip / Popover</a>
+    <a href="#empty" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Empty State</a>
+    <a href="#loading" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Loading</a>
+    <a href="#error" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Error State</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Overlays</div>
+    <a href="#modal" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Modal</a>
+    <a href="#drawer" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Drawer</a>
+    <a href="#confirmation" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Confirmation</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Workflow</div>
+    <a href="#stepper" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Stepper</a>
+    <a href="#choice-card" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Choice Card</a>
+    <a href="#progress" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Progress</a>
+  </div>
+
+  <div style="margin-top:8px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#9C948A;text-transform:uppercase;padding:14px 10px 6px">Проверка совместимости</div>
+    <a href="#compositions" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Композиции</a>
+    <a href="#responsive" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Responsive</a>
+    <a href="#a11y" style="display:block;padding:6px 10px;border-radius:8px;font-size:14px;color:#3C3834;text-decoration:none" style-hover="background:#F5F4F0;color:#FF714A">Accessibility</a>
+  </div>
+</nav>
+
+<main style="flex:1;margin-left:264px;padding:56px 64px 140px;max-width:1180px">
+
+  <header style="margin-bottom:56px">
+    <div style="font-size:12.5px;font-weight:600;letter-spacing:0.08em;color:#FF714A;text-transform:uppercase;margin-bottom:10px">Design System</div>
+    <h1 style="font-size:36px;font-weight:700;line-height:1.15;margin:0 0 12px;letter-spacing:-0.01em">Gruppa Info — UI Kit</h1>
+    <p style="font-size:18px;line-height:1.55;color:#71695F;margin:0;max-width:720px">Фундамент и библиотека компонентов для личного кабинета психологов и админ-панели. Система описывает, как выглядит и ведёт себя каждый интерфейсный элемент — без привязки к конкретным продуктовым экранам.</p>
+  </header>
+
+  <!-- ===================== COLORS ===================== -->
+  <section id="colors" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Цвета</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Функциональные роли цвета, а не просто палитра из четырёх исходных значений.</p>
+
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px">
+      <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px">Brand</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px">
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FF714A"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">primary</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#FF714A</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#E85F3A"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">primary-hover</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#E85F3A</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#D14B29"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">primary-active</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#D14B29</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FFE1D3;border:1px solid #EBE9E2"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">primary-subtle</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#FFE1D3</div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px">Text</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px">
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#3C3834;display:flex;align-items:center;justify-content:center;color:#F5F4F0;font-size:22px;font-weight:600">Aa</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">text-primary</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#3C3834</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#71695F;display:flex;align-items:center;justify-content:center;color:#F5F4F0;font-size:22px;font-weight:600">Aa</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">text-secondary</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#71695F</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#9C948A;display:flex;align-items:center;justify-content:center;color:#F5F4F0;font-size:22px;font-weight:600">Aa</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">text-muted</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#9C948A</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#C4BEB3;display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:22px;font-weight:600">Aa</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">text-disabled</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#C4BEB3</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#3C3834;display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:22px;font-weight:600;border:1px solid #EBE9E2">Aa</div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">text-inverse</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#FFFFFF</div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px">Background &amp; Border</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px">
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#F5F4F0;border:1px solid #EBE9E2"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">background-page</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#F5F4F0</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FFFFFF;border:1px solid #EBE9E2"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">background-surface</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#FFFFFF</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#EBE9E2"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">background-subtle</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#EBE9E2</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#E4E1D8"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">background-disabled</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#E4E1D8</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FFFFFF;border:2px solid #EBE9E2"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">border-default</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#EBE9E2</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FFFFFF;border:2px solid #D6D2C8"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">border-strong</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#D6D2C8</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FFFFFF;border:2px solid #FF714A"></div>
+          <div style="font-size:13px;font-weight:600;margin-top:8px">border-focus</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace">#FF714A</div>
+        </div>
+      </div>
+
+      <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px">Semantic</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#2E9960;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">success</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#2E9960</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#E2F2E8;display:flex;align-items:center;justify-content:center;color:#2E9960;font-size:13px;font-weight:600">success-subtle</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#E2F2E8</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#C97A17;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">warning</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#C97A17</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FAEAD2;display:flex;align-items:center;justify-content:center;color:#C97A17;font-size:13px;font-weight:600">warning-subtle</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#FAEAD2</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#D14545;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">danger</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#D14545</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#FAE2E2;display:flex;align-items:center;justify-content:center;color:#D14545;font-size:13px;font-weight:600">danger-subtle</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#FAE2E2</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#3D77AD;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">info</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#3D77AD</div>
+        </div>
+        <div style="width:140px">
+          <div style="height:72px;border-radius:12px;background:#E4EDF5;display:flex;align-items:center;justify-content:center;color:#3D77AD;font-size:13px;font-weight:600">info-subtle</div>
+          <div style="font-size:12px;color:#9C948A;font-family:monospace;margin-top:8px">#E4EDF5</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TYPOGRAPHY ===================== -->
+  <section id="typography" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Типографика</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Единственный шрифт — Montserrat. Начертания 400 / 500 / 600 / 700.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:18px">
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:34px;font-weight:600;line-height:1.2">Личный кабинет</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">display / h1 · 34 / 600 / 1.2</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:26px;font-weight:600;line-height:1.25">Заявки на модерацию</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">h2 · 26 / 600 / 1.25</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:21px;font-weight:600;line-height:1.3">Основная информация</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">h3 · 21 / 600 / 1.3</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:18px;font-weight:600;line-height:1.35">Контактные данные</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">h4 · 18 / 600 / 1.35</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:18px;font-weight:400;line-height:1.5">Заявка одобрена и передана куратору.</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">body-lg · 18 / 400 / 1.5</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:16px;font-weight:400;line-height:1.5">Основной текст интерфейса и описаний.</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">body · 16 / 400 / 1.5</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:16px;font-weight:500;line-height:1.5">Ирина Ковалёва, психолог</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">body-medium · 16 / 500 / 1.5</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:14px;font-weight:500;line-height:1.4;color:#71695F">Вторичный текст и подписи к полям.</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">small · 14 / 500 / 1.4</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid #EBE9E2;padding-bottom:16px">
+        <div style="font-size:12.5px;font-weight:500;line-height:1.4;letter-spacing:0.02em;color:#9C948A;text-transform:uppercase">Обновлено 12 августа</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">caption · 12.5 / 500 / 1.4</div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <div style="font-size:15px;font-weight:600;line-height:1">Сохранить изменения</div>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">button · 15 / 600 / 1</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SPACING ===================== -->
+  <section id="spacing" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Spacing</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Шкала: 4 / 8 / 12 / 16 / 24 / 32 / 40 / 48 / 64.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:32px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:4px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">4</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">8</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:12px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">12</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:16px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">16</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:24px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">24</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">32</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">40</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:48px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">48</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><div style="width:64px;height:20px;background:#FF714A;border-radius:2px"></div><span style="font-size:13px;font-family:monospace;color:#71695F">64</span></div>
+      </div>
+      <div style="flex:1;min-width:280px;font-size:14px;line-height:2;color:#3C3834">
+        <div><b>8</b> — label → input, между related-полями</div>
+        <div><b>12</b> — input → helper / error</div>
+        <div><b>16</b> — между полями формы, внутри card</div>
+        <div><b>24</b> — между группами полей, title → subtitle</div>
+        <div><b>32</b> — между card в списке</div>
+        <div><b>48</b> — между секциями страницы</div>
+        <div><b>64</b> — крупные блоки, content → actions на всю ширину</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SIZES ===================== -->
+  <section id="sizes" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Размеры компонентов</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Единая размерная сетка для button, input, select и подобных controls.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+        <button style="height:32px;padding:0 10px;border-radius:8px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Small</button>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">height 32 · padding-x 10 · icon 16 · font 14</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+        <button style="height:40px;padding:0 14px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Medium</button>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">height 40 · padding-x 14 · icon 18 · font 15</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+        <button style="height:48px;padding:0 18px;border-radius:12px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:15px">Large</button>
+        <div style="font-size:13px;color:#9C948A;font-family:monospace">height 48 · padding-x 18 · icon 20 · font 16</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RADIUS ===================== -->
+  <section id="radius" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Border Radius</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:20px;flex-wrap:wrap">
+      <div style="width:120px;text-align:center"><div style="height:80px;background:#FFE1D3;border-radius:8px"></div><div style="font-size:13px;font-weight:600;margin-top:8px">radius-sm · 8</div></div>
+      <div style="width:120px;text-align:center"><div style="height:80px;background:#FFE1D3;border-radius:12px"></div><div style="font-size:13px;font-weight:600;margin-top:8px">radius-md · 12</div></div>
+      <div style="width:120px;text-align:center"><div style="height:80px;background:#FFE1D3;border-radius:16px"></div><div style="font-size:13px;font-weight:600;margin-top:8px">radius-lg · 16</div></div>
+      <div style="width:120px;text-align:center"><div style="height:80px;background:#FFE1D3;border-radius:999px"></div><div style="font-size:13px;font-weight:600;margin-top:8px">radius-pill</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== BORDERS ===================== -->
+  <section id="borders" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Borders</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Толщина 1px везде, кроме focus-ring (2px).</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:16px;flex-wrap:wrap">
+      <div style="width:150px;height:60px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;justify-content:center;font-size:13px;color:#71695F">default</div>
+      <div style="width:150px;height:60px;border-radius:10px;border:1px solid #D6D2C8;display:flex;align-items:center;justify-content:center;font-size:13px;color:#71695F">hover</div>
+      <div style="width:150px;height:60px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;display:flex;align-items:center;justify-content:center;font-size:13px;color:#71695F">focus</div>
+      <div style="width:150px;height:60px;border-radius:10px;border:1px solid #D14545;display:flex;align-items:center;justify-content:center;font-size:13px;color:#D14545">error</div>
+      <div style="width:150px;height:60px;border-radius:10px;border:1px solid #EBE9E2;background:#F5F4F0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#C4BEB3">disabled</div>
+    </div>
+  </section>
+
+  <!-- ===================== SHADOWS ===================== -->
+  <section id="shadows" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Shadows / Elevation</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Только для dropdown, popover, modal, floating menu — не для обычных карточек.</p>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <div style="width:160px;height:90px;background:#FFFFFF;border:1px solid #EBE9E2;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#71695F">shadow-none</div>
+      <div style="width:160px;height:90px;background:#FFFFFF;border-radius:12px;box-shadow:0 1px 2px rgba(60,56,52,0.08),0 1px 1px rgba(60,56,52,0.04);display:flex;align-items:center;justify-content:center;font-size:13px;color:#71695F">shadow-sm</div>
+      <div style="width:160px;height:90px;background:#FFFFFF;border-radius:12px;box-shadow:0 12px 28px rgba(60,56,52,0.16);display:flex;align-items:center;justify-content:center;font-size:13px;color:#71695F">shadow-md</div>
+    </div>
+  </section>
+
+  <!-- ===================== ICONS ===================== -->
+  <section id="icons" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Иконки</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Lucide — line icons, округлая геометрия, единая толщина 1.75. Размеры 16 / 20 / 24.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px">
+        <i data-lucide="check" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="x" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="chevron-down" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="chevron-right" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="search" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="plus" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="trash-2" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="upload" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="calendar" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="clock" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="alert-circle" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="alert-triangle" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="info" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="check-circle-2" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="user" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="bell" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="settings" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="menu" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="more-horizontal" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="eye" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="filter" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="paperclip" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="external-link" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+        <i data-lucide="arrow-left" width="24" height="24" stroke-width="1.75" style="color:#3C3834"></i>
+      </div>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;border-top:1px solid #EBE9E2;padding-top:20px">
+        <div style="display:flex;align-items:center;gap:10px"><i data-lucide="bell" width="16" height="16" stroke-width="1.75" style="color:#3C3834"></i><span style="font-size:13px;color:#71695F">standalone 16</span></div>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px"><i data-lucide="plus" width="18" height="18" stroke-width="1.75"></i>icon + text</button>
+        <div style="display:flex;align-items:center;gap:8px"><i data-lucide="check-circle-2" width="18" height="18" stroke-width="1.75" style="color:#2E9960"></i><span style="font-size:14px;color:#3C3834">status icon</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOCUS ===================== -->
+  <section id="focus" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Focus System</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Единое focus-кольцо: 2px primary border + 3px halo #FFE1D3 — не только смена цвета.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+      <button style="height:40px;padding:0 16px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Button</button>
+      <input value="Input" readonly="" style="height:40px;padding:0 14px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;width:140px"></input>
+      <div style="width:20px;height:20px;border-radius:5px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;background:#FF714A;display:flex;align-items:center;justify-content:center"><i data-lucide="check" width="13" height="13" stroke-width="2.5" style="color:#fff"></i></div>
+      <a href="#focus" style="font-size:15px;font-weight:500;border-radius:6px;box-shadow:0 0 0 3px #FFE1D3;outline:2px solid #FF714A;padding:2px 4px">Ссылка</a>
+      <div style="width:44px;height:26px;border-radius:999px;background:#FF714A;box-shadow:0 0 0 3px #FFE1D3;border:2px solid #FF714A;position:relative"><div style="width:18px;height:18px;background:#fff;border-radius:999px;position:absolute;right:3px;top:2px"></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== BUTTONS ===================== -->
+  <section id="buttons" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Кнопки</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Primary / Secondary / Ghost / Danger / Text / Icon.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px">
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="width:110px;font-size:13px;color:#9C948A">Primary</span>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Default</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#E85F3A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Hover</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#D14B29;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Active</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:2px solid #D14B29;box-shadow:0 0 0 3px #FFE1D3;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Focus</button>
+        <button disabled="" style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#E4E1D8;color:#C4BEB3;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Disabled</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;opacity:0.85"><i data-lucide="loader-2" width="16" height="16" stroke-width="2"></i>Loading</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="width:110px;font-size:13px;color:#9C948A">Secondary</span>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Default</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:1px solid #D6D2C8;background:#F5F4F0;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Hover</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:1px solid #D6D2C8;background:#EBE9E2;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Active</button>
+        <button disabled="" style="height:40px;padding:0 16px;border-radius:10px;border:1px solid #EBE9E2;background:#FFFFFF;color:#C4BEB3;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Disabled</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="width:110px;font-size:13px;color:#9C948A">Ghost</span>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:transparent;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Default</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#EBE9E2;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Hover</button>
+        <button disabled="" style="height:40px;padding:0 16px;border-radius:10px;border:none;background:transparent;color:#C4BEB3;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Disabled</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="width:110px;font-size:13px;color:#9C948A">Danger</span>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#D14545;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Default</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#B93A3A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Hover</button>
+        <button disabled="" style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FAE2E2;color:#E9A6A6;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Disabled</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="width:110px;font-size:13px;color:#9C948A">Text</span>
+        <button style="height:40px;padding:0 4px;border-radius:6px;border:none;background:transparent;color:#FF714A;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Default</button>
+        <button style="height:40px;padding:0 4px;border-radius:6px;border:none;background:transparent;color:#D14B29;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;text-decoration:underline">Hover</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #EBE9E2;padding-top:20px">
+        <span style="width:110px;font-size:13px;color:#9C948A">Sizes</span>
+        <button style="height:32px;padding:0 12px;border-radius:8px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Small</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Default</button>
+        <button style="height:48px;padding:0 20px;border-radius:12px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:15px">Large</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid #EBE9E2;padding-top:20px">
+        <span style="width:110px;font-size:13px;color:#9C948A">Icon + текст</span>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px"><i data-lucide="plus" width="18" height="18" stroke-width="1.75"></i>Добавить</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px">Далее<i data-lucide="arrow-right" width="18" height="18" stroke-width="1.75"></i></button>
+        <button style="width:40px;height:40px;border-radius:10px;border:none;background:#FF714A;color:#fff;display:flex;align-items:center;justify-content:center"><i data-lucide="plus" width="18" height="18" stroke-width="1.75"></i></button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;width:100%;max-width:300px">Full width</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LINKS ===================== -->
+  <section id="links" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Ссылки</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+        <a href="#links" style="font-size:15px;font-weight:500;color:#FF714A;text-decoration:underline">Default</a>
+        <a href="#links" style="font-size:15px;font-weight:500;color:#D14B29;text-decoration:underline">Hover</a>
+        <a href="#links" style="font-size:15px;font-weight:500;color:#FF714A;text-decoration:underline;box-shadow:0 0 0 3px #FFE1D3;border-radius:4px;padding:2px 4px">Focus</a>
+        <span style="font-size:15px;font-weight:500;color:#9C948A;opacity:0.8">Disabled</span>
+        <a href="#links" style="font-size:15px;font-weight:500;color:#FF714A;text-decoration:underline;display:inline-flex;align-items:center;gap:6px">Открыть профиль<i data-lucide="external-link" width="14" height="14" stroke-width="1.75"></i></a>
+        <a href="#links" style="font-size:15px;font-weight:500;color:#D14545;text-decoration:underline">Удалить аккаунт</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ICON BUTTONS ===================== -->
+  <section id="icon-buttons" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Icon Button</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <button style="width:32px;height:32px;border-radius:8px;border:1px solid #EBE9E2;background:#FFFFFF;display:flex;align-items:center;justify-content:center"><i data-lucide="pencil" width="16" height="16" stroke-width="1.75" style="color:#3C3834"></i></button>
+      <button style="width:40px;height:40px;border-radius:10px;border:1px solid #EBE9E2;background:#F5F4F0;display:flex;align-items:center;justify-content:center"><i data-lucide="pencil" width="18" height="18" stroke-width="1.75" style="color:#3C3834"></i></button>
+      <button style="width:48px;height:48px;border-radius:12px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;background:#FFFFFF;display:flex;align-items:center;justify-content:center"><i data-lucide="pencil" width="20" height="20" stroke-width="1.75" style="color:#3C3834"></i></button>
+      <button disabled="" style="width:40px;height:40px;border-radius:10px;border:1px solid #EBE9E2;background:#F5F4F0;display:flex;align-items:center;justify-content:center;opacity:0.5"><i data-lucide="trash-2" width="18" height="18" stroke-width="1.75" style="color:#9C948A"></i></button>
+      <button style="width:40px;height:40px;border-radius:999px;border:none;background:#FF714A;display:flex;align-items:center;justify-content:center"><i data-lucide="plus" width="18" height="18" stroke-width="1.75" style="color:#fff"></i></button>
+    </div>
+  </section>
+
+  <!-- ===================== INPUT ===================== -->
+  <section id="input" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Input</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Anatomy: Label → Control → Prefix / Suffix → Value → Helper / Error.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Имя</label>
+        <input placeholder="Введите имя" style="width:100%;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;background:#FFFFFF"></input>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">empty</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Имя</label>
+        <input placeholder="Введите имя" style="width:100%;height:40px;padding:0 14px;border-radius:10px;border:1px solid #D6D2C8;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;background:#FFFFFF"></input>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">hover</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Имя</label>
+        <input value="Ирина" style="width:100%;height:40px;padding:0 14px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;background:#FFFFFF"></input>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">focus</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Имя <span style="color:#D14545">*</span></label>
+        <input value="Ирина Ковалёва" style="width:100%;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;background:#FFFFFF"></input>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">filled · required</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Электронная почта</label>
+        <input value="irina@mail" style="width:100%;height:40px;padding:0 14px;border-radius:10px;border:1px solid #D14545;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;background:#FFFFFF"></input>
+        <div style="font-size:12px;color:#D14545;margin-top:6px;display:flex;align-items:center;gap:5px"><i data-lucide="alert-circle" width="13" height="13" stroke-width="2"></i>Введите корректный e-mail</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;color:#C4BEB3">Телефон</label>
+        <input disabled="" placeholder="+375" style="width:100%;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;font-family:'Montserrat',sans-serif;font-size:14px;color:#C4BEB3;background:#F5F4F0"></input>
+        <div style="font-size:12px;color:#C4BEB3;margin-top:6px">disabled</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Пароль</label>
+        <div style="position:relative">
+          <input value="••••••••" style="width:100%;height:40px;padding:0 40px 0 14px;border-radius:10px;border:1px solid #EBE9E2;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;background:#FFFFFF"></input>
+          <i data-lucide="eye" width="18" height="18" stroke-width="1.75" style="position:absolute;right:12px;top:11px;color:#9C948A"></i>
+        </div>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">suffix icon</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Ссылка на профиль</label>
+        <div style="display:flex">
+          <span style="height:40px;padding:0 12px;display:flex;align-items:center;border:1px solid #EBE9E2;border-right:none;border-radius:10px 0 0 10px;background:#F5F4F0;font-size:14px;color:#9C948A">gruppa.info/</span>
+          <input value="irina-k" style="flex:1;height:40px;padding:0 14px;border-radius:0 10px 10px 0;border:1px solid #EBE9E2;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;min-width:0"></input>
+        </div>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">prefix</div>
+      </div>
+
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Комментарий куратора</label>
+        <input readonly="" value="Заполняется автоматически" style="width:100%;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;font-family:'Montserrat',sans-serif;font-size:14px;color:#71695F;background:#F5F4F0"></input>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">readonly</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TEXTAREA ===================== -->
+  <section id="textarea" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Textarea</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Описание</label>
+        <textarea placeholder="Расскажите о себе" style="width:100%;height:96px;padding:10px 14px;border-radius:10px;border:1px solid #EBE9E2;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;resize:none"></textarea>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">default</div>
+      </div>
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Описание</label>
+        <textarea style="width:100%;height:96px;padding:10px 14px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;resize:none">Работаю с тревожными расстройствами уже 8 лет.</textarea>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#9C948A;margin-top:6px"><span>focus</span><span>48 / 300</span></div>
+      </div>
+      <div>
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;color:#D14545">Описание</label>
+        <textarea style="width:100%;height:96px;padding:10px 14px;border-radius:10px;border:1px solid #D14545;font-family:'Montserrat',sans-serif;font-size:14px;color:#3C3834;resize:none">Слишком короткий текст</textarea>
+        <div style="font-size:12px;color:#D14545;margin-top:6px">Минимум 100 символов</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SELECT ===================== -->
+  <section id="select" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Select</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:24px;flex-wrap:wrap">
+      <div style="width:220px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Специализация</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#9C948A">Выберите значение<i data-lucide="chevron-down" width="16" height="16" stroke-width="1.75"></i></div>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">placeholder</div>
+      </div>
+      <div style="width:220px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Специализация</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#3C3834">Семейная терапия<i data-lucide="chevron-down" width="16" height="16" stroke-width="1.75"></i></div>
+        <div style="font-size:12px;color:#9C948A;margin-top:6px">selected</div>
+      </div>
+      <div style="width:220px;position:relative;margin-bottom:200px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Специализация</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#3C3834">Семейная терапия<i data-lucide="chevron-up" width="16" height="16" stroke-width="1.75"></i></div>
+        <div style="position:absolute;top:74px;left:0;right:0;background:#FFFFFF;border:1px solid #EBE9E2;border-radius:10px;box-shadow:0 12px 28px rgba(60,56,52,0.16);padding:6px;z-index:1">
+          <div style="padding:9px 10px;border-radius:8px;font-size:14px;color:#3C3834;background:#F5F4F0">Индивидуальная терапия</div>
+          <div style="padding:9px 10px;border-radius:8px;font-size:14px;color:#fff;background:#FF714A;display:flex;align-items:center;justify-content:space-between">Семейная терапия<i data-lucide="check" width="14" height="14" stroke-width="2"></i></div>
+          <div style="padding:9px 10px;border-radius:8px;font-size:14px;color:#3C3834">Парная терапия</div>
+          <div style="padding:9px 10px;border-radius:8px;font-size:14px;color:#C4BEB3">Детская психология (недоступно)</div>
+        </div>
+      </div>
+      <div style="width:220px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;color:#D14545">Специализация</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #D14545;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#9C948A">Выберите значение<i data-lucide="chevron-down" width="16" height="16" stroke-width="1.75"></i></div>
+        <div style="font-size:12px;color:#D14545;margin-top:6px">Поле обязательно</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHECKBOX ===================== -->
+  <section id="checkbox" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Checkbox</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:28px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer"><div style="width:20px;height:20px;border-radius:5px;border:1px solid #D6D2C8;background:#FFFFFF"></div><span style="font-size:15px">Unchecked</span></label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer"><div style="width:20px;height:20px;border-radius:5px;background:#FF714A;display:flex;align-items:center;justify-content:center"><i data-lucide="check" width="13" height="13" stroke-width="2.5" style="color:#fff"></i></div><span style="font-size:15px">Checked</span></label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer"><div style="width:20px;height:20px;border-radius:5px;background:#FF714A;display:flex;align-items:center;justify-content:center"><div style="width:10px;height:2px;background:#fff;border-radius:1px"></div></div><span style="font-size:15px">Indeterminate</span></label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer"><div style="width:20px;height:20px;border-radius:5px;border:1px solid #D6D2C8;background:#F5F4F0"></div><span style="font-size:15px">Hover</span></label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer"><div style="width:20px;height:20px;border-radius:5px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;background:#FFFFFF"></div><span style="font-size:15px">Focus</span></label>
+      <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:5px;border:1px solid #EBE9E2;background:#F5F4F0"></div><span style="font-size:15px;color:#C4BEB3">Disabled</span></label>
+      <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:5px;background:#E4E1D8;display:flex;align-items:center;justify-content:center"><i data-lucide="check" width="13" height="13" stroke-width="2.5" style="color:#fff"></i></div><span style="font-size:15px;color:#C4BEB3">Disabled checked</span></label>
+    </div>
+  </section>
+
+  <!-- ===================== RADIO ===================== -->
+  <section id="radio" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Radio</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:28px;flex-wrap:wrap">
+      <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:999px;border:1px solid #D6D2C8;background:#FFFFFF"></div><span style="font-size:15px">Unchecked</span></label>
+      <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:999px;border:6px solid #FF714A;background:#FFFFFF"></div><span style="font-size:15px">Selected</span></label>
+      <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:999px;border:1px solid #D6D2C8;background:#F5F4F0"></div><span style="font-size:15px">Hover</span></label>
+      <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:999px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3"></div><span style="font-size:15px">Focus</span></label>
+      <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:999px;border:1px solid #EBE9E2;background:#F5F4F0"></div><span style="font-size:15px;color:#C4BEB3">Disabled</span></label>
+    </div>
+  </section>
+
+  <!-- ===================== SWITCH ===================== -->
+  <section id="switch" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Switch</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:center">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:26px;border-radius:999px;background:#EBE9E2;position:relative"><div style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;left:3px;top:3px;box-shadow:0 1px 2px rgba(0,0,0,0.15)"></div></div><span style="font-size:14px;color:#71695F">Off</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:26px;border-radius:999px;background:#FF714A;position:relative"><div style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;right:3px;top:3px;box-shadow:0 1px 2px rgba(0,0,0,0.15)"></div></div><span style="font-size:14px;color:#3C3834">On</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:26px;border-radius:999px;background:#FF714A;box-shadow:0 0 0 3px #FFE1D3;border:2px solid #FF714A;position:relative"><div style="width:18px;height:18px;background:#fff;border-radius:999px;position:absolute;right:3px;top:2px"></div></div><span style="font-size:14px;color:#3C3834">Focus</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:26px;border-radius:999px;background:#E4E1D8;position:relative"><div style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;left:3px;top:3px;opacity:0.7"></div></div><span style="font-size:14px;color:#C4BEB3">Disabled</span></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:14px;border-top:1px solid #EBE9E2;padding-top:20px">
+        <div style="width:44px;height:26px;border-radius:999px;background:#FF714A;position:relative;flex-shrink:0"><div style="width:20px;height:20px;background:#fff;border-radius:999px;position:absolute;right:3px;top:3px"></div></div>
+        <div><div style="font-size:15px;font-weight:500">Уведомления о новых заявках</div><div style="font-size:13px;color:#9C948A;margin-top:2px">Приходят на почту и в приложение</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DATE/TIME ===================== -->
+  <section id="datetime" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Дата / время</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:24px;flex-wrap:wrap">
+      <div style="width:180px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Дата рождения</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#3C3834"><span>15.08.2026</span><i data-lucide="calendar" width="16" height="16" stroke-width="1.75" style="color:#9C948A"></i></div>
+      </div>
+      <div style="width:150px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Время сессии</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#3C3834"><span>18:30</span><i data-lucide="clock" width="16" height="16" stroke-width="1.75" style="color:#9C948A"></i></div>
+      </div>
+      <div style="width:320px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Период</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;font-size:15px;color:#3C3834">01.08.2026</div>
+          <span style="color:#9C948A">—</span>
+          <div style="flex:1;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;font-size:15px;color:#3C3834">31.08.2026</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MONEY ===================== -->
+  <section id="money" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Сумма</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:24px;flex-wrap:wrap">
+      <div style="width:200px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px">Стоимость сессии</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#3C3834"><span>125,00</span><span style="color:#9C948A">BYN</span></div>
+      </div>
+      <div style="width:200px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;color:#D14545">Стоимость сессии</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #D14545;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#3C3834"><span>-5,00</span><span style="color:#9C948A">BYN</span></div>
+        <div style="font-size:12px;color:#D14545;margin-top:6px">Сумма не может быть отрицательной</div>
+      </div>
+      <div style="width:200px">
+        <label style="display:block;font-size:14px;font-weight:500;margin-bottom:6px;color:#C4BEB3">Стоимость сессии</label>
+        <div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;background:#F5F4F0;display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#C4BEB3"><span>50,00</span><span>BYN</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FILE UPLOAD ===================== -->
+  <section id="upload" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Загрузка файла</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <div style="width:260px;height:120px;border:1.5px dashed #D6D2C8;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#9C948A"><i data-lucide="upload" width="22" height="22" stroke-width="1.75"></i><span style="font-size:13px">Перетащите файл сюда</span></div>
+        <div style="width:260px;height:120px;border:1.5px dashed #FF714A;background:#FFE1D3;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#D14B29"><i data-lucide="upload" width="22" height="22" stroke-width="1.75"></i><span style="font-size:13px">Отпустите, чтобы загрузить</span></div>
+        <div style="width:260px;height:120px;border:1px solid #EBE9E2;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#9C948A"><div style="width:160px;height:6px;background:#EBE9E2;border-radius:99px;overflow:hidden"><div style="width:60%;height:100%;background:#FF714A"></div></div><span style="font-size:13px">Загрузка… 60%</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #EBE9E2;padding-top:16px">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid #EBE9E2;border-radius:10px"><i data-lucide="file-text" width="20" height="20" stroke-width="1.75" style="color:#71695F"></i><div style="flex:1"><div style="font-size:14px;font-weight:500">Диплом.pdf</div><div style="font-size:12px;color:#9C948A">1.2 МБ · загружено</div></div><i data-lucide="x" width="16" height="16" stroke-width="1.75" style="color:#9C948A"></i></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid #D14545;border-radius:10px"><i data-lucide="file-x" width="20" height="20" stroke-width="1.75" style="color:#D14545"></i><div style="flex:1"><div style="font-size:14px;font-weight:500">Скан.png</div><div style="font-size:12px;color:#D14545">Файл слишком большой (макс. 5 МБ)</div></div><i data-lucide="x" width="16" height="16" stroke-width="1.75" style="color:#9C948A"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FORM LAYOUT ===================== -->
+  <section id="form-layout" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Form Layout</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Правила композиции форм — не готовые страницы.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;max-width:360px">
+        <label style="font-size:14px;font-weight:500">Одно поле в строке</label>
+        <input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:14px;font-weight:500">Имя</label><input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:14px;font-weight:500">Фамилия</label><input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:14px;font-weight:500">Индекс</label><input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:14px;font-weight:500">Город</label><input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:14px;font-weight:500">Кв.</label><input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label style="font-size:14px;font-weight:500">Формат работы</label>
+        <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:5px;background:#FF714A;display:flex;align-items:center;justify-content:center"><i data-lucide="check" width="13" height="13" stroke-width="2.5" style="color:#fff"></i></div><span style="font-size:15px">Онлайн</span></label>
+        <label style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:5px;border:1px solid #D6D2C8"></div><span style="font-size:15px">Очно</span></label>
+      </div>
+      <div style="border-top:1px solid #EBE9E2;padding-top:20px;display:flex;justify-content:flex-end;gap:12px">
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Отмена</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px">Сохранить</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LABELS/HELPER/ERROR ===================== -->
+  <section id="labels" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Label / Helper / Error</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:40px;flex-wrap:wrap">
+      <div><div style="font-size:14px;font-weight:500;margin-bottom:6px">Имя</div><div style="font-size:12px;color:#9C948A">normal label</div></div>
+      <div><div style="font-size:14px;font-weight:500;margin-bottom:6px">Имя <span style="color:#D14545">*</span></div><div style="font-size:12px;color:#9C948A">required</div></div>
+      <div><div style="font-size:14px;font-weight:500;margin-bottom:6px;color:#C4BEB3">Имя</div><div style="font-size:12px;color:#9C948A">disabled</div></div>
+      <div><div style="font-size:13px;color:#9C948A;margin-bottom:6px">Используется для связи с клиентом</div><div style="font-size:12px;color:#9C948A">helper text</div></div>
+      <div><div style="font-size:13px;color:#D14545;display:flex;align-items:center;gap:5px;margin-bottom:6px"><i data-lucide="alert-circle" width="13" height="13" stroke-width="2"></i>Поле обязательно для заполнения</div><div style="font-size:12px;color:#9C948A">error</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== BADGE ===================== -->
+  <section id="badge" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Badge / Status</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Статус всегда передаётся текстом, не только цветом.</p>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:12px;flex-wrap:wrap">
+      <span style="padding:5px 12px;border-radius:999px;background:#EBE9E2;color:#71695F;font-size:13px;font-weight:600">Черновик</span>
+      <span style="padding:5px 12px;border-radius:999px;background:#E4EDF5;color:#3D77AD;font-size:13px;font-weight:600">На модерации</span>
+      <span style="padding:5px 12px;border-radius:999px;background:#E2F2E8;color:#2E9960;font-size:13px;font-weight:600">Активна</span>
+      <span style="padding:5px 12px;border-radius:999px;background:#FAEAD2;color:#C97A17;font-size:13px;font-weight:600">Требует внимания</span>
+      <span style="padding:5px 12px;border-radius:999px;background:#FAE2E2;color:#D14545;font-size:13px;font-weight:600">Отклонена</span>
+      <span style="padding:5px 12px;border-radius:999px;background:#E2F2E8;color:#2E9960;font-size:13px;font-weight:600">Оплачено</span>
+    </div>
+  </section>
+
+  <!-- ===================== CHIPS ===================== -->
+  <section id="chips" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Chips / Tags</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:12px;flex-wrap:wrap">
+      <span style="padding:7px 14px;border-radius:999px;border:1px solid #EBE9E2;color:#3C3834;font-size:14px">Онлайн</span>
+      <span style="padding:7px 14px;border-radius:999px;background:#FFE1D3;border:1px solid #FF714A;color:#D14B29;font-size:14px;font-weight:600">Семейная терапия</span>
+      <span style="padding:7px 14px;border-radius:999px;border:1px solid #EBE9E2;color:#3C3834;font-size:14px;display:flex;align-items:center;gap:8px">Тревожность<i data-lucide="x" width="13" height="13" stroke-width="2"></i></span>
+      <span style="padding:7px 14px;border-radius:999px;border:1px solid #EBE9E2;color:#C4BEB3;font-size:14px">Недоступно</span>
+    </div>
+  </section>
+
+  <!-- ===================== CARD ===================== -->
+  <section id="card" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Card</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:20px;flex-wrap:wrap">
+      <div style="width:260px;padding:20px;border-radius:14px;background:#F5F4F0;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:16px;font-weight:600">Basic</div>
+        <div style="font-size:14px;color:#71695F">Поверхность без border, разделение фоном.</div>
+      </div>
+      <div style="width:260px;padding:20px;border-radius:14px;background:#FFFFFF;border:1px solid #EBE9E2;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 14px rgba(60,56,52,0.08)">
+        <div style="font-size:16px;font-weight:600">Interactive</div>
+        <div style="font-size:14px;color:#71695F">Hover-состояние, курсор pointer, лёгкий shadow.</div>
+      </div>
+      <div style="width:260px;padding:20px;border-radius:14px;background:#FFE1D3;border:1px solid #FFD3BC;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:16px;font-weight:600;color:#D14B29">Highlighted</div>
+        <div style="font-size:14px;color:#8A4A32">Акцентная информационная карточка.</div>
+      </div>
+      <div style="width:260px;padding:0;border-radius:14px;background:#FFFFFF;border:1px solid #EBE9E2;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid #EBE9E2;font-size:15px;font-weight:600">Header</div>
+        <div style="padding:20px;font-size:14px;color:#71695F">Body — основной контент карточки.</div>
+        <div style="padding:14px 20px;border-top:1px solid #EBE9E2;display:flex;justify-content:flex-end;gap:8px"><button style="height:32px;padding:0 12px;border-radius:8px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Действие</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DIVIDER ===================== -->
+  <section id="divider" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Divider</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px">
+      <div style="height:1px;background:#EBE9E2"></div>
+      <div style="display:flex;align-items:center;gap:14px;color:#9C948A;font-size:13px"><div style="flex:1;height:1px;background:#EBE9E2"></div>или<div style="flex:1;height:1px;background:#EBE9E2"></div></div>
+      <div style="display:flex;gap:14px;height:24px;align-items:center"><span style="font-size:14px">Профиль</span><div style="width:1px;height:100%;background:#EBE9E2"></div><span style="font-size:14px">Настройки</span></div>
+    </div>
+  </section>
+
+  <!-- ===================== TABLE ===================== -->
+  <section id="table" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Table</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:36px 2fr 1.2fr 1fr 1fr 60px;gap:12px;padding:12px 20px;background:#F5F4F0;border-bottom:1px solid #EBE9E2;font-size:13px;font-weight:600;color:#71695F">
+        <div><div style="width:16px;height:16px;border-radius:4px;border:1px solid #D6D2C8"></div></div>
+        <div style="display:flex;align-items:center;gap:6px">Имя<i data-lucide="chevron-down" width="13" height="13" stroke-width="2"></i></div>
+        <div>Статус</div>
+        <div style="text-align:right">Сумма</div>
+        <div>Дата</div>
+        <div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:36px 2fr 1.2fr 1fr 1fr 60px;gap:12px;padding:14px 20px;border-bottom:1px solid #EBE9E2;font-size:14px;align-items:center">
+        <div><div style="width:16px;height:16px;border-radius:4px;border:1px solid #D6D2C8"></div></div>
+        <div>Ирина Ковалёва</div>
+        <div><span style="padding:4px 10px;border-radius:999px;background:#E2F2E8;color:#2E9960;font-size:12.5px;font-weight:600">Активна</span></div>
+        <div style="text-align:right;font-family:monospace">125,00 BYN</div>
+        <div style="color:#71695F">12.08.2026</div>
+        <div><i data-lucide="more-horizontal" width="16" height="16" stroke-width="1.75" style="color:#9C948A"></i></div>
+      </div>
+      <div style="display:grid;grid-template-columns:36px 2fr 1.2fr 1fr 1fr 60px;gap:12px;padding:14px 20px;border-bottom:1px solid #EBE9E2;font-size:14px;align-items:center;background:#FFF7F3">
+        <div><div style="width:16px;height:16px;border-radius:4px;background:#FF714A;display:flex;align-items:center;justify-content:center"><i data-lucide="check" width="10" height="10" stroke-width="3" style="color:#fff"></i></div></div>
+        <div>Дмитрий Соколов</div>
+        <div><span style="padding:4px 10px;border-radius:999px;background:#E4EDF5;color:#3D77AD;font-size:12.5px;font-weight:600">На модерации</span></div>
+        <div style="text-align:right;font-family:monospace">50,00 BYN</div>
+        <div style="color:#71695F">10.08.2026</div>
+        <div><i data-lucide="more-horizontal" width="16" height="16" stroke-width="1.75" style="color:#9C948A"></i></div>
+      </div>
+      <div style="display:grid;grid-template-columns:36px 2fr 1.2fr 1fr 1fr 60px;gap:12px;padding:14px 20px;border-bottom:1px solid #EBE9E2;font-size:14px;align-items:center;opacity:0.6">
+        <div><div style="width:16px;height:16px;border-radius:4px;border:1px solid #D6D2C8"></div></div>
+        <div>Анна Волкова</div>
+        <div><span style="padding:4px 10px;border-radius:999px;background:#FAE2E2;color:#D14545;font-size:12.5px;font-weight:600">Отклонена</span></div>
+        <div style="text-align:right;font-family:monospace">—</div>
+        <div style="color:#71695F">02.08.2026</div>
+        <div><i data-lucide="lock" width="16" height="16" stroke-width="1.75" style="color:#C4BEB3"></i></div>
+      </div>
+      <div style="padding:40px 20px;text-align:center;color:#9C948A;font-size:14px">Ничего не найдено</div>
+    </div>
+  </section>
+
+  <!-- ===================== TABLE TOOLBAR ===================== -->
+  <section id="table-toolbar" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Table Toolbar</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="height:38px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:8px;color:#9C948A;font-size:14px;min-width:200px"><i data-lucide="search" width="16" height="16" stroke-width="1.75"></i>Поиск по имени</div>
+      <div style="height:38px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:6px;font-size:14px"><i data-lucide="filter" width="16" height="16" stroke-width="1.75" style="color:#71695F"></i>Фильтры</div>
+      <span style="padding:5px 12px;border-radius:999px;background:#FFE1D3;color:#D14B29;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px">Статус: Активна<i data-lucide="x" width="12" height="12" stroke-width="2"></i></span>
+      <span style="font-size:13px;color:#9C948A">Сброс</span>
+      <span style="flex:1"></span>
+      <span style="font-size:13px;color:#9C948A">1–20 из 124</span>
+      <button style="height:38px;padding:0 14px;border-radius:9px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Добавить</button>
+    </div>
+  </section>
+
+  <!-- ===================== LIST ITEM ===================== -->
+  <section id="list-item" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">List Item</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #EBE9E2"><div style="width:36px;height:36px;border-radius:999px;background:#FFE1D3;color:#D14B29;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">ИК</div><div style="flex:1"><div style="font-size:15px;font-weight:500">Ирина Ковалёва</div><div style="font-size:13px;color:#9C948A">Заявка на верификацию</div></div><div style="font-size:12px;color:#9C948A">2 ч назад</div><i data-lucide="chevron-right" width="18" height="18" stroke-width="1.75" style="color:#9C948A"></i></div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #EBE9E2;background:#F5F4F0"><div style="width:36px;height:36px;border-radius:999px;background:#E4EDF5;color:#3D77AD;display:flex;align-items:center;justify-content:center"><i data-lucide="file-text" width="16" height="16" stroke-width="1.75"></i></div><div style="flex:1"><div style="font-size:15px;font-weight:500">Диплом.pdf</div><div style="font-size:13px;color:#9C948A">Документ на проверку</div></div><div style="font-size:12px;color:#9C948A">вчера</div></div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 20px;opacity:0.5"><div style="width:36px;height:36px;border-radius:999px;background:#EBE9E2"></div><div style="flex:1"><div style="font-size:15px;font-weight:500">Группа «Границы в отношениях»</div><div style="font-size:13px;color:#9C948A">Недоступно</div></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== KEY-VALUE ===================== -->
+  <section id="keyvalue" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Key-Value / Description List</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:220px">
+        <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#9C948A">Формат</span><span style="font-weight:500">Онлайн</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#9C948A">Стоимость</span><span style="font-weight:500">50 BYN</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#9C948A">Дата</span><span style="font-weight:500">15.08.2026</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:max-content max-content;justify-content:start;gap:8px 16px;font-size:14px">
+        <span style="color:#9C948A">Формат</span><span style="font-weight:500">Онлайн</span>
+        <span style="color:#9C948A">Стоимость</span><span style="font-weight:500">50 BYN</span>
+        <span style="color:#9C948A">Дата</span><span style="font-weight:500">15.08.2026</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AVATAR ===================== -->
+  <section id="avatar" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Avatar</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+      <div style="width:28px;height:28px;border-radius:999px;background:#FFE1D3;color:#D14B29;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600">ИК</div>
+      <div style="width:40px;height:40px;border-radius:999px;background:#FFE1D3;color:#D14B29;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">ИК</div>
+      <div style="width:56px;height:56px;border-radius:999px;background:#FFE1D3;color:#D14B29;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600">ИК</div>
+      <div style="width:56px;height:56px;border-radius:999px;background:#EBE9E2;display:flex;align-items:center;justify-content:center"><i data-lucide="user" width="26" height="26" stroke-width="1.5" style="color:#9C948A"></i></div>
+      <div style="width:56px;height:56px;border-radius:999px;background:linear-gradient(135deg,#EBE9E2,#F5F4F0);border:1px dashed #D6D2C8"></div>
+    </div>
+  </section>
+
+  <!-- ===================== METRIC ===================== -->
+  <section id="metric" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Metric / Counter</h2>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:14px;padding:20px;width:180px;display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:8px;color:#9C948A;font-size:13px"><i data-lucide="users" width="15" height="15" stroke-width="1.75"></i>Психологи</div><div style="font-size:28px;font-weight:700">128</div></div>
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:14px;padding:20px;width:180px;display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:8px;color:#9C948A;font-size:13px"><i data-lucide="clock" width="15" height="15" stroke-width="1.75"></i>На модерации</div><div style="font-size:28px;font-weight:700">6</div></div>
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:14px;padding:20px;width:180px;display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:8px;color:#9C948A;font-size:13px"><i data-lucide="banknote" width="15" height="15" stroke-width="1.75"></i>Оплачено, BYN</div><div style="font-size:28px;font-weight:700">4 820</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== TIMELINE ===================== -->
+  <section id="timeline" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Timeline</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px">
+      <div style="display:flex;gap:16px">
+        <div style="display:flex;flex-direction:column;align-items:center;width:20px"><div style="width:12px;height:12px;border-radius:999px;background:#2E9960"></div><div style="width:1px;flex:1;background:#EBE9E2;margin-top:4px"></div></div>
+        <div style="padding-bottom:24px"><div style="font-size:14px;font-weight:500">Заявка одобрена</div><div style="font-size:13px;color:#9C948A;margin-top:2px">Куратор Мария П. · 12.08.2026, 14:20</div></div>
+      </div>
+      <div style="display:flex;gap:16px">
+        <div style="display:flex;flex-direction:column;align-items:center;width:20px"><div style="width:12px;height:12px;border-radius:999px;background:#C97A17"></div><div style="width:1px;flex:1;background:#EBE9E2;margin-top:4px"></div></div>
+        <div style="padding-bottom:24px"><div style="font-size:14px;font-weight:500">Запрошены дополнительные документы</div><div style="font-size:13px;color:#9C948A;margin-top:2px">Куратор Мария П. · 11.08.2026, 10:05</div><div style="font-size:14px;color:#3C3834;margin-top:6px;background:#F5F4F0;padding:10px 12px;border-radius:8px">«Пришлите, пожалуйста, скан диплома в хорошем качестве»</div></div>
+      </div>
+      <div style="display:flex;gap:16px">
+        <div style="display:flex;flex-direction:column;align-items:center;width:20px"><div style="width:12px;height:12px;border-radius:999px;background:#3D77AD"></div></div>
+        <div><div style="font-size:14px;font-weight:500">Заявка подана</div><div style="font-size:13px;color:#9C948A;margin-top:2px">Ирина Ковалёва · 10.08.2026, 09:12</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <section id="sidebar-nav" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Sidebar Navigation</h2>
+    <div style="background:#3C3834;border-radius:16px;padding:20px;width:260px;display:flex;flex-direction:column;gap:4px;color:#F5F4F0">
+      <div style="padding:8px 10px 18px;font-size:16px;font-weight:700">Gruppa Info</div>
+      <div style="padding:9px 12px;border-radius:9px;background:#FF714A;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px"><i data-lucide="layout-grid" width="17" height="17" stroke-width="1.75"></i>Обзор</div>
+      <div style="padding:9px 12px;border-radius:9px;color:#D8D3CB;font-size:14px;display:flex;align-items:center;gap:10px"><i data-lucide="users" width="17" height="17" stroke-width="1.75"></i>Психологи</div>
+      <div style="padding:9px 12px;border-radius:9px;color:#D8D3CB;font-size:14px;display:flex;align-items:center;gap:10px;justify-content:space-between"><span style="display:flex;align-items:center;gap:10px"><i data-lucide="folder" width="17" height="17" stroke-width="1.75"></i>Группы</span><span style="background:#FF714A;color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px">3</span></div>
+      <div style="padding:9px 12px;border-radius:9px;color:#D8D3CB;font-size:14px;display:flex;align-items:center;gap:10px"><i data-lucide="credit-card" width="17" height="17" stroke-width="1.75"></i>Платежи</div>
+      <div style="height:1px;background:#524D46;margin:14px 8px"></div>
+      <div style="padding:9px 12px;border-radius:9px;color:#D8D3CB;font-size:14px;display:flex;align-items:center;gap:10px"><i data-lucide="settings" width="17" height="17" stroke-width="1.75"></i>Настройки</div>
+      <div style="margin-top:16px;padding:10px 12px;border-radius:10px;background:#4A453F;display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:999px;background:#FF714A;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff">МК</div><div style="font-size:13px;font-weight:500">Мария Куратор</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== TOPBAR ===================== -->
+  <section id="topbar" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Topbar</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:16px">
+      <i data-lucide="menu" width="20" height="20" stroke-width="1.75" style="color:#3C3834"></i>
+      <div style="font-size:16px;font-weight:600;flex:1">Психологи</div>
+      <i data-lucide="bell" width="20" height="20" stroke-width="1.75" style="color:#71695F"></i>
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:999px;background:#FFE1D3;color:#D14B29;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">МК</div><i data-lucide="chevron-down" width="14" height="14" stroke-width="1.75" style="color:#9C948A"></i></div>
+    </div>
+  </section>
+
+  <!-- ===================== BREADCRUMBS ===================== -->
+  <section id="breadcrumbs" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Breadcrumbs</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#9C948A"><span>Психологи</span><i data-lucide="chevron-right" width="13" height="13" stroke-width="1.75"></i><span>Заявки</span><i data-lucide="chevron-right" width="13" height="13" stroke-width="1.75"></i><span style="color:#3C3834;font-weight:500">Ирина Ковалёва</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#9C948A"><span>Психологи</span><i data-lucide="chevron-right" width="13" height="13" stroke-width="1.75"></i><span>…</span><i data-lucide="chevron-right" width="13" height="13" stroke-width="1.75"></i><span style="color:#3C3834;font-weight:500">Документы</span></div>
+    </div>
+  </section>
+
+  <!-- ===================== TABS ===================== -->
+  <section id="tabs" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Tabs</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:20px">
+      <div style="display:flex;gap:24px;border-bottom:1px solid #EBE9E2">
+        <div style="padding:10px 2px;font-size:15px;font-weight:600;color:#FF714A;border-bottom:2px solid #FF714A">Профиль</div>
+        <div style="padding:10px 2px;font-size:15px;color:#71695F">Документы</div>
+        <div style="padding:10px 2px;font-size:15px;color:#71695F;display:flex;align-items:center;gap:6px">Заявки<span style="background:#FFE1D3;color:#D14B29;font-size:11px;font-weight:700;border-radius:999px;padding:1px 6px">2</span></div>
+        <div style="padding:10px 2px;font-size:15px;color:#C4BEB3">Архив</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PAGINATION ===================== -->
+  <section id="pagination" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Pagination</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <span style="font-size:13px;color:#9C948A">1–20 из 124</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button disabled="" style="width:32px;height:32px;border-radius:8px;border:1px solid #EBE9E2;background:#FFFFFF;display:flex;align-items:center;justify-content:center;opacity:0.4"><i data-lucide="chevron-left" width="15" height="15" stroke-width="1.75"></i></button>
+        <button style="width:32px;height:32px;border-radius:8px;border:none;background:#FF714A;color:#fff;font-size:13px;font-weight:600">1</button>
+        <button style="width:32px;height:32px;border-radius:8px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-size:13px">2</button>
+        <button style="width:32px;height:32px;border-radius:8px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-size:13px">3</button>
+        <span style="color:#9C948A;font-size:13px">…</span>
+        <button style="width:32px;height:32px;border-radius:8px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-size:13px">7</button>
+        <button style="width:32px;height:32px;border-radius:8px;border:1px solid #EBE9E2;background:#FFFFFF;display:flex;align-items:center;justify-content:center"><i data-lucide="chevron-right" width="15" height="15" stroke-width="1.75" style="color:#3C3834"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DROPDOWN ===================== -->
+  <section id="dropdown" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Dropdown Menu</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:12px;box-shadow:0 12px 28px rgba(60,56,52,0.14);padding:8px;width:220px">
+      <div style="padding:9px 12px;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:10px;background:#F5F4F0"><i data-lucide="eye" width="16" height="16" stroke-width="1.75" style="color:#71695F"></i>Просмотреть</div>
+      <div style="padding:9px 12px;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:10px"><i data-lucide="pencil" width="16" height="16" stroke-width="1.75" style="color:#71695F"></i>Редактировать</div>
+      <div style="padding:9px 12px;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:10px;color:#C4BEB3"><i data-lucide="archive" width="16" height="16" stroke-width="1.75"></i>В архив</div>
+      <div style="height:1px;background:#EBE9E2;margin:6px 8px"></div>
+      <div style="padding:9px 12px;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:10px;color:#D14545"><i data-lucide="trash-2" width="16" height="16" stroke-width="1.75"></i>Удалить</div>
+    </div>
+  </section>
+
+  <!-- ===================== SEARCH ===================== -->
+  <section id="search" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Search Input</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:20px;flex-wrap:wrap">
+      <div style="width:240px;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:10px;color:#9C948A;font-size:15px"><i data-lucide="search" width="17" height="17" stroke-width="1.75"></i>Поиск по имени</div>
+      <div style="width:240px;height:40px;padding:0 14px;border-radius:10px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;display:flex;align-items:center;gap:10px;font-size:15px;color:#3C3834"><i data-lucide="search" width="17" height="17" stroke-width="1.75" style="color:#9C948A"></i>Ирина<span style="flex:1"></span><i data-lucide="x" width="15" height="15" stroke-width="1.75" style="color:#9C948A"></i></div>
+      <div style="width:240px;height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:10px;font-size:15px;color:#3C3834"><i data-lucide="loader-2" width="17" height="17" stroke-width="2" style="color:#9C948A"></i>Поиск…</div>
+    </div>
+  </section>
+
+  <!-- ===================== FILTERS ===================== -->
+  <section id="filters" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Filters</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="height:36px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:6px;font-size:13.5px"><i data-lucide="sliders-horizontal" width="14" height="14" stroke-width="1.75"></i>Фильтр</div>
+        <div style="height:36px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:6px;font-size:13.5px">Специализация<i data-lucide="chevron-down" width="13" height="13" stroke-width="1.75"></i></div>
+        <div style="height:36px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:6px;font-size:13.5px">Статус: Активна<i data-lucide="chevron-down" width="13" height="13" stroke-width="1.75"></i></div>
+        <div style="height:36px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:6px;font-size:13.5px"><i data-lucide="calendar" width="14" height="14" stroke-width="1.75"></i>За месяц</div>
+        <span style="padding:6px 12px;border-radius:999px;background:#FFE1D3;color:#D14B29;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px">Активна<i data-lucide="x" width="12" height="12" stroke-width="2"></i></span>
+        <span style="font-size:13.5px;color:#9C948A;align-self:center">Очистить все</span>
+      </div>
+      <div style="width:320px;border:1px solid #EBE9E2;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:16px;font-weight:600">Фильтр Panel</div>
+        <div style="display:flex;flex-direction:column;gap:8px"><label style="font-size:13px;color:#9C948A">Статус</label><div style="height:38px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;padding:0 12px;font-size:14px">Активна</div></div>
+        <div style="display:flex;justify-content:space-between;border-top:1px solid #EBE9E2;padding-top:16px">
+          <span style="font-size:14px;color:#9C948A">Сбросить</span>
+          <button style="height:36px;padding:0 16px;border-radius:9px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Применить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ALERT ===================== -->
+  <section id="alert" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Alert</h2>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="background:#E4EDF5;border-radius:12px;padding:16px 18px;display:flex;gap:12px"><i data-lucide="info" width="19" height="19" stroke-width="1.75" style="color:#3D77AD;flex-shrink:0"></i><div><div style="font-size:14.5px;font-weight:600;color:#2C5A82">Изменения сохраняются автоматически</div></div></div>
+      <div style="background:#E2F2E8;border-radius:12px;padding:16px 18px;display:flex;gap:12px"><i data-lucide="check-circle-2" width="19" height="19" stroke-width="1.75" style="color:#2E9960;flex-shrink:0"></i><div><div style="font-size:14.5px;font-weight:600;color:#1F7245">Профиль успешно верифицирован</div><div style="font-size:13.5px;color:#2E7A4E;margin-top:2px">Психолог получил доступ к личному кабинету.</div></div></div>
+      <div style="background:#FAEAD2;border-radius:12px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start"><i data-lucide="alert-triangle" width="19" height="19" stroke-width="1.75" style="color:#C97A17;flex-shrink:0"></i><div style="flex:1"><div style="font-size:14.5px;font-weight:600;color:#8A5A10">Документы не загружены</div><div style="font-size:13.5px;color:#8A5A10;margin-top:2px">Заявка не может быть рассмотрена без диплома.</div></div><button style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #C97A17;background:transparent;color:#8A5A10;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px;flex-shrink:0">Загрузить</button></div>
+      <div style="background:#FAE2E2;border-radius:12px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start"><i data-lucide="alert-circle" width="19" height="19" stroke-width="1.75" style="color:#D14545;flex-shrink:0"></i><div style="flex:1"><div style="font-size:14.5px;font-weight:600;color:#9C2E2E">Не удалось сохранить изменения</div></div><i data-lucide="x" width="17" height="17" stroke-width="1.75" style="color:#9C2E2E"></i></div>
+    </div>
+  </section>
+
+  <!-- ===================== TOAST ===================== -->
+  <section id="toast" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Toast</h2>
+    <div style="display:flex;flex-direction:column;gap:10px;max-width:340px">
+      <div style="background:#3C3834;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 28px rgba(60,56,52,0.2)"><i data-lucide="check-circle-2" width="17" height="17" stroke-width="1.75" style="color:#6FCB93"></i><span style="color:#F5F4F0;font-size:14px;flex:1">Заявка отправлена</span></div>
+      <div style="background:#3C3834;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 28px rgba(60,56,52,0.2)"><i data-lucide="info" width="17" height="17" stroke-width="1.75" style="color:#8FBDE6"></i><span style="color:#F5F4F0;font-size:14px;flex:1">Новая версия доступна</span></div>
+      <div style="background:#3C3834;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 28px rgba(60,56,52,0.2)"><i data-lucide="alert-triangle" width="17" height="17" stroke-width="1.75" style="color:#E8B356"></i><span style="color:#F5F4F0;font-size:14px;flex:1">Сессия истекает через 5 минут</span></div>
+      <div style="background:#3C3834;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 28px rgba(60,56,52,0.2)"><i data-lucide="alert-circle" width="17" height="17" stroke-width="1.75" style="color:#E88585"></i><span style="color:#F5F4F0;font-size:14px;flex:1">Ошибка загрузки файла</span><i data-lucide="x" width="14" height="14" stroke-width="1.75" style="color:#9C948A"></i></div>
+    </div>
+  </section>
+
+  <!-- ===================== TOOLTIP/POPOVER ===================== -->
+  <section id="tooltip" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Tooltip / Popover</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><i data-lucide="info" width="18" height="18" stroke-width="1.75" style="color:#9C948A"></i><div style="background:#3C3834;color:#F5F4F0;font-size:12.5px;padding:6px 10px;border-radius:7px">Виден только куратору</div></div>
+      <div style="width:260px;border-radius:12px;background:#FFFFFF;border:1px solid #EBE9E2;box-shadow:0 12px 28px rgba(60,56,52,0.14);overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #EBE9E2;font-size:14px;font-weight:600">Быстрые действия</div>
+        <div style="padding:16px;font-size:13.5px;color:#71695F">Popover может содержать header и body, в отличие от компактного tooltip.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EMPTY STATE ===================== -->
+  <section id="empty" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Empty State</h2>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:14px;padding:36px 24px;width:260px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px"><i data-lucide="inbox" width="30" height="30" stroke-width="1.5" style="color:#C4BEB3"></i><div style="font-size:15px;font-weight:600">Пока нет заявок</div><div style="font-size:13.5px;color:#9C948A">Новые заявки появятся здесь</div></div>
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:14px;padding:36px 24px;width:260px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px"><i data-lucide="search-x" width="30" height="30" stroke-width="1.5" style="color:#C4BEB3"></i><div style="font-size:15px;font-weight:600">Ничего не найдено</div><div style="font-size:13.5px;color:#9C948A">Попробуйте изменить параметры поиска</div></div>
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:14px;padding:36px 24px;width:260px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px"><i data-lucide="lock" width="30" height="30" stroke-width="1.5" style="color:#C4BEB3"></i><div style="font-size:15px;font-weight:600">Доступ ограничен</div><div style="font-size:13.5px;color:#9C948A">Обратитесь к администратору</div><button style="margin-top:6px;height:36px;padding:0 14px;border-radius:9px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px">Запросить доступ</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== LOADING ===================== -->
+  <section id="loading" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Loading</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;gap:24px;align-items:center">
+        <i data-lucide="loader-2" width="16" height="16" stroke-width="2" style="color:#FF714A"></i>
+        <i data-lucide="loader-2" width="24" height="24" stroke-width="2" style="color:#FF714A"></i>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;opacity:0.85"><i data-lucide="loader-2" width="16" height="16" stroke-width="2"></i>Сохранение…</button>
+      </div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:8px;width:220px"><div style="height:14px;background:#EBE9E2;border-radius:6px;width:70%"></div><div style="height:14px;background:#EBE9E2;border-radius:6px;width:100%"></div><div style="height:14px;background:#EBE9E2;border-radius:6px;width:85%"></div></div>
+        <div style="width:220px;height:120px;background:#EBE9E2;border-radius:12px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:320px"><div style="height:16px;background:#EBE9E2;border-radius:6px"></div><div style="height:16px;background:#EBE9E2;border-radius:6px"></div><div style="height:16px;background:#EBE9E2;border-radius:6px"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ERROR STATE ===================== -->
+  <section id="error" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Error State</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-size:13px;color:#D14545;display:flex;align-items:center;gap:5px"><i data-lucide="alert-circle" width="13" height="13" stroke-width="2"></i>inline field error</div>
+      <div style="background:#FAE2E2;border-radius:10px;padding:14px 16px;font-size:14px;color:#9C2E2E">Не удалось загрузить список заявок. Попробуйте обновить страницу.</div>
+      <div style="text-align:center;padding:32px;border:1px dashed #EBE9E2;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:10px"><i data-lucide="server-crash" width="28" height="28" stroke-width="1.5" style="color:#C4BEB3"></i><div style="font-size:15px;font-weight:600">Не удалось загрузить данные</div><button style="height:36px;padding:0 14px;border-radius:9px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px">Повторить</button></div>
+    </div>
+  </section>
+
+  <!-- ===================== MODAL ===================== -->
+  <section id="modal" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Modal</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Sizes: Small 360 / Medium 480 / Large 640. Variants — паттерны использования, не разные визуальные стили.</p>
+    <div style="background:#EBE9E2;border-radius:16px;padding:40px;display:flex;justify-content:center">
+      <div style="width:420px;background:#FFFFFF;border-radius:16px;box-shadow:0 20px 48px rgba(60,56,52,0.22);overflow:hidden">
+        <div style="padding:18px 20px;border-bottom:1px solid #EBE9E2;display:flex;align-items:center;justify-content:space-between"><div style="font-size:17px;font-weight:600">Отклонить заявку?</div><i data-lucide="x" width="18" height="18" stroke-width="1.75" style="color:#9C948A"></i></div>
+        <div style="padding:20px;font-size:14.5px;color:#71695F">Психолог получит уведомление с указанной причиной. Действие можно отменить в течение 24 часов.</div>
+        <div style="padding:16px 20px;border-top:1px solid #EBE9E2;display:flex;justify-content:flex-end;gap:10px"><button style="height:38px;padding:0 14px;border-radius:9px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Отмена</button><button style="height:38px;padding:0 14px;border-radius:9px;border:none;background:#D14545;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Отклонить</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DRAWER ===================== -->
+  <section id="drawer" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Drawer / Off-canvas</h2>
+    <div style="background:#EBE9E2;border-radius:16px;padding:24px;display:flex;justify-content:flex-end">
+      <div style="width:320px;background:#FFFFFF;border-radius:14px;box-shadow:0 20px 48px rgba(60,56,52,0.2);overflow:hidden">
+        <div style="padding:16px 18px;border-bottom:1px solid #EBE9E2;display:flex;align-items:center;justify-content:space-between"><div style="font-size:16px;font-weight:600">Фильтры</div><i data-lucide="x" width="17" height="17" stroke-width="1.75" style="color:#9C948A"></i></div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;font-size:14px;color:#71695F"><div>Статус</div><div style="height:38px;border-radius:9px;border:1px solid #EBE9E2"></div><div>Специализация</div><div style="height:38px;border-radius:9px;border:1px solid #EBE9E2"></div></div>
+        <div style="padding:14px 18px;border-top:1px solid #EBE9E2"><button style="height:38px;width:100%;border-radius:9px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Применить</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONFIRMATION ===================== -->
+  <section id="confirmation" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Confirmation Pattern</h2>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <div style="width:340px;background:#FFFFFF;border-radius:14px;border:1px solid #EBE9E2;padding:20px;display:flex;flex-direction:column;gap:14px"><div style="font-size:16px;font-weight:600">Сохранить изменения?</div><div style="font-size:14px;color:#71695F">Несохранённые данные будут потеряны.</div><div style="display:flex;justify-content:flex-end;gap:10px"><button style="height:36px;padding:0 14px;border-radius:9px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px">Не сохранять</button><button style="height:36px;padding:0 14px;border-radius:9px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px">Сохранить</button></div></div>
+      <div style="width:340px;background:#FFFFFF;border-radius:14px;border:1px solid #EBE9E2;padding:20px;display:flex;flex-direction:column;gap:14px"><div style="font-size:16px;font-weight:600">Удалить аккаунт?</div><div style="font-size:14px;color:#71695F">Действие необратимо, все данные будут удалены.</div><div style="display:flex;justify-content:flex-end;gap:10px"><button style="height:36px;padding:0 14px;border-radius:9px;border:1px solid #EBE9E2;background:#FFFFFF;color:#3C3834;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px">Отмена</button><button style="height:36px;padding:0 14px;border-radius:9px;border:none;background:#D14545;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13.5px">Удалить</button></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== STEPPER ===================== -->
+  <section id="stepper" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Stepper</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;align-items:center">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:28px;height:28px;border-radius:999px;background:#2E9960;display:flex;align-items:center;justify-content:center"><i data-lucide="check" width="14" height="14" stroke-width="2.5" style="color:#fff"></i></div><span style="font-size:12.5px;color:#71695F">Профиль</span></div>
+        <div style="flex:1;height:2px;background:#2E9960;margin:0 4px 22px"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:28px;height:28px;border-radius:999px;background:#FF714A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">2</div><span style="font-size:12.5px;font-weight:600">Документы</span></div>
+        <div style="flex:1;height:2px;background:#EBE9E2;margin:0 4px 22px"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:28px;height:28px;border-radius:999px;border:1px solid #D6D2C8;display:flex;align-items:center;justify-content:center;color:#9C948A;font-size:13px">3</div><span style="font-size:12.5px;color:#9C948A">Оплата</span></div>
+        <div style="flex:1;height:2px;background:#EBE9E2;margin:0 4px 22px"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:28px;height:28px;border-radius:999px;border:1px solid #D14545;display:flex;align-items:center;justify-content:center;color:#D14545;font-size:13px">4</div><span style="font-size:12.5px;color:#D14545">Проверка</span></div>
+      </div>
+      <div style="font-size:13.5px;color:#9C948A">Шаг 2 из 4</div>
+    </div>
+  </section>
+
+  <!-- ===================== CHOICE CARD ===================== -->
+  <section id="choice-card" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Choice Card</h2>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="width:200px;border:1px solid #EBE9E2;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px"><i data-lucide="video" width="20" height="20" stroke-width="1.75" style="color:#71695F"></i><div style="font-size:15px;font-weight:600">Онлайн</div><div style="font-size:13px;color:#9C948A">Сессии по видеосвязи</div><div style="width:18px;height:18px;border-radius:999px;border:1px solid #D6D2C8;margin-top:4px"></div></div>
+      <div style="width:200px;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;background:#FFF7F3;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px"><i data-lucide="map-pin" width="20" height="20" stroke-width="1.75" style="color:#D14B29"></i><div style="font-size:15px;font-weight:600;color:#D14B29">Очно</div><div style="font-size:13px;color:#8A4A32">Личные встречи в кабинете</div><div style="width:18px;height:18px;border-radius:999px;border:6px solid #FF714A;margin-top:4px"></div></div>
+      <div style="width:200px;border:1px solid #EBE9E2;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;opacity:0.5"><i data-lucide="users" width="20" height="20" stroke-width="1.75" style="color:#71695F"></i><div style="font-size:15px;font-weight:600">Группа</div><div style="font-size:13px;color:#9C948A">Недоступно</div><div style="width:18px;height:18px;border-radius:999px;border:1px solid #D6D2C8;margin-top:4px"></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== PROGRESS ===================== -->
+  <section id="progress" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Progress</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px;max-width:400px">
+      <div><div style="display:flex;justify-content:space-between;font-size:13px;color:#9C948A;margin-bottom:6px"><span>Заполнение профиля</span><span>40%</span></div><div style="height:8px;background:#EBE9E2;border-radius:999px;overflow:hidden"><div style="width:40%;height:100%;background:#FF714A"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px;color:#9C948A;margin-bottom:6px"><span>Верификация завершена</span><span>100%</span></div><div style="height:8px;background:#EBE9E2;border-radius:999px;overflow:hidden"><div style="width:100%;height:100%;background:#2E9960"></div></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== COMPOSITIONS ===================== -->
+  <section id="compositions" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Композиции</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Проверка совместимости компонентов — не продуктовые страницы.</p>
+    <div style="display:flex;flex-direction:column;gap:24px">
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px">
+        <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px">Form Example</div>
+        <div style="max-width:480px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:14px;font-weight:500">Имя</label><input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:14px;font-weight:500">Телефон</label><input style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2"></input></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font-size:14px;font-weight:500">Специализация</label><div style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #EBE9E2;display:flex;align-items:center;justify-content:space-between;color:#9C948A;font-size:15px">Выберите значение<i data-lucide="chevron-down" width="16" height="16" stroke-width="1.75"></i></div></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #EBE9E2;padding-top:16px"><button style="height:38px;padding:0 14px;border-radius:9px;border:1px solid #EBE9E2;background:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Отмена</button><button style="height:38px;padding:0 14px;border-radius:9px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Сохранить</button></div>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px">
+        <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px">Table Example</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="height:36px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;display:flex;align-items:center;gap:8px;color:#9C948A;font-size:14px;flex:1;max-width:220px"><i data-lucide="search" width="15" height="15" stroke-width="1.75"></i>Поиск</div><div style="height:36px;padding:0 12px;border-radius:9px;border:1px solid #EBE9E2;font-size:14px;display:flex;align-items:center;gap:6px"><i data-lucide="filter" width="14" height="14" stroke-width="1.75"></i>Фильтры</div></div>
+        <div style="border:1px solid #EBE9E2;border-radius:10px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 40px;padding:10px 16px;background:#F5F4F0;font-size:12.5px;font-weight:600;color:#71695F"><div>Имя</div><div>Статус</div><div style="text-align:right">Сумма</div><div></div></div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 40px;padding:12px 16px;border-top:1px solid #EBE9E2;font-size:14px;align-items:center"><div>Ирина Ковалёва</div><div><span style="padding:3px 9px;border-radius:999px;background:#E2F2E8;color:#2E9960;font-size:12px;font-weight:600">Активна</span></div><div style="text-align:right;font-family:monospace">125,00</div><div><i data-lucide="more-horizontal" width="15" height="15" stroke-width="1.75" style="color:#9C948A"></i></div></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px"><span style="font-size:12.5px;color:#9C948A">1–1 из 47</span></div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px">
+        <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px">Wizard Example</div>
+        <div style="display:flex;align-items:center;margin-bottom:20px">
+          <div style="width:24px;height:24px;border-radius:999px;background:#2E9960;display:flex;align-items:center;justify-content:center"><i data-lucide="check" width="13" height="13" stroke-width="2.5" style="color:#fff"></i></div>
+          <div style="flex:1;height:2px;background:#FF714A;margin:0 6px"></div>
+          <div style="width:24px;height:24px;border-radius:999px;background:#FF714A;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center">2</div>
+          <div style="flex:1;height:2px;background:#EBE9E2;margin:0 6px"></div>
+          <div style="width:24px;height:24px;border-radius:999px;border:1px solid #D6D2C8;color:#9C948A;font-size:12px;display:flex;align-items:center;justify-content:center">3</div>
+        </div>
+        <div style="display:flex;gap:14px;margin-bottom:20px">
+          <div style="flex:1;border:2px solid #FF714A;box-shadow:0 0 0 3px #FFE1D3;background:#FFF7F3;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:600;color:#D14B29">Онлайн</div><div style="width:16px;height:16px;border-radius:999px;border:5px solid #FF714A"></div></div>
+          <div style="flex:1;border:1px solid #EBE9E2;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px"><div style="font-size:14px;font-weight:600">Очно</div><div style="width:16px;height:16px;border-radius:999px;border:1px solid #D6D2C8"></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between"><button style="height:38px;padding:0 14px;border-radius:9px;border:1px solid #EBE9E2;background:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Назад</button><button style="height:38px;padding:0 14px;border-radius:9px;border:none;background:#FF714A;color:#fff;font-family:'Montserrat',sans-serif;font-weight:600;font-size:13px">Далее</button></div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px">
+        <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px">Detail Example</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div><div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#9C948A;margin-bottom:4px"><span>Психологи</span><i data-lucide="chevron-right" width="12" height="12" stroke-width="1.75"></i><span style="color:#3C3834">Ирина Ковалёва</span></div><div style="font-size:20px;font-weight:600">Ирина Ковалёва</div></div>
+          <span style="padding:5px 12px;border-radius:999px;background:#E2F2E8;color:#2E9960;font-size:13px;font-weight:600">Активна</span>
+        </div>
+        <div style="display:grid;grid-template-columns:max-content max-content;justify-content:start;gap:6px 16px;font-size:14px;margin-bottom:16px"><span style="color:#9C948A">Формат</span><span style="font-weight:500">Онлайн</span><span style="color:#9C948A">Стоимость</span><span style="font-weight:500">50 BYN</span></div>
+        <div style="display:flex;gap:16px;align-items:center"><div style="display:flex;flex-direction:column;align-items:center;width:16px"><div style="width:10px;height:10px;border-radius:999px;background:#2E9960"></div></div><div style="font-size:13.5px;color:#71695F">Профиль верифицирован · 12.08.2026</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RESPONSIVE ===================== -->
+  <section id="responsive" style="scroll-margin-top:24px;margin-bottom:64px">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Responsive Rules</h2>
+    <p style="font-size:15px;color:#9C948A;margin:0 0 24px">Breakpoints: &lt;576 / 576+ / 768+ / 992+ / 1200+.</p>
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px">
+        <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px">Типографика и spacing по breakpoints</div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:12px 20px;font-size:13.5px">
+          <div style="color:#9C948A;font-weight:600">Token</div>
+          <div style="color:#9C948A;font-weight:600">&lt;576 (mobile)</div>
+          <div style="color:#9C948A;font-weight:600">768–991 (tablet)</div>
+          <div style="color:#9C948A;font-weight:600">1200+ (desktop)</div>
+
+          <div>Display / H1</div><div>26px / 600</div><div>30px / 600</div><div>34px / 600</div>
+          <div>H2</div><div>21px / 600</div><div>24px / 600</div><div>26px / 600</div>
+          <div>H3</div><div>18px / 600</div><div>20px / 600</div><div>21px / 600</div>
+          <div>Body</div><div>16px / 400 (без изменений)</div><div>16px / 400</div><div>16px / 400</div>
+          <div>Container padding</div><div>16px</div><div>24–32px</div><div>48–64px</div>
+          <div>Spacing между секциями</div><div>32px</div><div>40px</div><div>48–64px</div>
+          <div>Touch target</div><div>минимум 44×44px</div><div>минимум 40×40px</div><div>минимум 32×32px (мышь)</div>
+        </div>
+        <div style="font-size:13px;color:#9C948A;margin-top:16px;line-height:1.7">
+          Body/Small/Caption не уменьшаются на мобильных — читаемость важнее плотности. Уменьшается только крупная типографика (Display/H1–H3) и внешние отступы контейнера. Высота controls (input/button) не меняется по breakpoint — только touch target вокруг маленьких иконок увеличивается до 44px на &lt;576px за счёт padding, а не размера иконки.
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px">
+        <div style="font-size:13px;font-weight:600;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px">Компоненты по breakpoints</div>
+        <div style="display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:12px 20px;font-size:13.5px">
+          <div style="color:#9C948A;font-weight:600">Компонент</div>
+          <div style="color:#9C948A;font-weight:600">&lt;576 (mobile)</div>
+          <div style="color:#9C948A;font-weight:600">768–991 (tablet)</div>
+          <div style="color:#9C948A;font-weight:600">1200+ (desktop)</div>
+
+          <div>Button</div><div>full width в формах и модалках; группа кнопок stacked (вертикально, primary сверху)</div><div>auto width; группа — в строку, если помещается</div><div>auto width; группа — в строку</div>
+          <div>Icon Button</div><div>44×44px hit-area (иконка 20px внутри)</div><div>40×40px hit-area</div><div>32–40×32–40px hit-area</div>
+          <div>Input / Select</div><div>full width, высота не меняется (40px)</div><div>full width в колонке формы</div><div>ширина по grid-колонке</div>
+          <div>Badge / Chip</div><div>размер и padding не меняются, допускается перенос строк в группе</div><div>без изменений</div><div>без изменений</div>
+          <div>Card</div><div>padding 16px, edge-to-edge на &lt;400px (без внешних отступов)</div><div>padding 20px</div><div>padding 24–28px</div>
+          <div>Table</div><div>заменяется на список карточек либо горизонтальный scroll</div><div>горизонтальный scroll с зафиксированной первой колонкой</div><div>полная таблица</div>
+          <div>Dropdown / Popover</div><div>раскрывается как bottom-sheet на всю ширину</div><div>стандартный dropdown</div><div>стандартный dropdown</div>
+          <div>Stepper</div><div>компактный вид «Шаг 2 из 4» без подписей шагов</div><div>горизонтальный, подписи сокращены</div><div>горизонтальный, полные подписи</div>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:4px">Формы</div><div style="font-size:13px;color:#9C948A;max-width:220px">Колонки складываются в одну на &lt;768px</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Desktop</span><div style="width:200px;border:1px solid #EBE9E2;border-radius:10px;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="height:24px;background:#F5F4F0;border-radius:6px"></div><div style="height:24px;background:#F5F4F0;border-radius:6px"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Mobile</span><div style="width:100px;border:1px solid #EBE9E2;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px"><div style="height:24px;background:#F5F4F0;border-radius:6px"></div><div style="height:24px;background:#F5F4F0;border-radius:6px"></div></div></div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:4px">Table</div><div style="font-size:13px;color:#9C948A;max-width:220px">Горизонтальный scroll на &lt;992px</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Desktop</span><div style="width:200px;border:1px solid #EBE9E2;border-radius:10px;padding:10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px"><div style="height:20px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;background:#F5F4F0;border-radius:4px"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Mobile</span><div style="width:100px;overflow:hidden;border:1px solid #EBE9E2;border-radius:10px;padding:10px;position:relative"><div style="width:180px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px"><div style="height:20px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;background:#F5F4F0;border-radius:4px"></div></div><div style="position:absolute;right:0;top:0;bottom:0;width:24px;background:linear-gradient(to right,rgba(255,255,255,0),#FFFFFF)"></div></div></div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:4px">Modal</div><div style="font-size:13px;color:#9C948A;max-width:220px">Почти full-width с отступом 16px на &lt;576px</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Desktop</span><div style="width:200px;height:70px;background:#EBE9E2;border-radius:10px;display:flex;align-items:center;justify-content:center"><div style="width:110px;height:50px;background:#FFFFFF;border-radius:8px;box-shadow:0 6px 14px rgba(60,56,52,0.16)"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Mobile</span><div style="width:100px;height:70px;background:#EBE9E2;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 6px"><div style="width:100%;height:56px;background:#FFFFFF;border-radius:8px;box-shadow:0 6px 14px rgba(60,56,52,0.16)"></div></div></div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:4px">Sidebar</div><div style="font-size:13px;color:#9C948A;max-width:220px">Заменяется на Drawer по menu-иконке на &lt;992px</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Desktop</span><div style="width:200px;height:70px;border:1px solid #EBE9E2;border-radius:10px;display:flex;overflow:hidden"><div style="width:56px;background:#3C3834"></div><div style="flex:1;background:#F5F4F0"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Mobile</span><div style="width:100px;height:70px;border:1px solid #EBE9E2;border-radius:10px;overflow:hidden"><div style="height:20px;background:#FFFFFF;border-bottom:1px solid #EBE9E2;display:flex;align-items:center;padding:0 8px"><i data-lucide="menu" width="12" height="12" stroke-width="1.75" style="color:#3C3834"></i></div><div style="background:#F5F4F0;height:49px"></div></div></div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:4px">Tabs</div><div style="font-size:13px;color:#9C948A;max-width:220px">Горизонтальный overflow со скроллом</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Desktop</span><div style="width:200px;border:1px solid #EBE9E2;border-radius:10px;padding:10px;display:flex;gap:12px"><div style="height:16px;width:36px;background:#FF714A;border-radius:4px"></div><div style="height:16px;width:36px;background:#F5F4F0;border-radius:4px"></div><div style="height:16px;width:36px;background:#F5F4F0;border-radius:4px"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Mobile</span><div style="width:100px;overflow:hidden;border:1px solid #EBE9E2;border-radius:10px;padding:10px;position:relative"><div style="display:flex;gap:12px;width:180px"><div style="height:16px;width:36px;background:#FF714A;border-radius:4px"></div><div style="height:16px;width:36px;background:#F5F4F0;border-radius:4px"></div><div style="height:16px;width:36px;background:#F5F4F0;border-radius:4px"></div></div><div style="position:absolute;right:0;top:0;bottom:0;width:20px;background:linear-gradient(to right,rgba(255,255,255,0),#FFFFFF)"></div></div></div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:24px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap">
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:4px">Page header actions</div><div style="font-size:13px;color:#9C948A;max-width:220px">Переносятся под заголовок на &lt;768px</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Desktop</span><div style="width:200px;border:1px solid #EBE9E2;border-radius:10px;padding:10px;display:flex;justify-content:space-between;align-items:center"><div style="height:14px;width:70px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;width:50px;background:#FF714A;border-radius:6px"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;color:#9C948A;text-transform:uppercase;letter-spacing:0.05em">Mobile</span><div style="width:100px;border:1px solid #EBE9E2;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px"><div style="height:14px;width:70px;background:#F5F4F0;border-radius:4px"></div><div style="height:20px;width:100%;background:#FF714A;border-radius:6px"></div></div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== ACCESSIBILITY ===================== -->
+  <section id="a11y" style="scroll-margin-top:24px;margin-bottom:0">
+    <h2 style="font-size:26px;font-weight:600;margin:0 0 6px">Accessibility</h2>
+    <div style="background:#FFFFFF;border:1px solid #EBE9E2;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.8">
+      <div>— Контраст текста соответствует WCAG AA (text-primary на background-page ≈ 10:1).</div>
+      <div>— Touch target минимум 44×44px для интерактивных элементов на мобильных.</div>
+      <div>— Статус всегда сопровождается текстом, не только цветом (см. Badge).</div>
+      <div>— Placeholder не заменяет Label — Label всегда присутствует отдельно.</div>
+      <div>— Focus-состояние одинаково для всех интерактивных компонентов (см. Focus System).</div>
+      <div>— Disabled-элементы визуально отличаются цветом текста и фона, не только opacity.</div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    if (window.lucide) window.lucide.createIcons();
+  }
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
