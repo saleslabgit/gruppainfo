@@ -37,7 +37,8 @@ final class AuthenticationAccessTest extends TestCase
 
         $this->assertAuthenticatedAs($user);
         self::assertNotSame($sessionId, session()->getId());
-        $this->get('/cabinet')->assertOk()->assertSee($user->email);
+        $this->get('/cabinet')->assertRedirect(route('cabinet.groups'));
+        $this->get(route('cabinet.groups'))->assertOk()->assertSee('Мои группы');
     }
 
     public function test_approved_enabled_administrator_authenticates_and_reaches_admin(): void
@@ -170,7 +171,7 @@ final class AuthenticationAccessTest extends TestCase
     public function test_access_is_revoked_on_next_request(array $changes): void
     {
         $user = $this->createUser();
-        $this->actingAs($user)->get('/cabinet')->assertOk();
+        $this->actingAs($user)->get('/cabinet')->assertRedirect(route('cabinet.groups'));
 
         User::query()->whereKey($user->getKey())->update($changes);
 

@@ -16,7 +16,7 @@
 - `config` — конфигурация Laravel;
 - `tests` — unit- и feature-тесты.
 
-Stage 5 добавляет первый внутренний продуктовый модуль: административное управление психологами и их приватными документами. Публичная анкета, email-onboarding, кабинет психолога и платежи в этот модуль не входят.
+Stage 5 добавил административное управление психологами и их приватными документами. Stage 6 добавляет первый продуктовый кабинет психолога: пустую до Stage 7 поверхность групп и read-only просмотр собственной анкеты и документов. Публичная анкета, email-onboarding, групповой CRUD и платежи в эти модули не входят.
 
 ## Аутентификация и доступ
 
@@ -27,6 +27,8 @@ Stage 5 добавляет первый внутренний продуктов�
 `App\Domain\User\UserSessionInvalidator` удаляет все записи настроенной database session table для одного пользователя через настроенное session connection. Сервис не зависит от текущего HTTP request и является точкой повторного использования для disable/reject/delete в Stage 5.
 
 Маршруты `/admin/psychologists` остаются внутри цепочки `stale-session -> auth -> eligible -> role:admin`. Дополнительно каждый controller action использует `UserPolicy` или `UserDocumentPolicy`: middleware не является единственной границей авторизации, а попытка подставить administrator ID вместо psychologist ID возвращает 403.
+
+Маршруты `/cabinet`, `/cabinet/groups` и `/cabinet/profile` используют ту же цепочку с границей `role:psychologist`; `/cabinet` перенаправляет в основной раздел групп. Профиль не принимает идентификатор пользователя: `CabinetController` получает текущего психолога только из authenticated request, явно проверяет `UserPolicy::viewOwnProfile` и заранее загружает `educationType` и `documents`. Выдача документа не дублируется в кабинете и по-прежнему проходит через общий `UserDocumentController` и owner-or-admin `UserDocumentPolicy`.
 
 ## Доменная модель
 

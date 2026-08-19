@@ -25,7 +25,7 @@ final class StaleAuthenticatedSessionTest extends TestCase
         $user = $this->createUser('soft-deleted@example.test');
 
         $this->post('/login', $this->credentials($user))->assertRedirect('/cabinet');
-        $protectedResponse = $this->get('/cabinet')->assertOk();
+        $protectedResponse = $this->get('/cabinet')->assertRedirect(route('cabinet.groups'));
 
         $sessionId = $this->sessionIdFrom($protectedResponse);
         $authSessionKey = $this->authSessionKey();
@@ -45,7 +45,7 @@ final class StaleAuthenticatedSessionTest extends TestCase
         $this->assertGuest();
 
         $this->post('/login', $this->credentials($user))->assertRedirect('/cabinet');
-        $this->get('/cabinet')->assertOk();
+        $this->get('/cabinet')->assertRedirect(route('cabinet.groups'));
     }
 
     public function test_session_for_missing_user_is_revoked_safely(): void

@@ -23,6 +23,11 @@ final class UserPolicy
         return $actor->admin && ! $psychologist->admin && ! $psychologist->trashed();
     }
 
+    public function viewOwnProfile(User $actor, User $psychologist): bool
+    {
+        return ! $actor->admin && $actor->is($psychologist) && ! $psychologist->trashed();
+    }
+
     public function update(User $actor, User $psychologist): bool
     {
         return $this->view($actor, $psychologist);

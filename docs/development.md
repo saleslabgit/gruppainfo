@@ -57,6 +57,12 @@ docker compose down
 
 Это локальные значения по умолчанию из `.env.example`; при env-переопределении используйте настроенные значения. Logout выполняется только POST-формой внутри защищённой области. Порог login rate limit при необходимости настраивается через `AUTH_LOGIN_MAX_ATTEMPTS` и `AUTH_LOGIN_DECAY_SECONDS` (по умолчанию 5 попыток и 60 секунд).
 
+Stage 6 cabinet routes:
+
+- `/cabinet` — вход с перенаправлением в основной раздел;
+- `/cabinet/groups` — **Мои группы**, до Stage 7 показывает truthful empty state;
+- `/cabinet/profile` — read-only **Мои данные** и приватные документы текущего психолога.
+
 Приватные документы психологов хранятся на disk `local` в `storage/app/private`. Необязательный `DOCUMENT_MAX_UPLOAD_KB` задаёт максимальный размер одного файла в килобайтах. Числовое продуктовое значение пока не утверждено, поэтому переменная по умолчанию пуста и Laravel/PHP применяют системный upload ceiling; allowlist PDF/JPEG/PNG и проверка фактического MIME действуют независимо от этого значения.
 
 `phpunit.xml` принудительно задаёт test-схему, поэтому запущенный в контейнере `php artisan test` не использует development-схему и не использует SQLite.
@@ -145,6 +151,22 @@ Bootstrap 5.3.8 хранится в `public/vendor/bootstrap` вместе с л
 
 ```bash
 docker compose exec app php artisan test tests/Feature/AdminPsychologistCrudTest.php tests/Feature/PsychologistDocumentTest.php tests/Feature/UiKitPageTest.php
+```
+
+## Ручная проверка Stage 6
+
+После seed войдите development-психологом и проверьте:
+
+1. `/cabinet` перенаправляет на `/cabinet/groups`, где нет кнопки или фиктивных данных Stage 7;
+2. desktop sidebar и mobile Drawer при ширине около 390px открывают **Мои группы**, **Мои данные** и POST logout, active state соответствует разделу;
+3. `/cabinet/profile` показывает только текущую анкету, nullable/boolean/date-time значения читаемы и нет mutation/admin controls;
+4. при наличии документов работают **Открыть** и **Скачать**, а private path и `/storage/...` не появляются в HTML или Network;
+5. в Console нет ошибок, в Network нет CDN/build-tool запросов и горизонтального overflow страницы.
+
+Сфокусированные проверки Stage 6 и сохранённых границ:
+
+```bash
+docker compose exec app php artisan test tests/Feature/PsychologistCabinetTest.php tests/Feature/AuthenticationAccessTest.php tests/Feature/StaleAuthenticatedSessionTest.php tests/Feature/PsychologistDocumentTest.php
 ```
 
 ## Проверенная диагностика

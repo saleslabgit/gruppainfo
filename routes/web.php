@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\PsychologistActionController;
 use App\Http\Controllers\Admin\PsychologistController;
 use App\Http\Controllers\Admin\PsychologistDocumentController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CabinetController;
 use App\Http\Controllers\UserDocumentController;
 use App\Support\DateTimeFormatter;
 use App\Support\MoneyFormatter;
@@ -38,7 +39,9 @@ Route::middleware(['stale-session', 'auth', 'eligible'])->group(function (): voi
     });
 
     Route::middleware('role:psychologist')->prefix('cabinet')->name('cabinet.')->group(function (): void {
-        Route::view('/', 'cabinet.index')->name('index');
+        Route::get('/', [CabinetController::class, 'index'])->name('index');
+        Route::get('/groups', [CabinetController::class, 'groups'])->name('groups');
+        Route::get('/profile', [CabinetController::class, 'profile'])->name('profile');
     });
 
     Route::get('/documents/{document}/view', [UserDocumentController::class, 'view'])->name('documents.view');
