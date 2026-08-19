@@ -1,304 +1,333 @@
-# Task: TASK-2026-08-19-06
+# Task: TASK-2026-08-19-07
 
 Status: planned
-Created from: a5daaa772176f146d4157e6baa8f37afbccb222b
+Created from: 91193a555848be8024a4ae2476e35bb51e91415a
 
 ## Title
 
-Implement the Stage 3 design-system foundation and baseline UI kit
+Fix Stage 3 visual acceptance and reusable-component gaps
 
 ## Goal
 
-Implement the reusable visual foundation that all subsequent Gruppa Info interfaces will use, while avoiding unnecessary up-front implementation of every component described in the full design specification.
+Correct the Stage 3 baseline before acceptance.
 
-Stage 3 must establish the real production-ready design tokens, local visual assets, shared Blade UI primitives, responsive application shell, and a browser-visible UI-kit page. Later stages may add specialized components only when they are first needed, but they must add them to the shared design system before using them on a product page.
+`TASK-2026-08-19-06` implemented the design-system foundation, but product-owner visual review and ChatGPT acceptance review found concrete visual and reusable-component gaps. Fix those gaps without starting Stage 4, without redesigning unrelated components, and without broadening the deferred component catalogue.
 
-The implementation must match `DESIGN_SYSTEM.md` and the approved visual reference in `uikit/index.html`; Codex must not redesign, simplify, reinterpret, or "improve" the approved visual language.
+The result must remain a single shared design system governed by `DESIGN_SYSTEM.md` and `uikit/index.html`. Where the latest product-owner feedback below changes an existing visual rule, update `DESIGN_SYSTEM.md` so the correction becomes the new durable source of truth rather than a UI-kit-only patch.
 
 ## Facts
 
-- `main` at task creation is `a5daaa772176f146d4157e6baa8f37afbccb222b`.
-- Stage 1 and Stage 2 are completed and accepted.
-- `TASK-2026-08-19-05` established mandatory design-system governance in `WORKFLOW.md` and `AGENTS.md`.
-- `DESIGN_SYSTEM.md` is authoritative for explicit visual numeric values and design implementation rules.
-- `uikit/index.html` is the approved visual reference for intent not already resolved by `DESIGN_SYSTEM.md`.
-- `uikit/` is reference material only and must not become a Laravel runtime dependency.
-- The project uses Blade, local Bootstrap 5.3.8, project CSS, and Vanilla JS only where needed.
-- Node.js, npm, Vite, frontend build steps, runtime CDN dependencies, React, Vue, Inertia, Livewire, and Tailwind are prohibited.
-- Existing runtime assets are loaded directly from `public/`.
-- The application already has shared date/time and money formatters from Stage 1.
-- The current page is only a technical placeholder and is not an approved product interface.
-- The user has explicitly chosen an incremental design-system implementation strategy: implement the reusable foundation and components needed by the near-term stages now; add specialized components later when a real product screen first requires them.
+- Current `main` at task creation is `91193a555848be8024a4ae2476e35bb51e91415a` (`codex: TASK-2026-08-19-06 implement design system foundation`).
+- Stage 1 and Stage 2 are accepted.
+- Stage 3 baseline is implemented but **not accepted yet**.
+- The current `/ui-kit` is the acceptance surface for this correction.
+- The product owner reviewed `/ui-kit` at a wide desktop viewport and reported seven visual issues listed below.
+- ChatGPT review also found reusable-component and responsive gaps listed below.
+- Latest product-owner visual feedback has priority over older design documentation where the two conflict.
+- `DESIGN_SYSTEM.md` must be updated minimally when a newly approved visual rule changes the existing system.
+- `uikit/` remains reference-only and must not become a runtime dependency.
+- No Node/npm/Vite/runtime-CDN/frontend framework may be introduced.
 
 ## Assumptions
 
-- Shared Blade UI components should live under a clear reusable namespace such as `resources/views/components/ui/`; use generic component names, never page-specific names such as `GroupCard` or `PaymentTable`.
-- The design-system stylesheet may reorganize the existing project CSS as needed, but runtime CSS remains directly served from `public/` with no compilation step.
-- Bootstrap may provide low-level layout/behavior where appropriate, but Bootstrap's default visual appearance is not the design system. Approved visual output must come from the project design tokens and component styles.
-- Montserrat and Lucide must be available locally at runtime. Vendoring pinned browser-ready assets with their licenses is preferred over introducing a package/build workflow.
-- The UI-kit route is a development/testing verification surface, not a production product page, and should not expose internal design documentation in production.
+- Fix visual problems at the shared component/token level whenever the issue is systemic; do not patch only the demo markup if the same defect would appear on product pages.
+- If an issue exists only because the UI-kit displays multiple examples side-by-side, fix the comparison/demo layout without adding an unnecessary fixed size to the production component.
+- Reuse the existing approved spacing scale. For the newly requested separation between adjacent select/navigation items, use the existing `4px` spacing token rather than inventing a new spacing value.
+- Add a minimal shared motion system for interactive micro-transitions. Use one project token pair: `160ms` duration with `ease-out`; respect `prefers-reduced-motion: reduce`. Do not animate layout dimensions.
 
 ## Unknowns
 
-- The exact local Lucide distribution version and the exact local Montserrat font-file source/version are not currently fixed in the repository. Codex may select stable official distributable assets compatible with the no-build architecture, must pin/record what was selected, include the applicable license files, and must not use runtime CDN loading.
-- Some values/patterns are intentionally marked unresolved in `DESIGN_SYSTEM.md`. They remain unresolved and must not be invented in this task.
+None that block this correction.
 
 ## Scope
 
-### 1. Align the staged implementation plan
+### 1. Form focus treatment — product-owner issues 1 and 2
 
-Update the relevant Stage 3/design-system planning wording in `SPEC.md` and project documentation so it matches the user's approved incremental strategy without weakening the final design-system rules:
+The owner reports an unclear/broken inner outline on focused fields, including:
 
-- Stage 3 implements the foundation and baseline reusable components listed in this task;
-- specialized components from the broader design-system catalogue are implemented only when a subsequent product stage first needs them;
-- a product page may never introduce its own visual replacement for a missing shared component;
-- when a later screen needs a component not yet implemented, that component is first added to the shared UI system according to `DESIGN_SYSTEM.md`, then consumed by the screen;
-- unresolved design values still require an explicit user/design decision before implementation.
+- normal text input (`#name`, `.ui-input`);
+- search input inside `.ui-search`.
 
-Keep the full component catalogue in `DESIGN_SYSTEM.md` as the target design language. Do not remove or redesign components merely because their implementation is deferred.
+Correct the focus system so form controls have **one clean visible focus treatment**, with no double/internal outline, no nested ring, and no layout shift.
 
-### 2. Design tokens and global foundations
+Requirements:
 
-Implement the shared CSS foundation from `DESIGN_SYSTEM.md`, including the approved values needed by the baseline system:
+- preserve an accessible, clearly visible primary-colored focus indication and the approved subtle halo;
+- apply focus to the correct visual control shell;
+- composite controls such as Search must use the outer shell (`:focus-within` or equivalent) and must not apply a second focus border/ring to the inner native input;
+- normal Input/Textarea/Select must not visually shrink because a thicker border is inserted inside the control;
+- update `DESIGN_SYSTEM.md` focus wording where necessary so the new owner-approved treatment is canonical;
+- do not remove keyboard focus visibility.
 
-- color tokens;
-- typography tokens and responsive heading rules;
-- spacing scale;
-- control sizes;
-- radii;
-- borders and focus system;
-- shadows/elevation;
-- base page/surface/text styles;
-- responsive breakpoints and container/application-shell behavior required by the implemented components.
+The same principle must be applied consistently to implemented form controls, not just the two examples marked by the owner.
 
-Use named CSS custom properties/tokens consistently. Do not scatter duplicated raw values across component styles when an approved token applies.
+### 2. Form composition rhythm — ChatGPT review
 
-The custom design-system styles must load after Bootstrap so they control the final appearance.
+The current `.ui-field` uses one `6px` gap for everything, while the canonical form-composition rule is:
 
-### 3. Local typography and icons
+- Label → Control: `8px`;
+- Control → Helper/Error: `12px`;
+- Helper and Error are mutually exclusive.
 
-Make the approved visual assets production-compatible with the project's no-CDN architecture:
+Implement the `8px / 12px` rhythm explicitly instead of one generic gap.
 
-- Montserrat is the only UI font; provide local runtime files for weights 400, 500, 600, and 700 and wire them through `@font-face` or the simplest equivalent direct-CSS mechanism;
-- Lucide is the only icon library; provide a pinned browser-ready local distribution suitable for direct loading without Node/npm/build tooling;
-- include the relevant font/icon license files in the vendored asset directories;
-- record the selected versions/source facts in development/architecture documentation;
-- do not load Google Fonts, unpkg, jsDelivr, or any other runtime CDN.
+`DESIGN_SYSTEM.md` currently contains older conflicting `6px` label/helper wording in component sections. Normalize those conflicting lines to the canonical §5 form-composition rhythm so future implementations do not regress.
 
-Do not copy `uikit/support.js` into the application and do not make `uikit/index.html` a runtime dependency.
+### 3. Select option separation and open-focus state — product-owner issue 4 + ChatGPT review
 
-### 4. Baseline reusable Blade components
+The owner reports that Select options have no visual separation and hover visually merges with the selected option.
 
-Implement a coherent baseline set of generic shared Blade components sufficient for Stages 4-7 and common application states. Follow the exact states, variants, dimensions, typography, spacing, focus behavior, responsive rules, and visual intent defined in `DESIGN_SYSTEM.md` and `uikit/index.html`.
+Requirements:
 
-At minimum implement shared primitives for:
+- add `4px` vertical separation between adjacent options inside the Select panel;
+- keep the selected item clearly distinct from a hovered unselected item;
+- hover/focus must not visually join two adjacent rounded option surfaces;
+- while the Select is open, the trigger must retain the approved open/focus treatment even when keyboard focus moves into an option;
+- keyboard ArrowUp/ArrowDown/Escape/selection behavior must remain correct;
+- update `DESIGN_SYSTEM.md` Select rules with the approved option gap/open-focus clarification.
 
-#### Actions
+### 4. Sidebar navigation separation — product-owner issue 5
 
-- Button with the approved baseline variants needed by the system (including primary, secondary, danger, and any other variants already defined by `DESIGN_SYSTEM.md` that naturally belong to the same button primitive);
-- Icon Button where required by baseline navigation/table/modal interactions.
+The owner reports that hovered navigation items visually merge with the active item.
 
-#### Forms
+Requirements:
 
-- Label / required indicator;
-- Text Input;
-- Textarea;
-- Select;
-- Checkbox;
-- Radio;
-- helper text / validation error presentation;
-- reusable form field composition/rhythm.
+- add `4px` vertical separation between adjacent sidebar/drawer navigation items;
+- active and hovered items must remain visually separate rounded surfaces;
+- desktop Sidebar and mobile Drawer navigation must use the same shared rule;
+- update `DESIGN_SYSTEM.md` navigation rule accordingly.
 
-Do not invent Small/Large form-control variants: the design specification explicitly leaves them unresolved.
+### 5. Shared motion / transitions — product-owner issue 6
 
-#### Feedback and data display
+The owner explicitly requires smooth transitions on buttons and other interactive elements across the application.
 
-- Alert;
-- Badge / semantic status badge primitive;
-- Card;
-- Empty State;
-- Loading presentation sufficient for normal page/component loading;
-- Error State sufficient for inline and failed-block/page states.
+Add a small shared motion layer to the design system:
 
-#### Data/list administration foundation
+- `--motion-duration-fast: 160ms`;
+- `--motion-ease-standard: ease-out`.
 
-- Table styling/component structure;
-- Table toolbar primitives needed for search/filter/result-count/action composition;
-- Pagination;
-- Dropdown Menu.
+Apply transitions consistently to implemented interactive baseline components where state changes are visual, including at minimum:
 
-These must be generic building blocks, not psychologist/group/payment-specific implementations.
-
-#### Navigation and page structure
-
-- responsive application shell;
-- desktop sidebar/navigation;
-- mobile navigation replacement required by the approved responsive shell (implement the generic Drawer primitive if that is the design-system pattern needed to do this correctly);
-- page header;
-- basic header/topbar behavior only where required by the approved shell.
-
-#### Overlays / confirmation
-
-- Modal;
-- Confirmation pattern/dialog using the approved neutral/destructive action ordering and variants.
-
-#### Existing domain presentation helpers
-
-- reusable Blade presentation for date/time using the existing centralized formatter;
-- reusable Blade presentation for money using the existing centralized formatter;
-- do not duplicate timezone or money-formatting logic in Blade components.
-
-### 5. Explicitly deferred components
-
-Do **not** implement components only for catalogue completeness when they are not required by the baseline above.
-
-Unless they are genuinely required internally to satisfy the responsive shell or another baseline component, defer specialized components such as:
-
-- Stepper;
-- Choice Card;
-- Timeline;
-- Metric;
-- Progress;
-- specialized document/file item;
-- specialized upload/dropzone interaction;
-- Tabs/Breadcrumbs/Popover/Tooltip/Toast/Chips/Switch and other catalogue items that are not needed by the baseline acceptance surface.
-
-When a later stage first needs one of these, it must be implemented as a shared design-system component before product-page use.
-
-Do not use this deferred list as permission to invent a page-specific substitute.
-
-### 6. UI-kit verification page
-
-Create a Laravel/Blade UI-kit page that renders the implemented system from the actual production CSS/JS and Blade components, not copied markup/styles from `uikit/index.html`.
-
-The page must allow visual verification of the implemented baseline, including as applicable:
-
-- typography and core colors;
 - buttons and icon buttons;
-- form controls and labels;
-- normal, disabled, validation/error, and success/semantic states;
-- alerts and badges;
-- cards;
-- table + toolbar + pagination;
-- dropdown;
-- modal and confirmation behavior;
-- navigation/application shell;
-- empty/loading/error states;
-- date/time and money presentation;
-- keyboard focus behavior;
-- desktop and mobile responsive behavior.
+- links/navigation items;
+- Input/Textarea/Search/Select shells;
+- Select and Dropdown items;
+- pagination controls;
+- interactive cards;
+- table-row hover state;
+- other existing baseline interactive controls where the same treatment is appropriate.
 
-The UI-kit route must be available for local development/testing and must not become a normal public production route.
+Transition only visual micro-interaction properties such as `color`, `background-color`, `border-color`, `box-shadow`, and `opacity` where applicable. Do not animate width/height/layout geometry.
 
-Keep this page a verification surface. Do not rebuild the huge source reference document one-to-one and do not copy `uikit/index.html` into a Blade template.
+Respect `prefers-reduced-motion: reduce` by effectively disabling nonessential project-defined transitions/animations.
 
-### 7. JavaScript behavior
+Do not replace or fight Bootstrap's existing Modal/Offcanvas transition mechanism unless a concrete visual defect requires it.
 
-Use the minimum JavaScript required for the implemented interactive components.
+Add the motion rule/tokens to `DESIGN_SYSTEM.md` so this is a permanent site-wide rule.
 
-- Prefer existing local Bootstrap behavior where it satisfies interaction needs without changing the approved visual design.
-- Keep project-specific JS in the existing direct-runtime approach (`public/`, no build step).
-- Ensure keyboard interaction and focus behavior work for interactive baseline components.
-- Do not add a frontend framework or package manager.
+### 6. Confirmation patterns shown at inconsistent sizes — product-owner issue 3
 
-### 8. Documentation and report
+On the UI-kit page, the two side-by-side confirmation examples have visibly different heights because their text wraps differently.
 
-Update documentation to describe the actual implemented state:
+Correct the comparison presentation so paired confirmation examples in the same UI-kit row appear as equal-height cards.
 
-- `docs/architecture.md` — design-system implementation structure, component location, token/runtime-asset boundaries;
-- `docs/development.md` — UI-kit route, local font/icon assets, and how to verify the design system;
-- `docs/project-status.md` — Stage 3 baseline implementation status and the rule that specialized components remain incremental;
-- `README.md` only if a small orientation link/change is genuinely useful;
-- `.ai/report.md` — factual implementation report and actual checks.
+Important boundary:
 
-Do not claim deferred components are implemented.
+- keep the production Confirmation component's approved `340px` width and content-driven intrinsic height;
+- do **not** invent a global fixed confirmation height;
+- equalize the side-by-side demo/comparison layout through its parent layout or an appropriate reusable equal-height layout treatment.
+
+### 7. Card body phantom bottom spacing — product-owner issue 7
+
+The owner reports an unexplained bottom gap inside the Section Card body.
+
+Remove default descendant margins that create phantom extra space at the bottom of Card content.
+
+At minimum:
+
+- the final child inside Card body/header/footer must not introduce an unintended trailing margin;
+- preserve intentional component padding from `DESIGN_SYSTEM.md`;
+- solve this generically for the Card component rather than only changing the sample paragraph.
+
+### 8. Production-ready Pagination — ChatGPT review blocker
+
+The current `x-ui.pagination` hard-codes pages `1`, `2`, `…` and is a demo rather than a reusable application component.
+
+Replace it with a real generic pagination component suitable for upcoming Laravel list pages.
+
+Requirements:
+
+- no hard-coded page numbers or totals in the production component;
+- primary API should work naturally with Laravel paginator data (prefer accepting a Laravel paginator object or an equally reusable generic pagination state that can be built from it without page-specific code);
+- render current page, previous/next availability, page links/ellipsis as applicable, and range/total information from real state;
+- preserve the visual specification for pagination;
+- use links/URLs for real navigation rather than inert demo-only buttons when URLs are available;
+- keep a deterministic UI-kit example by constructing/passing demo pagination data **from the UI-kit page/test**, not embedding fake data inside the component;
+- add focused tests proving different current-page/total states render correctly.
+
+### 9. Mobile Modal / Confirmation actions — ChatGPT review blocker
+
+The design system requires mobile action groups in forms/modals to stack vertically, use full-width buttons, and show the primary/destructive action first visually.
+
+Fix the responsive baseline for:
+
+- `.modal-footer` action groups;
+- `.ui-confirmation__actions`;
+- any shared action-row primitive already used for the same pattern.
+
+Desktop/tablet ordering must remain the approved Secondary-left / Primary-or-Danger-right arrangement.
+
+On mobile:
+
+- buttons are full width;
+- actions stack vertically;
+- Primary/Danger appears first visually;
+- spacing follows existing design tokens.
+
+Do not introduce duplicate mobile-only component markup if CSS/shared component structure can solve the behavior cleanly.
+
+### 10. Input password and readonly states — ChatGPT review blocker
+
+The baseline Input must be usable by the upcoming authentication stage.
+
+Implement the already-specified states that are currently missing/inaccurate:
+
+- `readonly` must use the approved readonly presentation (`#71695F` text), not disabled text styling;
+- `type=password` must include the specified trailing eye control/icon and allow the user to reveal/hide the password;
+- the password toggle must be keyboard-accessible and have a meaningful accessible label/state;
+- preserve the 40px control shell and approved suffix-icon sizing/position;
+- do not add a new form-control size.
+
+Use minimal Vanilla JS in the existing direct-runtime file for the password toggle.
+
+### 11. UI-kit acceptance coverage
+
+Update `/ui-kit` so every corrected behavior can be inspected without product pages.
+
+At minimum expose/test examples for:
+
+- focused normal Input and focused Search without an inner/double outline;
+- correct Label→Control→Helper/Error rhythm;
+- Select with separated options and distinct hover/selected/open focus behavior;
+- adjacent active/hover sidebar navigation items;
+- transitions on representative interactive controls;
+- equal-height side-by-side Confirmation examples;
+- Section Card body with no phantom trailing gap;
+- Pagination in at least two meaningful states;
+- readonly Input and password reveal/hide behavior;
+- mobile Modal/Confirmation action stacking.
+
+Do not turn the UI-kit page into product functionality.
+
+### 12. Design-system and documentation synchronization
+
+Update `DESIGN_SYSTEM.md` only where the latest owner-approved visual feedback changes or resolves a rule:
+
+- form-control focus treatment;
+- canonical 8px/12px form rhythm where old 6px wording conflicts;
+- Select option `4px` gap/open-focus behavior;
+- Sidebar/Drawer nav-item `4px` gap;
+- shared 160ms/ease-out motion rule and reduced-motion behavior;
+- generic Card trailing-content margin rule if needed to prevent future recurrence.
+
+Do not rewrite unrelated tokens/components.
+
+Update `docs/project-status.md`, `docs/architecture.md`, or `docs/development.md` only if needed to keep factual Stage 3 implementation/verification guidance current. Do not add documentation churn.
+
+Replace `.ai/report.md` with the factual report for this correction.
 
 ## Out Of Scope
 
-- Stage 4 authentication/integration functionality.
-- Admin psychologist management flows.
-- Psychologist cabinet product pages.
-- Group creation/moderation flows.
-- Payment, scheduler, application, or external-integration behavior.
-- Implementing every component in `DESIGN_SYSTEM.md` merely for completeness.
-- Filling any unresolved design-system value.
-- Redesigning approved tokens/components.
-- Importing `uikit/index.html` or `uikit/support.js` into Laravel runtime.
-- Page-specific CSS/component forks.
-- Node.js, npm, Vite, frontend compilation, runtime CDN assets, or new frontend frameworks.
-- Backend/domain refactoring unrelated to rendering the baseline UI system.
+- Stage 4 authentication/integration implementation.
+- Admin or psychologist product pages.
+- New business/domain behavior.
+- Implementing deferred design-system catalogue components unrelated to these fixes.
+- Redesigning unrelated approved components or tokens.
+- Changing `uikit/index.html` / `uikit/support.js`.
+- Adding Node/npm/Vite, runtime CDN dependencies, frontend frameworks, or new build tooling.
+- Broad CSS refactoring not required to fix the listed issues.
+- Page-specific forks of shared components.
 
 ## Constraints
 
-- Follow `WORKFLOW.md`, `AGENTS.md`, `DESIGN_SYSTEM.md`, and the current `SPEC.md` source-of-truth hierarchy.
-- Before UI work, inspect `uikit/index.html` as required by governance.
-- Explicit numeric design values and implementation rules in `DESIGN_SYSTEM.md` win over visual approximation.
-- When `DESIGN_SYSTEM.md` is silent, use `uikit/index.html` for approved visual intent; if neither source resolves a required decision, stop/report instead of inventing.
+- Follow `WORKFLOW.md`, `AGENTS.md`, and the updated `DESIGN_SYSTEM.md` governance.
+- Treat the latest product-owner feedback in this task as an approved design correction and update `DESIGN_SYSTEM.md` where required.
+- Keep all fixes shared/reusable where the defect is systemic.
 - Keep `uikit/` reference-only.
-- Use generic reusable component names and APIs.
-- No one-off or page-specific copies of shared UI primitives.
-- Preserve the current Laravel/Blade/Bootstrap/no-build architecture.
-- Do not alter Stage 2 business/domain behavior.
-- Do not commit secrets, local data, caches, logs, temporary screenshots, or unrelated artifacts.
+- Preserve local Bootstrap, local Montserrat, local Lucide, and no-build runtime architecture.
+- Preserve Stage 2 domain behavior and Stage 3 environment guard for `/ui-kit`.
+- Do not commit screenshots, the visual-review ZIP, local browser artifacts, logs, caches, or secrets.
 
 ## Acceptance Criteria
 
-1. The Laravel application has a real shared design-token layer matching the explicit applicable values in `DESIGN_SYSTEM.md`.
-2. Montserrat 400/500/600/700 loads locally with no runtime font CDN request.
-3. Lucide loads locally with a pinned/recorded distribution and no runtime icon CDN request.
-4. The implemented baseline Blade components are generic, reusable, and centralized; no page-specific visual duplicates are introduced.
-5. Buttons, forms, feedback states, badges, cards, tables, toolbar/pagination, dropdown, modal/confirmation, navigation/shell, empty/loading/error states, and date/money presentation can be inspected on the UI-kit page.
-6. Implemented controls/components match the required visual states, dimensions, spacing, typography, colors, radii, and focus behavior from `DESIGN_SYSTEM.md`.
-7. The application shell and UI-kit verification surface work at desktop and mobile widths according to the approved responsive rules.
-8. Keyboard focus is visible and conforms to the approved focus system for implemented focusable controls.
-9. Date/time rendering continues to use the existing centralized `Europe/Minsk` presentation path; money rendering continues to use the existing integer-minor-unit formatter.
-10. The UI-kit page is development/testing-only and is not exposed as a normal production route.
-11. `uikit/index.html` and `uikit/support.js` remain reference-only and unchanged unless a truly necessary reference-path correction is identified; they are not loaded by Laravel runtime.
-12. No Node/npm/Vite/frontend build step or runtime CDN dependency is introduced.
-13. Specialized deferred components are not implemented merely for completeness and product-specific pages are not started.
-14. `SPEC.md`/documentation accurately record the incremental design-system strategy so later tasks cannot misread the deferred components as permission for page-specific styling.
-15. Automated project checks remain green and targeted rendering/route tests cover the new UI-kit foundation where practical.
-16. `.ai/report.md` accurately lists implemented vs deferred components, local assets, checks, visual/runtime verification, and any remaining gaps.
-17. Final diff contains only changes necessary for the Stage 3 baseline design-system implementation.
+1. Focused Input/Textarea/Search/Select controls have one clean visible focus treatment with no inner/double outline or layout shift.
+2. Search uses its outer shell for focus; the nested native search input does not get a second ring.
+3. Form rhythm is `8px` Label→Control and `12px` Control→Helper/Error, with no conflicting `6px` implementation/documentation rule remaining for that composition.
+4. Select options have `4px` separation; hover/focus never visually merges with the selected option; trigger retains open-focus treatment while the list is open.
+5. Sidebar and mobile Drawer navigation items have `4px` separation and distinct active/hover surfaces.
+6. Shared interactive baseline components use the approved `160ms ease-out` motion tokens, and reduced-motion users do not receive nonessential project animations/transitions.
+7. Side-by-side UI-kit Confirmation examples render equal-height without imposing an arbitrary global fixed height on the production component.
+8. Section Card content has no unintended trailing bottom margin beyond approved component padding.
+9. Pagination is data-driven/reusable and can render real Laravel pagination state; no page numbers/totals are hard-coded in the production component.
+10. Mobile Modal and Confirmation action groups stack full-width with Primary/Danger first visually; desktop/tablet Secondary-left / Primary-or-Danger-right remains correct.
+11. Readonly Input uses approved readonly styling and is visually distinct from disabled.
+12. Password Input has an accessible reveal/hide control using the approved icon system and minimal Vanilla JS.
+13. `/ui-kit` demonstrates all corrected states and remains unavailable in production.
+14. `DESIGN_SYSTEM.md` records the newly approved focus, form rhythm, spacing, and motion rules so later pages cannot regress.
+15. No Stage 4/product functionality or deferred unrelated component is implemented.
+16. Existing local asset/no-CDN/no-build constraints remain intact.
+17. Full automated project checks pass and browser verification covers the corrected desktop/mobile interactions.
+18. `.ai/report.md` accurately records all fixes, checks, remaining unresolved design values, and user visual acceptance as still pending.
+19. Final diff contains only files necessary for this Stage 3 correction.
 
 ## Checks
 
 Run and report at minimum:
 
-- targeted tests for the UI-kit route/component rendering and any new environment guard;
+- focused feature/component tests for Pagination data states and `/ui-kit` production guard;
 - full `php artisan test` on the isolated MySQL test database;
-- `composer check` (or its current equivalent aggregate checks), including Pint and Larastan/PHPStan;
-- `composer check-platform-reqs` if not already included in the aggregate command;
-- verify the UI-kit page responds successfully in development/testing;
-- inspect rendered HTML/runtime asset references and verify there are no Google Fonts, unpkg, jsDelivr, or other runtime CDN dependencies;
-- verify local Montserrat and Lucide runtime assets exist and are actually referenced by the application;
-- verify the UI-kit page in a real browser at desktop and mobile viewport sizes if browser tooling is available without adding project dependencies; if unavailable, report the limitation clearly for user manual acceptance rather than claiming visual verification;
-- exercise keyboard focus and interactive baseline controls where browser tooling is available;
+- `composer check` including Pint and Larastan/PHPStan;
+- `composer check-platform-reqs`;
+- JS syntax check for `public/app.js`;
+- local HTTP `/ui-kit` response check;
+- real-browser desktop verification, including a wide viewport comparable to the owner's review (`2174×937`) and a normal desktop viewport;
+- real-browser mobile verification around `390×844`;
+- verify Input and Search focus computed styles and visually confirm there is no inner/double outline;
+- verify Select open/hover/selected states and option separation;
+- verify active + hovered nav items remain visually separate;
+- verify representative computed `transition-duration` / easing and `prefers-reduced-motion` behavior;
+- verify paired Confirmation examples have equal rendered height on the acceptance page;
+- verify Section Card body has no unintended trailing margin;
+- verify Pagination URLs/state change correctly from supplied paginator data;
+- verify password toggle by keyboard and click, including accessible label/state;
+- verify mobile Modal/Confirmation action width/order;
+- browser console/network inspection: no errors/warnings caused by the changes and no runtime CDN requests;
 - `git diff --check`;
 - final `git status --short`, full diff, and staged-file inspection.
 
-The user remains the product tester for final visual acceptance. Automated tests cannot substitute for checking visual conformance to `DESIGN_SYSTEM.md` and `uikit/index.html`.
+Final visual acceptance remains with the product owner.
 
 ## Hard Workflow Gate
 
 Before implementation:
 
-- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, `DESIGN_SYSTEM.md`, relevant `SPEC.md` sections, `docs/architecture.md`, `docs/development.md`, and `docs/project-status.md`;
-- inspect `uikit/index.html` sufficiently to understand the implemented baseline components and responsive shell;
+- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, `DESIGN_SYSTEM.md`, relevant Stage 3 `SPEC.md`, and current Stage 3 documentation;
+- inspect the current `/ui-kit` implementation and relevant shared Blade components/CSS/JS;
+- inspect `uikit/index.html` where needed for unchanged visual intent;
 - run `git log --oneline -5` and `git status --short`;
-- confirm `TASK-2026-08-19-06` is the current planned task and has not already been completed;
+- confirm `TASK-2026-08-19-07` is the current planned task and `TASK-2026-08-19-06` has already been implemented but not accepted;
 - do not touch unknown local changes.
 
 Before commit:
 
-- complete the applicable automated/runtime checks;
-- update `.ai/report.md` with actual results and an explicit implemented/deferred component list;
-- inspect `git status --short`, full diff, and staged files;
-- stage only task-related files;
-- ensure no secrets, unrelated artifacts, caches, generated screenshots, or local data are included.
+- complete the required automated/browser checks;
+- update `.ai/report.md` with actual results;
+- inspect final Git status, full diff, and staged files;
+- stage only files related to this correction;
+- ensure no screenshots, review ZIPs, browser artifacts, secrets, logs, caches, or unrelated files are included.
 
 If the gate passes, commit with:
 
-`codex: TASK-2026-08-19-06 implement design system foundation`
+`codex: TASK-2026-08-19-07 fix Stage 3 visual acceptance gaps`
 
-If a required visual decision is unresolved or safe completion is impossible, report `partial`, `blocked`, or `failed` instead of inventing a design rule.
+If safe completion is impossible, report `partial`, `blocked`, or `failed` instead of claiming success.
