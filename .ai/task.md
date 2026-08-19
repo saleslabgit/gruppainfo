@@ -1,538 +1,296 @@
-# Task: TASK-2026-08-19-13
+# Task: TASK-2026-08-19-14
 
 Status: planned
-Created from: ea2999606c79b861ed6f52b9de99dc6563328613
+Created from: 2cba80312e0118bbf7160f23b2cf241d5b107a32
 
 ## Title
 
-Implement Stage 7 group CRUD and moderation
+Fix Stage 7 acceptance blockers
 
 ## Goal
 
-Implement the revised `SPEC.md` Stage 7 as the complete internal group-management and moderation workflow, without bank/payment integration and without starting later lifecycle, applications, external API, or email stages.
+Close the four confirmed Stage 7 acceptance blockers without redesigning or expanding the accepted group CRUD/moderation architecture.
 
-After this task a psychologist can create a draft group, fill and save its data, submit it for moderation, see moderation feedback/history, revise and resubmit when requested, view every own group, and delete only permitted groups. An administrator can list/search/filter/sort/paginate groups, create/view/edit groups, moderate them through the existing domain state machine, inspect full history, manually delete abandoned draft records, and activate an approved group after manual publication with correct placement dates and optional external catalog ID.
+After this correction:
 
-The workflow must remain state-machine driven:
+- admin draft cleanup cannot delete a group that still has a successful non-refunded payment, and rejection UI warns about such a payment without introducing refund/bank functionality;
+- groups and status history remain readable and correctly attributed after a psychologist is soft-deleted;
+- shared Money Input has exactly one composite focus ring on its outer shell;
+- a normally seeded local/testing environment can complete the real psychologist `draft -> moderation` flow, and any failed submission shows an explicit actionable validation error instead of appearing to do nothing.
 
-`draft -> moderation -> revision/rejected/approved -> active`
-
-`awaiting_payment` must not be reachable from any Stage 7 UI/action. No Stage 7 action creates `gp_payments`, redirects to a bank, or depends on a payment provider.
+Stage 7 remains unaccepted until all four blockers are closed.
 
 ## Facts
 
-- Current `main` at task creation is `ea2999606c79b861ed6f52b9de99dc6563328613` (`codex: TASK-2026-08-19-12 implement Stage 6 psychologist cabinet`).
-- Stage 1–5 are accepted technically; Stage 6 is implemented and technically accepted, and the user explicitly requested the next stage.
-- Current `SPEC.md` Stage 7 requires psychologist group creation/form/view/edit/delete/list, admin CRUD/list, moderation, comments/rejection reason, status history, manual activation, `external_catalog_id`, manual abandoned-draft deletion, policies and IDOR protection.
-- Stage 7 acceptance explicitly requires the payment flow to remain absent even for a psychologist whose `gp_users.free=false`.
-- `gp_groups` and `gp_group_status_history` already exist from Stage 2 with the required columns, indexes, soft delete, relations, `public_uuid`, moderation fields, publication fields and placement fields. Do not add a replacement group schema.
-- `GroupStatus` already contains `awaiting_payment`, `draft`, `moderation`, `revision`, `rejected`, `approved`, `active`, `expired` and the approved transition matrix.
-- `GroupStatusTransitionService` already uses `lockForUpdate`, rejects invalid/stale transitions, changes status and writes `gp_group_status_history` atomically. It is the mandatory status-transition boundary and must be reused rather than bypassed.
-- `SettingService` and `SettingKey::PlacementDurationDays` already exist. `SettingSeeder` provides `placement_duration_days=30` by default.
-- `Group` already generates `public_uuid` on creation and casts status, monetary minor units and publication timestamps.
-- Existing dictionaries include definitions for `group_format` and `gender`, but product dictionary item values are intentionally not seeded because they are not approved yet.
-- Existing cabinet `/cabinet/groups` is the truthful Stage 6 empty surface that Stage 7 must now replace with the real own-group list.
-- Stage 5 provides the real admin shell, Table/Toolbar/Search/Filters/Pagination, Modal, Form controls, Description List and corrected List/Form/Detail compositions.
-- `DESIGN_SYSTEM.md` already defines the shared Timeline component (§4.35) and Money Input visual (§4.10), but Timeline is not implemented in the shared Blade namespace and the existing `x-ui.money` is display-only.
-- `uikit/index.html` contains approved Timeline, Money, Table/List, form, Modal/Confirmation and responsive reference examples. It remains reference-only.
-- `SPEC.md §12` defines the Russian group status labels; raw status codes must not be duplicated through views.
-- `SPEC.md §14` allows psychologist editing only in `draft` and `revision`, viewing of every own group, and psychologist deletion only in `draft` and `rejected` when there is no successful non-refunded payment.
-- Stage 8 owns automatic expiry and free extension. Stage 10 owns participant applications/counters. Stage 13 owns bank/payment integration.
+- Current `main` at task creation is `2cba80312e0118bbf7160f23b2cf241d5b107a32` (`codex: TASK-2026-08-19-13 implement Stage 7 group CRUD and moderation`).
+- The Stage 7 implementation otherwise passed its reported full gate: 86 tests / 957 assertions, Pint and Larastan/PHPStan.
+- Existing psychologist delete already blocks a linked payment with `status=succeeded`, but admin `GroupPolicy::cleanup()` currently checks only `draft/awaiting_payment` and therefore allows cleanup despite a successful payment.
+- `SPEC.md` requires manual group deletion to be blocked while there is a successful payment without a refund mark. It also requires the rejection interface for a paid group with a successful payment to remind the administrator about manual refund handling and show payment data.
+- `gp_payments` already contains `transaction_id`, `amount`, `currency`, `status`, `paid_at`, `refunded_at`, `refund_comment`, timestamps and soft delete. No payment schema change is needed.
+- Stage 7 must not create payments or implement refunds/bank integration; Stage 13 owns that functionality.
+- `Group::owner()` and `GroupStatusHistory::actor()` currently do not use `withTrashed()`. Stage 5 can soft-delete psychologists while preserving their related data.
+- Admin group list/detail accesses group owner identity. Status Timeline currently treats a missing actor relation as `Система`, even if the history row has `actor_type=user`.
+- Existing `UserActionHistory` already preserves soft-deleted target/actor relations with `withTrashed()` and is the repository precedent for historical attribution.
+- Shared Money Input uses an outer `:focus-within` ring, but its nested native `<input>` also matches the global `input:focus-visible` rule, producing a second focus ring. `DESIGN_SYSTEM.md` requires composite controls to render focus only on the outer shell.
+- `SubmitGroupRequest` correctly performs the complete-data validation and existing automated tests prove that a valid group transitions through `GroupStatusTransitionService` from `draft` to `moderation`.
+- A normal `DatabaseSeeder` currently creates only the `group_format` and `gender` dictionary definitions; it creates no items for them. Stage 7 browser verification used temporary dictionary items and removed them afterwards.
+- Therefore a freshly seeded local environment does not have selectable values for the required `format_id` and `gender_id`, so a real product-owner manual Stage 7 submission cannot be completed from normal seed state.
+- Failed submit validation returns to the group detail with `$errors`, but current cabinet layout/detail shows only `session('status')` / `session('error')`; validation errors from the submit action are not surfaced, making failure look like a no-op.
+- Production dictionary item values remain unapproved and must not be invented. Stage 8 owns real dictionary/settings administration.
 
 ## Assumptions
 
-- Stage 7's temporary “free path for everyone” means **bypassing the payment gate**, not falsifying the historical tariff snapshot. On group creation copy the current psychologist `free` flag into `gp_groups.free` per `SPEC.md §4.4`, but regardless of whether that value is `true` or `false`, create the group directly in `draft` and create no payment. A `free=false` psychologist must therefore still reach the same Stage 7 CRUD/moderation flow.
-- Psychologist **Добавить группу** should follow the existing free-group scenario: create a minimal empty `draft` first, then redirect to its edit form. This intentionally makes abandoned drafts possible and matches the nullable Stage 2 schema.
-- Draft/revision save may persist incomplete data, but every supplied value must still pass type/range/dictionary validation. Transition to `moderation` is the completeness gate and must validate the full business form before calling the status service.
-- The moderation completeness gate should require the group content fields named by `SPEC.md §11`: name, description, schedule, format, meeting duration, participant count, gender and meeting price. System/admin fields (`status`, `disabled`, `accept`, `free`, `public_uuid`, moderation comments, external ID, publication/expiry fields) are never trusted from psychologist form input.
-- Meeting duration and participant count must be positive integers. Meeting price is entered for humans in BYN but stored exactly as integer minor units; do not use `float`/binary floating point for parsing.
-- Admin creation may select an active non-admin psychologist as owner. Once a group exists, generic edit forms do not silently reassign ownership unless an existing repository rule explicitly requires it.
-- Admin may edit group content regardless of group status, as allowed by `SPEC.md §14`; status itself remains changeable only through explicit domain actions.
-- Admin soft-delete in this stage is intended for manual cleanup of draft/`awaiting_payment` records, especially abandoned drafts. Do not add a generic destructive action for active/approved/moderation groups merely because “CRUD” appears in the stage description.
-- The existing successful-payment deletion guard is a safety invariant, but Stage 7 must not add payment creation/history UI. If a pre-existing/test `succeeded` payment is linked to a group, psychologist deletion must remain denied; no new bank behavior is introduced.
-- Revision and rejection comments are persisted both in the existing current-field representation (`moderator_comment` / `rejection_reason`) where applicable and in immutable status history. History is the durable record and previous comments must never be overwritten there.
-- Activation is an explicit admin action from `approved` only. It may accept optional `external_catalog_id`; publication timestamps are generated by the application, never user-entered.
-- Group status presentation should be centralized on the enum (or one equivalent shared mapper) using the exact Russian labels from `SPEC.md §12` and existing Badge semantic variants only.
-- Timeline must be implemented generically in `resources/views/components/ui/` before first product use and demonstrated on `/ui-kit`.
-- The first editable meeting-price field requires a generic shared Money Input conforming to `DESIGN_SYSTEM.md §4.10`; do not create a group-specific money control.
+- A payment blocks destructive cleanup when it represents a successful placement that has not been marked refunded. Use the existing payment status/refund facts; do not invent a second payment lifecycle.
+- A `refunded` payment must not keep the cleanup blocked merely because it was successful in the past. Preserve the existing domain status semantics rather than adding ad-hoc flags.
+- Rejection itself remains allowed when such a payment exists; the requirement is a visible warning/reminder and payment facts, not a new Stage 7 refund action.
+- For historical status attribution, `Система` is valid only when the history row is actually `actor_type=system`. A soft-deleted user actor remains a user actor and must remain identifiable from retained data.
+- To make Stage 7 manually testable before Stage 8, it is acceptable to add clearly technical **local/testing-only** dictionary item fixtures for `group_format` and `gender`, following the same environment gate used for development admin/psychologist seeds. These values are test fixtures, not product dictionary decisions.
+- Local/testing fixture labels/codes must be obviously non-production/test-only and must never be created by production seeding.
+- The submit interaction may stay on group detail; the correction does not need a new wizard or new page pattern. If submit validation fails, the detail page must visibly explain that required group data is incomplete/invalid and expose the concrete validation messages plus a truthful route back to editing where the policy allows it.
 
 ## Unknowns
 
-Two numeric product values are not defined anywhere in the current repository/specification and must **not** be invented:
-
-1. `SPEC.md` says rejection reason has a minimum length, but does not define the number. Stage 7 must enforce a required, trimmed, non-empty reason now, but must not invent `min:N`. Record the missing numeric threshold in the report/status documentation.
-2. `SPEC.md §22` defines an “abandoned drafts older than N days” quick filter, but no `N` or setting key exists. Implement the fully defined quick filters (`approved` awaiting publication and `expired` requiring removal), normal `draft` status filtering, and manual draft deletion; do not implement a fake abandoned-age threshold. Record this unresolved value for a later product/settings decision.
-
-Dictionary item values for group format/gender are also intentionally unapproved. Do not seed invented product values. Automated/browser verification may create clearly temporary test fixtures and must remove development fixtures afterwards.
-
-These unknown numeric values do not block the core Stage 7 CRUD/moderation acceptance flow.
+- The production values for `group_format` and `gender` remain intentionally unknown. Do not seed product-looking production values.
+- The numeric minimum length for rejection reason and abandoned-draft age threshold remain unresolved from TASK-13 and are not part of this correction.
 
 ## Scope
 
-### 1. Group domain/application workflow boundary
+### 1. Successful-payment safety for admin cleanup
 
-Build the smallest group application/domain coordination needed around the existing `GroupStatusTransitionService`.
-
-Requirements:
-
-- never assign `group.status` directly from controllers, requests, Blade or generic mass-assignment endpoints;
-- every status transition goes through `GroupStatusTransitionService`;
-- multi-step actions that combine transition + side fields must be atomic in one outer transaction;
-- use row locking/current DB state for mutation authorization/invariants where stale route-bound models could otherwise allow an invalid operation;
-- keep controllers thin;
-- do not create a second transition matrix or duplicate history-writing logic.
-
-Explicit Stage 7 actions:
-
-- psychologist submit: `draft -> moderation`;
-- psychologist resubmit after corrections: `revision -> moderation`;
-- admin request revision: `moderation -> revision`, required comment;
-- admin reject: `moderation -> rejected`, required non-empty reason;
-- admin approve: `moderation -> approved`;
-- admin activate: `approved -> active`.
-
-A forged POST/PATCH attempting any other transition must fail safely and leave status/history/side fields consistent.
-
-### 2. Group creation and free-path override for Stage 7
-
-Psychologist creation:
-
-- expose a real **Добавить группу** action from **Мои группы**;
-- create a non-admin-owned `gp_groups` row for the authenticated psychologist only;
-- `status=draft`;
-- `disabled=false`;
-- copy `owner.free` to `group.free`;
-- let the model generate `public_uuid`;
-- do not write `accept`;
-- do not create `gp_payments`;
-- do not use `awaiting_payment` even when `owner.free=false`;
-- redirect immediately to the draft edit form.
-
-Admin creation:
-
-- provide a protected admin group-create flow using an existing active non-admin psychologist as owner;
-- same initial Stage 7 state rules: `draft`, no payment, snapshot owner tariff, generated UUID;
-- do not create new psychologist records from the group form.
-
-Test explicitly that a `free=false` psychologist creates a `free=false` **draft** with zero payment rows.
-
-### 3. Shared group form and validation
-
-Implement one reusable group form composition used by psychologist/admin pages where appropriate.
-
-Editable business fields from existing `gp_groups`:
-
-- `name`;
-- `description`;
-- `schedule`;
-- `format_id` from active `group_format` dictionary items;
-- `meeting_duration_minutes`;
-- `participant_count`;
-- `gender_id` from active `gender` dictionary items;
-- `price_per_meeting` entered as a human BYN amount and stored as integer minor units.
-
-Validation rules:
-
-- draft/revision save accepts incomplete fields but validates any supplied values;
-- moderation submission requires the full business form;
-- dictionary IDs must belong to the correct active dictionary, not merely exist globally;
-- string DB limits must be respected where the schema defines them;
-- positive integer rules for duration/count;
-- price conversion must be exact and reject malformed/over-precision input without floats;
-- validation errors use shared field-level error presentation and preserve entered values.
-
-Never accept generic form writes to:
-
-- owner ID from psychologist requests;
-- `status`;
-- `disabled`;
-- `accept`;
-- `free`;
-- `public_uuid`;
-- `moderator_comment` / `rejection_reason`;
-- `external_catalog_id` from psychologist forms;
-- `published_at`, `expires_at`, `expiry_warning_sent_at`, `placement_days`;
-- timestamps/deleted state.
-
-Implement the shared Money Input first if needed. Follow `DESIGN_SYSTEM.md §4.10` exactly and update `/ui-kit`; do not modify `DESIGN_SYSTEM.md` to justify implementation choices.
-
-### 4. Psychologist **Мои группы** real list
-
-Replace the Stage 6 empty-only page with the real ownership-scoped group list.
+Correct the admin cleanup boundary so a `draft` / existing `awaiting_payment` group cannot be soft-deleted while it has a successful non-refunded payment.
 
 Requirements:
 
-- query only current authenticated psychologist's non-deleted groups;
-- never accept an owner/user filter from the client;
-- use a bounded/paginated list suitable for growth;
-- use the approved List composition and shared Table/Toolbar/Pagination primitives;
-- Toolbar may contain the truthful result count and real **Добавить группу** action; do not invent search/filter controls not required for this user list;
-- show at minimum group name, centralized status, format, creation date and available view action;
-- show publication/expiry values only when present and truthfully as `Не указано`/equivalent when absent;
-- do **not** show application counters yet; Stage 10 owns internal application work;
-- no payment-history surface;
-- empty state now includes the real add-group action;
-- list query must not produce N+1 queries.
+- enforce the invariant server-side, not only by hiding the button;
+- keep the invariant true when `GroupWorkflowService::delete()` re-authorizes the freshly locked group;
+- use the existing payment relation/status model and existing `PaymentStatus` enum;
+- preserve psychologist deletion safety and align it with the same semantic rule where necessary;
+- once a payment is actually in the existing refunded state, cleanup may proceed if all other cleanup rules allow it;
+- do not add refund mutation endpoints, payment admin CRUD, bank adapters, webhook handling, or payment creation.
 
-Available actions must be status-driven and truthful. Do not render an edit/delete/submit control when policy/domain rules do not permit that action.
+Admin group detail must be truthful:
 
-### 5. Psychologist group detail/edit/delete/submit
+- when cleanup is blocked by a successful non-refunded payment, do not render a destructive cleanup action as available;
+- show a clear warning that the payment must be handled/refunded before destructive cleanup;
+- expose only safe existing payment facts needed by the administrator: amount/currency through shared money presentation, `transaction_id` when present, and paid date/time when present;
+- never expose raw `bank_response`.
 
-Group detail:
+Add regression coverage proving:
 
-- owner can view every own non-deleted group regardless of status;
-- another psychologist cannot view it by changing the group ID;
-- show full group data, status, dates, optional external catalog ID if present, and current relevant moderation feedback;
-- show full immutable status/comment history;
-- use the shared Timeline component for history;
-- history actor/date/comment must be readable; system actor is represented truthfully when actor is null/system;
-- status history relation must not create N+1 actor lookups.
+1. admin cleanup of ordinary `draft` still succeeds;
+2. cleanup of `draft` with successful non-refunded payment is denied and the group remains undeleted;
+3. the detail UI does not offer cleanup as available in that blocked state and shows the warning/payment facts;
+4. a group whose payment is already in the existing refunded state is not blocked by the old successful-payment fact alone;
+5. moderation/approved/active cleanup remains denied as before.
 
-Editing:
+### 2. Payment reminder on rejection
 
-- psychologist can edit only `draft` and `revision`;
-- `moderation`, `approved`, `active`, `expired` and `rejected` cannot be edited by psychologist;
-- owner check and status rule must both be enforced server-side/policy/domain, not only by hidden buttons;
-- revision detail makes the latest correction comment prominent using existing Alert/Card patterns, with full history below.
-
-Submitting:
-
-- `draft -> moderation` and `revision -> moderation` only after complete Form Request validation;
-- transition writes actor/history through the existing transition service;
-- repeated/forged submit from another status is rejected and does not create duplicate/invalid history.
-
-Deletion:
-
-- psychologist may soft-delete only own `draft` or `rejected` groups;
-- deny delete when a linked payment is currently `succeeded` (read-only safety check; do not build payment UI);
-- use existing destructive Modal/Confirmation pattern;
-- deleting a group never force-deletes history/payments/applications;
-- another psychologist cannot delete via IDOR.
-
-### 6. Admin group list
-
-Add **Группы** as a real admin navigation section and implement the admin List page.
-
-List requirements:
-
-- all non-deleted groups;
-- eager-load only what the rows need, at minimum owner and relevant dictionaries;
-- pagination;
-- search by internal group ID, group name and psychologist identity (name/email where useful);
-- combinable GET filters for status and free/paid snapshot;
-- sorting whitelist: creation date, publication date, expiry date; explicit asc/desc; safe default to newest created;
-- quick filter for `approved` groups awaiting publication;
-- quick filter for `expired` groups requiring manual removal;
-- normal `draft` filter remains available;
-- do not invent the unresolved “older than N days” abandoned quick-filter threshold;
-- no bank/payment-success filter in this internal no-bank stage;
-- query parameters survive pagination;
-- truthful empty/no-results states;
-- no N+1 regression.
-
-Show at minimum the §22 group facts that are available now: ID, name, psychologist, status, free/paid snapshot, creation/publication/expiry dates and view action.
-
-### 7. Admin group create/view/edit
-
-Create:
-
-- admin can create a Stage 7 draft for an existing active psychologist;
-- owner selection is validated against active non-admin users;
-- no payment is created regardless of selected owner's tariff.
-
-View/detail:
-
-- show psychologist identity, all group fields, status, free/paid snapshot, publication dates, UUID/external ID as appropriate, and full status history;
-- do not expose fake bank details when no payment exists;
-- use centralized status labels/Badge and shared Timeline;
-- show only state-valid moderation/activation/delete actions.
-
-Edit:
-
-- admin may edit group content regardless of status;
-- generic edit cannot directly assign status/system fields;
-- changing content must not silently create history entries or transition status;
-- do not silently change the stored `free` snapshot when psychologist tariff later changes.
-
-### 8. Admin moderation actions
-
-Implement explicit protected actions, each with policy authorization, Form Request validation where input exists, and approved Modal form composition.
-
-**Request revision** (`moderation -> revision`):
-
-- comment required, trimmed, non-empty;
-- set/update `moderator_comment` as the current/latest moderator comment;
-- write the same comment into immutable status history through the transition;
-- never erase previous history comments.
-
-**Reject** (`moderation -> rejected`):
-
-- reason required, trimmed, non-empty;
-- do not invent the unspecified numeric `min:N`;
-- set `rejection_reason`;
-- persist reason in transition history;
-- psychologist detail visibly shows the reason.
-
-**Approve** (`moderation -> approved`):
-
-- no arbitrary status select;
-- transition/history through the existing service.
-
-All invalid transitions, including forged actions against stale/current incompatible states, must be rejected by the domain transition service and leave data consistent.
-
-### 9. Manual activation after external publication
-
-Implement the admin **Отметить активной** action for `approved` groups only.
-
-In one transaction:
-
-1. obtain current `placement_duration_days` through `SettingService` / `SettingKey::PlacementDurationDays`;
-2. require a valid positive configured integer; do not silently hardcode a fallback if configuration is corrupt/missing;
-3. transition `approved -> active` through `GroupStatusTransitionService` with the admin actor;
-4. set `published_at` to current UTC time;
-5. set `placement_days` to the configured value at activation time;
-6. set `expires_at = published_at + placement_days`;
-7. reset `expiry_warning_sent_at=null`;
-8. persist optional trimmed `external_catalog_id` if supplied.
-
-Do not allow browser input to choose publication/expiry timestamps or placement days.
-
-Use time-frozen automated tests to prove exact values and that changing the setting after activation does not rewrite the already stored `placement_days`/dates.
-
-Stage 8, not this task, will automatically transition `active -> expired` and implement free extension.
-
-### 10. Manual admin draft cleanup
-
-Implement a destructive, policy-protected soft-delete action for admin cleanup of `draft` and existing `awaiting_payment` records.
+When a paid group (`group.free=false`) in `moderation` has a successful non-refunded payment, the admin rejection surface must show the `SPEC.md` reminder before rejection.
 
 Requirements:
 
-- confirmation required;
-- no age threshold is invented;
-- do not label every draft as objectively “abandoned” in UI; present manual cleanup truthfully;
-- do not expose generic delete of moderation/approved/active/expired groups in this task;
-- soft delete only; preserve related history/data;
-- test admin can delete a draft and cannot use the cleanup action for an active/moderating group.
+- keep the existing `moderation -> rejected` domain transition unchanged;
+- rejection remains possible; no automatic refund is attempted;
+- the rejection modal/detail visibly warns that a manual refund must be handled separately;
+- show the same safe payment facts defined above;
+- do not render fake bank actions or a refund button;
+- if no such payment exists, do not show fake payment information.
 
-### 11. Group policies and IDOR
+Add a focused rendered-response test for the warning and payment facts.
 
-Add explicit `GroupPolicy` (or equivalent existing Laravel policy pattern) and register it.
+### 3. Preserve soft-deleted owner and history actor identity
 
-At minimum cover:
+Historical/group reads must survive psychologist soft delete without 500s or false attribution.
 
-- psychologist list/create scoped to self;
-- view own group only;
-- edit/update own only in `draft`/`revision`;
-- submit own only in `draft`/`revision`;
-- psychologist delete own only in `draft`/`rejected` plus payment safety invariant;
-- admin list/create/view/edit;
-- admin moderation only on non-deleted psychologist groups and only through valid state actions;
-- admin manual cleanup only for permitted draft states.
+Requirements:
 
-Route middleware remains defense-in-depth; controller actions must explicitly authorize resources/actions.
+- group owner relation used by admin/history surfaces must be able to resolve a soft-deleted psychologist;
+- status-history actor relation must be able to resolve a soft-deleted user actor;
+- admin group list and group detail must render retained owner identity after owner soft delete;
+- Timeline attribution must use `actor_type` truthfully:
+  - `actor_type=system` -> `Система`;
+  - `actor_type=user` with a resolvable soft-deleted user -> that retained user identity;
+  - a user history row must never silently become `Система` only because the related account is no longer active;
+- do not restore or re-enable deleted users and do not weaken authentication eligibility;
+- do not cascade-delete groups/history.
 
-Add IDOR tests for view, edit, update, submit and delete with two psychologists.
+Add regression tests covering at minimum:
 
-### 12. Shared Timeline and group status presentation
+1. create a psychologist/group/history entry with the psychologist as actor, soft-delete the psychologist, then admin list/detail still return 200 and show the retained owner identity;
+2. Timeline still attributes the old transition to the user, not `Система`;
+3. an actual system history row still renders `Система`;
+4. no N+1 regression is introduced in admin list/history reads.
 
-Implement the already-designed Timeline generically before using it in group detail pages.
+### 4. Fix Money Input composite focus
 
-Timeline must follow `DESIGN_SYSTEM.md §4.35` exactly:
+Bring the shared Money Input into exact focus-system conformance.
 
-- 12px marker + 1px connector;
-- 16px marker/content gap;
-- 24px entry spacing except last;
-- approved semantic variants only;
-- title, datetime/actor line and optional comment block;
-- no group-specific visual primitive.
+Requirements:
 
-Add a `/ui-kit` demonstration using the real shared component.
+- keyboard focus on the native money input produces the approved focus edge/halo only on `.ui-money-input` through `:focus-within`;
+- the nested `.ui-money-input__control` must not render its own global `focus-visible` border/ring/shadow;
+- retain keyboard accessibility and visible outer focus;
+- do not restyle size, padding, typography, currency suffix, validation state or any other accepted Money Input behavior;
+- use existing design tokens/rules; do not change `DESIGN_SYSTEM.md` to justify the implementation.
 
-Centralize group status labels using the exact `SPEC.md §12` user-facing wording:
+Update `UiKitPageTest` (or equivalent shared-component coverage) so it proves both the outer focus treatment and suppression of the inner focus ring. Browser verification must include keyboard focus on Money Input at desktop and mobile widths.
 
-- `awaiting_payment` — `Ожидает оплаты` (not reachable from Stage 7 UI);
-- `draft` — `Черновик`;
-- `moderation` — `На модерации`;
-- `revision` — `На доработке`;
-- `rejected` — `Отклонена`;
-- `approved` — `Одобрена, ожидает публикации`;
-- `active` — `Активная`;
-- `expired` — `Закончена`.
+### 5. Make normal local/testing Stage 7 submit actually executable
 
-Use existing Badge semantic variants; do not add colors.
+A developer/product owner must be able to start from the repository's normal local/testing seed and complete `draft -> moderation` without manually inserting dictionary rows.
 
-### 13. Responsive/UI behavior
+Implement the smallest development-only fixture support:
 
-All new pages must compose approved generic components and the List/Form/Detail page patterns from `DESIGN_SYSTEM.md`.
+- add idempotent local/testing-only dictionary item fixtures for the existing `group_format` and `gender` dictionaries;
+- follow the existing `DatabaseSeeder` environment boundary used for development admin/psychologist seeds;
+- fixture codes/labels must be clearly technical/test-only, not plausible production product decisions;
+- production seeding must continue to create no invented format/gender items;
+- do not build Stage 8 dictionary CRUD in this correction;
+- do not change the approved `DictionarySeeder` definitions into product values.
 
-Verify desktop and mobile (~390px):
+Add seed regression coverage proving:
 
-- psychologist group list, real add action and empty state;
-- create/edit form fields, custom selects and Money Input;
-- detail actions remain reachable without hover;
-- revision/rejection feedback is obvious;
-- Timeline is readable;
-- admin list filters/sorting/pagination;
-- moderation and activation modals fit viewport and use the accepted body/footer action pattern;
-- tables use approved responsive horizontal scrolling;
-- no horizontal page overflow outside table scroll containers;
-- mobile Drawer navigation includes real **Группы** section where appropriate;
-- no runtime CDN/build-tool regression.
+1. local/testing normal seed creates at least one usable active item in each required dictionary;
+2. repeated seed is idempotent;
+3. production path does not create the development-only items.
 
-If a required visual pattern is not covered by `DESIGN_SYSTEM.md`/uikit, stop and report the gap rather than inventing a fourth page pattern or new component variant.
+### 6. Make submit failure visible and actionable
 
-### 14. Tests
+Correct the UX for `POST /cabinet/groups/{group}/submit` validation failure.
 
-Add focused Stage 7 feature/domain tests. At minimum prove:
+Requirements:
 
-1. psychologist `free=true` and `free=false` both create direct `draft` groups; stored `group.free` snapshots their respective tariff and no payment row is created;
-2. draft save persists allowed fields and rejects protected-field injection;
-3. moderation submission requires complete valid group data and creates `draft -> moderation` history with actor;
-4. admin revision requires a non-empty comment, transitions through the domain service, updates current comment and preserves history;
-5. psychologist sees revision comment/history, edits, and resubmits `revision -> moderation`;
-6. rejection requires a non-empty reason, writes history and psychologist sees it;
-7. approval is `moderation -> approved` through the domain service;
-8. activation computes UTC `published_at`, frozen `placement_days`, `expires_at`, clears warning timestamp and stores optional external catalog ID atomically;
-9. forged invalid transition is rejected and does not corrupt history/fields;
-10. psychologist edit authorization is limited to `draft`/`revision`;
-11. psychologist delete is limited to own `draft`/`rejected`, is soft delete, and succeeds/denies according to the existing succeeded-payment safety invariant;
-12. second psychologist receives denial on view/edit/update/submit/delete of another owner's group;
-13. admin can create/view/edit groups and manually soft-delete a draft, but cleanup action does not delete moderation/active records;
-14. admin search/status/free filters, defined quick filters, sorting and pagination work and preserve query params;
-15. psychologist/admin group lists have bounded query counts/no N+1;
-16. status history shows all transitions/actors/comments in order;
-17. `awaiting_payment` and payment creation are unreachable from Stage 7 web UI;
-18. existing Stage 4–6 auth/session/admin-psychologist/document tests remain green;
-19. `/ui-kit` remains production-guarded and demonstrates any newly implemented shared Timeline/Money Input components.
+- when submission fails complete-data validation, the returned product surface visibly tells the psychologist that the group was not sent to moderation;
+- show the actual validation messages in a shared approved feedback pattern; do not silently discard `$errors`;
+- preserve field-specific errors for the edit form and existing entered/stored data;
+- provide a truthful Edit action/link when the group is still editable;
+- do not claim success and do not change status/history on validation failure;
+- no new custom page pattern or one-off visual component.
 
-Use temporary dictionary items/factories in automated tests. Do not add invented dictionary values to production seed data.
+Add tests for an incomplete draft submitted from the detail page:
 
-### 15. Documentation and report
+- response returns to a visible error state;
+- status remains `draft`;
+- no status-history row is created;
+- error text is rendered to the user;
+- edit route remains available.
 
-Update only facts made true by Stage 7:
+### 7. Real end-to-end moderation regression
 
-- `docs/architecture.md` — group ownership/policies, domain workflow coordination, activation boundary and no-bank Stage 7 rule;
-- `docs/development.md` — Stage 7 URLs and concise manual verification for psychologist/admin, including temporary dictionary fixture guidance if needed;
-- `docs/project-status.md` — Stage 7 implemented, Stage 8 next, plus the two unresolved numeric thresholds;
-- `.ai/report.md` — exact implementation, changed files, checks/browser flows, facts/unknowns/remaining risks.
+Add/adjust a realistic session-based Stage 7 flow that does not depend on ad-hoc temporary DB setup beyond the normal local/testing seed:
 
-Do not change `SPEC.md`; the roadmap/stage is already approved.
+1. seed normally;
+2. login as the development psychologist through the real login endpoint/session;
+3. create a group;
+4. open edit form and select the local/testing group format/gender fixtures;
+5. fill every required field and save if the existing UX requires it;
+6. submit from the actual UI/action;
+7. assert redirect/success feedback;
+8. assert database status is `moderation`;
+9. assert exactly one `draft -> moderation` history row with the psychologist actor;
+10. reload group detail and verify `На модерации` is visible.
+
+Browser verification must reproduce this flow from a normal seeded development database, not by inserting temporary dictionary values immediately before the test.
+
+### 8. Documentation and report
+
+Update only factual documentation made necessary by the correction:
+
+- document the local/testing-only group dictionary fixtures and that they are not production product values;
+- keep the unresolved production dictionary values explicit;
+- update `.ai/report.md` with the exact fixes, tests and browser flow actually run;
+- do not change `SPEC.md`.
 
 ## Out Of Scope
 
-- Bank/acquirer adapter, redirect, return or webhook.
-- Creating `gp_payments` from any Stage 7 UI/action.
-- Making `awaiting_payment` reachable through Stage 7 product flows.
-- Payment history UI or bank/payment-success filters.
-- Automatic `active -> expired` scheduler behavior.
-- Expiry warning email/job/queue behavior.
-- Free or paid extension.
-- Participant application list/counters/status handling.
-- Public application intake or psychologist questionnaire intake API.
-- `/api/v1`, HMAC, idempotency or external-site integration.
-- Email/password onboarding or SMTP.
-- Dictionary/settings CRUD.
-- Inventing group-format/gender product dictionary values.
-- Inventing the rejection-reason minimum length.
-- Inventing the abandoned-draft age threshold.
-- New schema for groups/history unless a concrete incompatibility with the already-approved Stage 2 schema is proven and reported first.
-- Vue/React/Livewire/Inertia/Tailwind/Vite/npm/Node or runtime CDN dependencies.
-- Unrelated redesign/refactoring of accepted Stage 3–6 UI.
+- Stage 8 dictionary/settings CRUD.
+- Production `group_format` / `gender` values.
+- Payment creation, payment list/admin CRUD, refund mutation, bank adapter, redirect, webhook or transaction reconciliation.
+- Stage 8 expiry/extension lifecycle.
+- Stage 10 participant applications.
+- Stage 11 external API.
+- Stage 12 email/onboarding.
+- New schema/migrations unless a concrete blocker proves they are strictly necessary; current schema already supports these corrections.
+- Changes to group transition matrix.
+- New roles/permissions framework.
+- Redesign of Stage 7 pages or shared components outside the Money Input focus correction and necessary feedback/warning composition.
+- New frontend dependencies, npm/Node/Vite/CDN runtime assets.
+- Resolving the previously unknown rejection minimum length or abandoned-draft age threshold.
 
 ## Constraints
 
-- Follow `WORKFLOW.md`, `AGENTS.md`, current `SPEC.md`, `DESIGN_SYSTEM.md`, and `uikit/index.html`.
-- Work only from current `main` and this task; do not modify `.ai/task.md` during execution.
-- Preserve Stage 4 auth/session/stale-session security and Stage 5/6 access/document behavior.
-- Reuse the existing `GroupStatus`, `GroupStatusTransitionService`, `SettingService`, models, schema and Laravel policy architecture.
-- No controller/form may directly write group status.
-- `accept` remains legacy/non-authoritative and must not become a workflow source of truth.
-- Money remains integer minor units; no floats.
-- Store timestamps in UTC and render through existing Europe/Minsk conventions.
-- Use Form Requests for all mutations/input validation.
-- Use explicit authorization in controller actions in addition to route role middleware.
-- Use only shared design-system components/tokens and approved page compositions.
-- Add shared Timeline/Money Input before product use; do not create page-specific copies.
-- Do not invent missing numeric/product/design values.
-- Do not seed unapproved dictionary items.
-- No new dependency unless a concrete blocker is proven and reported.
+- Follow `WORKFLOW.md`, `AGENTS.md`, current `SPEC.md`, `DESIGN_SYSTEM.md` and `uikit/index.html`.
+- Work from current `main` and this task only; do not modify `.ai/task.md` during implementation.
+- Preserve the accepted Stage 4 auth/session boundary and Stage 5 psychologist/document security.
+- Preserve the Stage 7 `GroupStatusTransitionService` as the only status-transition/history-writing boundary.
+- Do not weaken policies to make tests pass.
+- Payment safety must be server-side and survive stale-model/re-authorization paths.
+- Soft-deleted historical identities are for read/history truth only; do not make deleted psychologists eligible to authenticate.
+- Development dictionary fixtures must stay strictly local/testing-only.
+- Use existing shared Alert/Modal/Description/Money/Timeline/UI primitives; do not invent new visual variants.
+- No secrets, real personal data, persistent browser fixtures or unrelated cleanup.
 
 ## Acceptance Criteria
 
-1. Psychologist can create a draft, save group data, submit to moderation, view all own groups and view group detail.
-2. A `free=false` psychologist follows the same Stage 7 direct-draft path, while the group's `free` snapshot remains `false`; no payment is created and `awaiting_payment` is not used.
-3. Psychologist can edit only own `draft`/`revision` groups and delete only own permitted `draft`/`rejected` groups.
-4. Another psychologist cannot view/edit/update/submit/delete a group by changing IDs.
-5. Admin has real group list/create/view/edit surfaces with search, status/free filters, defined quick filters, sorting and pagination without N+1.
-6. `draft -> moderation`, `revision -> moderation`, `moderation -> revision/rejected/approved`, and `approved -> active` happen only through `GroupStatusTransitionService`.
-7. Revision comment is required, preserved in history and visibly shown to psychologist.
-8. Rejection reason is required/non-empty, preserved in history and visibly shown to psychologist; no arbitrary numeric minimum is invented.
-9. History contains every Stage 7 transition with actor/date/comment and is visible to psychologist/admin through the shared Timeline.
-10. Admin activation uses configured placement duration and atomically sets `published_at`, `placement_days`, `expires_at`, clears warning timestamp and optionally stores `external_catalog_id`.
-11. Admin can manually soft-delete draft cleanup records but cannot use that action as a generic active/moderation delete.
-12. Existing group `public_uuid`, tariff snapshot, history and related rows remain preserved according to soft-delete/domain rules.
-13. Group forms use server-side validation and exact minor-unit money conversion; protected/system fields cannot be mass-assigned from requests.
-14. No Stage 7 web action creates a payment, redirects to a bank or exposes `awaiting_payment` as a selectable/reachable state.
-15. New UI uses approved List/Form/Detail patterns and shared components; Timeline and Money Input are generic and represented on `/ui-kit` before product use.
-16. Desktop/mobile flows are usable, moderation feedback is obvious, modals are compliant and tables do not cause page-level overflow.
-17. Existing Stage 4–6 security/product regressions remain green.
-18. Full MySQL test suite, Pint, Larastan/PHPStan, platform requirements, applicable JS syntax check and `git diff --check` pass.
-19. Final diff contains only Stage 7 group workflow/UI/tests/docs and justified shared UI additions.
-20. The two undefined numeric thresholds remain explicitly documented as unresolved rather than guessed.
+1. Admin cannot cleanup a `draft/awaiting_payment` group with a successful non-refunded payment; the group remains intact.
+2. Admin detail truthfully warns about the blocking payment and shows safe payment facts; after existing refunded state, payment no longer blocks cleanup.
+3. Rejection UI for a paid moderation group with successful non-refunded payment shows the required manual-refund reminder/payment facts, but no refund/bank action is added.
+4. Admin group list/detail remains functional after owner psychologist soft delete and still shows retained owner identity.
+5. Soft-deleted user actors remain correctly attributed in group Timeline; only actual `actor_type=system` entries render as `Система`.
+6. Money Input shows exactly one outer composite focus ring and no nested input ring.
+7. A normal local/testing seed contains clearly test-only selectable `group_format` and `gender` items; production seed does not.
+8. From normal local/testing seed, the real psychologist UI can create, complete and submit a group to `moderation` without manual DB fixture insertion.
+9. Successful submit creates exactly the valid `draft -> moderation` history with the psychologist actor and visible success/status feedback.
+10. Incomplete/invalid submit visibly explains failure, preserves `draft`, writes no history and gives the psychologist an actionable way back to editing.
+11. Existing Stage 7 CRUD, IDOR, edit/delete/status restrictions, activation dates and no-bank behavior remain green.
+12. Existing Stage 4–6 regressions remain green.
+13. No Stage 8+ functionality or new dependency is introduced.
 
 ## Checks
 
 Run and report at minimum:
 
-- focused group status/domain workflow tests, including stale/invalid transition cases;
-- focused psychologist group CRUD/policy/IDOR tests;
-- focused admin group CRUD/list/filter/sort/moderation/activation tests;
-- query-count/N+1 tests for psychologist and admin group lists;
-- payment-absence regression for both free and paid-tariff psychologists;
-- existing `AuthenticationAccessTest`, `StaleAuthenticatedSessionTest`, `UserSessionInvalidatorTest`, Stage 5 admin/document tests and Stage 6 cabinet tests;
-- existing and expanded `UiKitPageTest` for Timeline/Money Input if added;
-- full isolated-MySQL `php artisan test` / project `composer check` gate;
-- Pint and Larastan/PHPStan through the existing project command;
+- focused admin cleanup/payment-guard tests, including successful and refunded cases;
+- focused rejection-payment reminder rendered-response test;
+- focused soft-deleted group owner/history actor tests;
+- focused submit validation and real `draft -> moderation` tests;
+- local/testing seed idempotency + production-exclusion tests for development dictionary fixtures;
+- `UiKitPageTest` / shared Money Input focus regression;
+- existing `PsychologistGroupCrudTest` and `AdminGroupWorkflowTest` in full;
+- Stage 4 auth/stale-session tests;
+- Stage 5 admin psychologist/document tests;
+- Stage 6 psychologist cabinet tests;
+- full isolated-MySQL `composer check` gate;
 - `composer check-platform-reqs`;
-- `node --check public/app.js` only if JS changes and Node is available externally without adding it as a dependency;
-- route inspection for group routes and absence of `/api/v1`/payment routes added by this task;
-- real browser flow at desktop and ~390px using temporary test dictionary fixtures if needed:
-  - psychologist create -> edit/save -> submit;
-  - admin request revision -> psychologist sees feedback -> edit/resubmit;
-  - separate reject fixture with visible reason;
-  - separate approve -> manual activation fixture with dates/external ID;
-  - ownership/available-action checks;
-  - admin search/filter/sort/pagination;
-  - mobile navigation/forms/modals/timeline;
-- browser console/network inspection with no runtime CDN/external requests;
-- cleanup of every temporary browser fixture/artifact;
+- real Chromium desktop and ~390px mobile checks for:
+  - Money Input keyboard focus;
+  - normal-seed psychologist login -> group edit -> submit -> visible `На модерации`;
+  - incomplete submit -> visible validation feedback;
+  - admin blocked-cleanup/payment warning and rejection reminder where a clearly temporary test payment fixture is used;
+  - soft-deleted owner/history rendering without console/runtime errors;
+- no external/CDN requests;
+- clean up every temporary payment/group/history/browser artifact introduced for manual verification;
 - `git diff --check`;
 - final `git status --short`, full diff and staged-file inspection.
-
-Final manual visual/product acceptance remains with the product owner.
 
 ## Hard Workflow Gate
 
 Before implementation:
 
-- read `WORKFLOW.md`, `AGENTS.md`, `.ai/task.md`, current Stage 7 sections of `SPEC.md`, `DESIGN_SYSTEM.md`, current project-status/architecture/development docs;
-- inspect `Group`, `GroupStatus`, `GroupStatusTransitionService`, `GroupStatusHistory`, payment status relation used only for deletion safety, settings service/key/seeder, dictionary definitions, current admin/cabinet layouts/routes and relevant shared UI components;
-- inspect the matching `uikit/index.html` Timeline, Money, Table/List, form and Modal examples;
-- run `git log --oneline -5` and `git status --short`;
-- confirm `TASK-2026-08-19-13` is the current planned task created from `ea2999606c79b861ed6f52b9de99dc6563328613`;
+- confirm `TASK-2026-08-19-14` is the current planned task created from `2cba80312e0118bbf7160f23b2cf241d5b107a32`;
+- read `WORKFLOW.md`, `AGENTS.md`, this task, relevant current group/payment models/policies/requests/views/tests, `DESIGN_SYSTEM.md` and relevant `uikit/index.html` sections;
 - do not touch unknown local changes.
 
 Before commit:
 
 - complete all applicable focused/full/browser checks;
-- update `.ai/report.md` with actual results only, including the unresolved numeric thresholds;
-- update only factual Stage 7 documentation;
+- update `.ai/report.md` with actual results only;
+- update only factual documentation required by this correction;
 - inspect final Git status, full diff and staged files;
 - stage only task-related files;
-- ensure no screenshots, Playwright artifacts, temporary dictionary/group/payment fixtures, uploaded files, logs, caches, secrets or sensitive data are committed.
+- ensure no screenshots, Playwright artifacts, temporary DB fixtures, logs, caches, secrets or sensitive data are committed;
+- commit only after the gate passes with message:
 
-If the gate passes, commit with:
+`codex: TASK-2026-08-19-14 fix Stage 7 acceptance blockers`
 
-`codex: TASK-2026-08-19-13 implement Stage 7 group CRUD and moderation`
-
-If safe completion is impossible because of a real unresolved product/design/security requirement, report `partial`, `blocked`, or `failed` instead of inventing the missing value or weakening existing boundaries.
+If any confirmed blocker cannot be safely closed without a new product decision, report `partial`, `blocked` or `failed` rather than silently weakening the requirement or starting Stage 8.
